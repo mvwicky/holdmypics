@@ -11,6 +11,7 @@ app.url_map.converters["dim"] = DimensionConverter
 
 Dimension = Tuple[int, int]
 
+cache_time = int(24 * 60 * 60)
 fg_color_default = {"fg_color": "aaa"}
 bg_color_default = {"bg_color": "000"}
 fmt_default = {"fmt": "png"}
@@ -36,7 +37,7 @@ def image_response(
         im.getvalue(),
         {
             "Content-Type": f"image/{fmt}",
-            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Cache-Control": f"public, max-age={cache_time}",
         },
     )
 
