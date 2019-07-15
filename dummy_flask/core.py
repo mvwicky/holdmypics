@@ -25,6 +25,7 @@ fg_color_default = {"fg_color": "aaa"}
 bg_color_default = {"bg_color": "000"}
 fmt_default = {"fmt": "png"}
 all_defaults = merge(fg_color_default, bg_color_default, fmt_default)
+img_formats = ",".join(["jpg", "jpeg", "gif", "png", "webp"])
 
 
 def image_response(
@@ -52,16 +53,14 @@ def image_response(
 
 
 def make_rules():
+    fmt_rule = f"<any({img_formats}):fmt>"
     colors_default = merge(bg_color_default, fg_color_default)
     rule_parts = [
         ("<any(jpg,jpeg,gif,png):fmt>", colors_default),
         ("<string:bg_color>", merge(fg_color_default, fmt_default)),
         ("<string:bg_color>/<string:fg_color>", fmt_default),
-        ("<string:bg_color>/<any(jpg,jpeg,gif,png):fmt>", fg_color_default),
-        (
-            "<string:bg_color>/<string:fg_color>/<any(jpg,jpeg,gif,png):fmt>",
-            None,
-        ),
+        (f"<string:bg_color>/{fmt_rule}", fg_color_default),
+        (f"<string:bg_color>/<string:fg_color>/{fmt_rule}", None),
     ]
     return rule_parts
 
