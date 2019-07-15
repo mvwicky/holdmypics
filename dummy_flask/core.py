@@ -1,13 +1,22 @@
 from typing import Text, Tuple, Optional
 
+from environs import Env
 from flask import Flask, request, Markup
+from flask_redis import FlaskRedis
 from funcy import merge
 
 from .converters import DimensionConverter
 from .utils import make_image
 
+env = Env()
+env.read_env()
+
+REDIS_URL = env("REDIS_URL")
+
 app = Flask(__name__)
 app.url_map.converters["dim"] = DimensionConverter
+app.config["REDIS_URL"] = REDIS_URL
+redis_client = FlaskRedis(app)
 
 Dimension = Tuple[int, int]
 
@@ -75,6 +84,7 @@ def make_route():
 
 @make_route()
 def image_route(size, bg_color, fg_color, fmt):
+    redis_client.incr("image_count")
     text = request.args.get("text", None)
     filename = request.args.get("filename")
     return image_response(
@@ -85,7 +95,11 @@ def image_route(size, bg_color, fg_color, fmt):
 @app.route("/")
 def index():
     rule_parts = make_rules()
+    count = redis_client.get("image_count")
+
+    hdr = "<h1>{0}</h1>".format(count.decode())
     s = "<br>".join(
         [Markup.escape("api/<dim:size>/" + e[0] + "/") for e in rule_parts]
     )
-    return s
+
+    return hdr + "<br>" + s
