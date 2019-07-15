@@ -1,6 +1,6 @@
 from typing import Text, Tuple, Optional
 
-from flask import Flask, request
+from flask import Flask, request, Markup
 from funcy import merge
 
 from .converters import DimensionConverter
@@ -41,13 +41,7 @@ def image_response(
     )
 
 
-def make_route():
-    parts = [
-        ("<dim:size>", merge(bg_color_default, fg_color_default, fmt_default)),
-        ("<string:bg_color>", merge(fg_color_default, fmt_default)),
-        ("<string:fg_color>", fmt_default),
-        ("<any(jpg,jpeg,gif,png):fmt>", None),
-    ]
+def make_rules():
     colors_default = merge(bg_color_default, fg_color_default)
     rule_parts = [
         ("<any(jpg,jpeg,gif,png):fmt>", colors_default),
@@ -59,11 +53,12 @@ def make_route():
             None,
         ),
     ]
+    return rule_parts
+
+
+def make_route():
+    rule_parts = make_rules()
     rules = list()
-    # for i in range(len(parts) + 1):
-    #     defaults = parts[i - 1][1]
-    #     rule = "/api/" + "/".join(p[0] for p in parts[:i]) + "/"
-    #     rules.append((rule, defaults))
 
     for part, defaults in rule_parts:
         rule = "/api/<dim:size>/" + part + "/"
@@ -84,3 +79,12 @@ def image_route(size, bg_color, fg_color, fmt):
     return image_response(
         size, bg_color, fg_color, fmt, text=text, filename=filename
     )
+
+
+@app.route("/")
+def index():
+    rule_parts = make_rules()
+    s = "<br>".join(
+        [Markup.escape("api/<dim:size>/" + e[0] + "/") for e in rule_parts]
+    )
+    return s
