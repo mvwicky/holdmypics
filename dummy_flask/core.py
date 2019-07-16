@@ -1,7 +1,7 @@
 from typing import Text, Tuple, Optional
 
 from environs import Env
-from flask import Flask, request, Markup
+from flask import Flask, request, Markup, render_template
 from flask_redis import FlaskRedis
 from funcy import merge
 
@@ -104,9 +104,12 @@ def index():
     rule_parts = make_rules()
     count = redis_client.get("image_count")
 
-    hdr = "<h1>{0}</h1>".format(count.decode())
-    s = "<br>".join(
-        [Markup.escape("api/<dim:size>/" + e[0] + "/") for e in rule_parts]
-    )
+    rules = [
+        e[0].replace("string:", "").replace("any", "") for e in rule_parts
+    ]
 
-    return hdr + "<br>" + s
+    kw = {
+        "rules": ["api/<size>/" + r + "/" for r in rules],
+        "count": count.decode(),
+    }
+    return render_template("base.jinja", **kw)
