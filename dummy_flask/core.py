@@ -1,7 +1,8 @@
-from typing import Text, Tuple, Optional
+import time
+from typing import Optional, Text, Tuple
 
 from environs import Env
-from flask import Flask, request, Markup, render_template
+from flask import Flask, render_template, request
 from flask_redis import FlaskRedis
 from funcy import merge
 
@@ -26,6 +27,16 @@ bg_color_default = {"bg_color": "000"}
 fmt_default = {"fmt": "png"}
 all_defaults = merge(fg_color_default, bg_color_default, fmt_default)
 img_formats = ",".join(["jpg", "jpeg", "gif", "png", "webp"])
+
+
+@app.before_request
+def before_request_cb():
+    request.start_time = time.monotonic()
+
+
+@app.after_request
+def after_request_db(res):
+    res.header["X-Processed-Time"] = time.monotonic() - request.start_time
 
 
 def image_response(
