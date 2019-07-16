@@ -29,7 +29,7 @@
       font-size: 1rem;
     }
     img {
-
+      margin: 0.5rem auto 1.5rem;
     }
   </style>
 </head>
@@ -37,13 +37,17 @@
   <div class="content">
     <h1>Images Created: {{ count }}</h1>
 
+    <img src="/api/766x388/cef/555/webp/?text=webp" alt="Example image.">
+    <code>/api/766x388/cef/555/webp/?text=webp</code>
+
+    <br><br>
+
     <h3>Routes:</h3>
     {% for rule in rules %}
     <code>{{ rule|e }}</code>
     <br><br>
     {% endfor %}
 
-    <img src="/api/766x388/cef/555/webp/?text=Hello" alt="">
   </div>
 
 </body>
