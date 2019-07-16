@@ -37,6 +37,7 @@ def before_request_cb():
 @app.after_request
 def after_request_db(res):
     res.headers["X-Processed-Time"] = time.monotonic() - request.start_time
+    return res
 
 
 def image_response(
