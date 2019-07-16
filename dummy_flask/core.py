@@ -35,8 +35,9 @@ def image_response(
     fmt: Text = "png",
     text: Optional[Text] = None,
     filename: Optional[Text] = None,
+    font_name: Optional[Text] = None,
 ):
-    im = make_image(size, bg_color, fg_color, fmt, text)
+    im = make_image(size, bg_color, fg_color, fmt, text, font_name)
     if filename is None:
         filename = "img-{0}-{1}.{2}".format(
             "x".join(map(str, size)), bg_color.replace("#", ""), fmt
@@ -86,8 +87,15 @@ def image_route(size, bg_color, fg_color, fmt):
     redis_client.incr("image_count")
     text = request.args.get("text", None)
     filename = request.args.get("filename")
+    font_name = request.args.get("font")
     return image_response(
-        size, bg_color, fg_color, fmt, text=text, filename=filename
+        size,
+        bg_color,
+        fg_color,
+        fmt,
+        text=text,
+        filename=filename,
+        font_name=font_name,
     )
 
 
