@@ -59,8 +59,8 @@ def image_route(size, bg_color, fg_color, fmt):
     redis_client.incr("image_count")
     cache_time = config_value("MAX_AGE", 0)
     text = request.args.get("text", None)
-    filename = request.args.get("filename")
-    font_name = request.args.get("font")
+    filename = request.args.get("filename", None)
+    font_name = request.args.get("font", "overpass")
     path = image_response(
         size,
         bg_color,
@@ -70,4 +70,14 @@ def image_route(size, bg_color, fg_color, fmt):
         filename=filename,
         font_name=font_name,
     )
-    return send_file(path, cache_timeout=cache_time)
+    if filename is not None:
+        if not filename.endswith("." + fmt):
+            filename = ".".join([filename, fmt])
+        return send_file(
+            path,
+            cache_timeout=cache_time,
+            as_attachment=True,
+            attachment_filename=filename,
+        )
+    else:
+        return send_file(path, cache_timeout=cache_time)

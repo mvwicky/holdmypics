@@ -95,8 +95,12 @@ img {
 footer {
   border: 1px solid #e9ecef;
   margin: 1em 0 0.2em;
-  padding: 1em;
+  padding: 2em;
   text-align: center;
+}
+
+footer span {
+  font-size: 70%;
 }
 
 footer h6 {

@@ -90,8 +90,15 @@
     </div>
   </main>
   <footer>
+    <h6>Licenses</h6>
+    <span>Fira Mono, Fira Sans, Overpass, and Spectral are licensed under the <a href="{{ url_for('static', filename='licenses/ofl.txt') }}">Open Font License</a>.</span>
+    <br>
+    <span>Roboto is licensed under the <a href="{{ url_for('static', filename='licenses/apache.txt') }}">Apache License</a>.</span>
+    <br><br>
     <h6>Powered by <a href="https://palletsprojects.com/p/flask/">Flask</a></h6>
     <h6>And <a href="https://heroku.com">Heroku</a></h6>
+    <br>
+    <h6>Created by Michael Van Wickle</h6>
   </footer>
   <script src="{{ url_for('static', filename=main_js) }}"></script>
 </body>

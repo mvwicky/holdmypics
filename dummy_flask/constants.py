@@ -14,12 +14,14 @@ img_formats_str = ",".join(img_formats)
 
 HERE = Path(os.path.dirname(os.path.abspath(__file__)))
 font_dir = HERE / "fonts"
-font_files = {
-    "overpass": font_dir / "overpass.ttf",
-    "fira-sans": font_dir / "fira-sans.ttf",
-    "roboto": font_dir / "roboto.ttf",
-    "spectral": font_dir / "spectral.ttf",
-}
+font_files = {f.stem: f for f in font_dir.glob("*.ttf")}
+print(font_files)
+# font_files = {
+#     "overpass": font_dir / "overpass.ttf",
+#     "fira-sans": font_dir / "fira-sans.ttf",
+#     "roboto": font_dir / "roboto.ttf",
+#     "spectral": font_dir / "spectral.ttf",
+# }
 font_sizes = list(range(4, 289, 4))
 fonts = {
     name: {sz: ImageFont.truetype(str(file), size=sz) for sz in font_sizes}
