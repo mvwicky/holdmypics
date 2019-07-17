@@ -41,9 +41,7 @@ def create_app(config_class=Config):
             name = request.path.split("/")[-1]
             parts = name.split(".")
             if len(parts) == 3:
-                first, last = parts[0], parts[2]
-                if first == "styles" and last == "css":
-                    res.headers["Cache-Control"] = CACHE_CONTROL_MAX
+                res.headers["Cache-Control"] = CACHE_CONTROL_MAX
 
         res.headers["X-Processed-Time"] = time.monotonic() - request.start_time
 

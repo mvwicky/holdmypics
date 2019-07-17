@@ -1,8 +1,8 @@
 import os
 from pathlib import Path
 
-from PIL import ImageFont
 from funcy import merge
+from PIL import ImageFont
 
 cache_time = int(24 * 60 * 60)
 fg_color_default = {"fg_color": "aaa"}

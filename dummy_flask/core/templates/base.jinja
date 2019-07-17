@@ -2,19 +2,62 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <link href="https://unpkg.com/sanitize.css" rel="stylesheet"/>
-  <link href="https://unpkg.com/sanitize.css/typography.css" rel="stylesheet"/>
-  {# <link href="https://unpkg.com/sanitize.css/page.css" rel="stylesheet" /> #}
+  <script crossorigin="anonymous" src="https://polyfill.io/v3/polyfill.min.js?flags=gated&features=default"></script>
+  <link href="https://unpkg.com/sanitize.css" rel="stylesheet" />
+  <link href="https://unpkg.com/sanitize.css/typography.css" rel="stylesheet" />
+  <link href="https://unpkg.com/sanitize.css/forms.css" rel="stylesheet" />
+  <script src="https://unpkg.com/feather-icons"></script>
+  <link href="{{ url_for('static', filename=styles) }}" rel="stylesheet" />
+
   <title>Image Stats</title>
 
-  <link href="{{ url_for('static', filename=styles) }}" rel="stylesheet" />
+
 </head>
 <body>
   <div class="content">
-    <h1>Images Created: {{ count }}</h1>
+    <h1>Placeholder Image Generator</h1>
 
-    <img src="/api/766x388/cef/555/webp/?text=webp" alt="Example image.">
-    <code>/api/766x388/cef/555/webp/?text=webp</code>
+    <p>
+      Ever needed to create some placeholder images?
+    </p>
+
+    <h2>Images Created: {{ count }}</h2>
+
+    <div class="image-container">
+      <img id="example-image" src="{{ img_url }}?text={{ img_query }}" alt="Example image.">
+      <code id="endpoint">{{ img_url }}?text={{ img_query }}</code>
+      <i
+        id="copy-button"
+        data-feather="copy"
+        title="Copy to clipboard."
+      ></i>
+    </div>
+
+
+    <form id="params-form" action="">
+      <label for="width">Width</label>
+      <input id="width" type="number" min="1" step="1" value="{{ width }}">
+
+      <label for="height">Height</label>
+      <input id="height" type="number" min="1" step="1" value="{{ height }}">
+
+      <label for="bg">Background Color</label>
+      <input id="bg" type="text" value="{{ bg_color }}" pattern="([a-fA-F0-9]{3})|([a-fA-F0-9]{6})">
+
+      <label for="fg">Text Color</label>
+      <input id="fg" type="text" value="{{ fg_color }}">
+
+      <label for="fmt">Format</label>
+      <select name="fmt" id="fmt">
+        <option selected value="webp">webp</option>
+        <option value="png">png</option>
+        <option value="jpg">jpg</option>
+      </select>
+
+      <label for="imageText">Text</label>
+      <input id="imageText" type="text" value="{{ text }}" maxlength="30">
+    </form>
+
 
     <br><br>
 
@@ -25,6 +68,6 @@
     {% endfor %}
 
   </div>
-
+  <script src="{{ url_for('static', filename=main_js) }}"></script>
 </body>
 </html>
