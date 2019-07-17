@@ -1,0 +1,13 @@
+[flake8]
+ignore = D1
+import-order-style = pep8
+exclude =
+    .git
+    node_modules
+    migrations
+    *.pyi,
+    __pycache__
+application-import-names =
+    config
+max-complexity = 10
+enable-extensions = E704

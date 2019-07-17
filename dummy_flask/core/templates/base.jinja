@@ -7,31 +7,7 @@
   {# <link href="https://unpkg.com/sanitize.css/page.css" rel="stylesheet" /> #}
   <title>Image Stats</title>
 
-  <style>
-    html {
-      padding: 1em;
-    }
-    @media (min-width: 34em) {
-      html {
-        padding: 1em calc(45% - 16em);
-      }
-    }
-
-    .content {
-      width: 100%;
-      /* margin-left: auto; */
-      /* margin-right: auto; */
-    }
-    .content h1 {
-      margin-bottom: 3rem;
-    }
-    code {
-      font-size: 1rem;
-    }
-    img {
-      margin: 0.5rem auto 1.5rem;
-    }
-  </style>
+  <link href="{{ url_for('static', filename=styles) }}" rel="stylesheet" />
 </head>
 <body>
   <div class="content">
