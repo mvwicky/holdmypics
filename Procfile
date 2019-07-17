@@ -1,1 +1,1 @@
-web: gunicorn dummy_flask:app --config python:gunicorn_config
+web: gunicorn wsgi:application --config python:gunicorn_config
