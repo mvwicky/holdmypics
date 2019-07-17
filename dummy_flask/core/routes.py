@@ -1,10 +1,11 @@
-from urllib.parse import quote_plus
+from urllib.parse import urlencode
 
 from flask import render_template, url_for
 
 from .. import redis_client
 from ..hashed_file import HashedFile
 from ..utils import make_rules
+from ..constants import FONT_NAMES
 from . import bp
 
 style_file = HashedFile("styles.css", strip_newlines=False)
@@ -20,7 +21,7 @@ def index():
         e[0].replace("string:", "").replace("any", "") for e in rule_parts
     ]
 
-    width, height = 766, 388
+    width, height = 638, 328
     bg_color, fg_color = "cef", "555"
     fmt = "webp"
     text = "Something Funny"
@@ -31,7 +32,8 @@ def index():
         fg_color=fg_color,
         fmt=fmt,
     )
-    img_query = quote_plus(text)
+    img_query = urlencode({"text": text, "font": "overpass"})
+    font_names = [(n, n.replace("-", " ").title()) for n in sorted(FONT_NAMES)]
     kw = {
         "rules": ["api/<size>/" + r + "/" for r in rules],
         "count": count.decode(),
@@ -45,5 +47,6 @@ def index():
         "fg_color": fg_color,
         "fmt": fmt,
         "text": text,
+        "font_names": font_names,
     }
     return render_template("base.jinja", **kw)

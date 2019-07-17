@@ -3,12 +3,19 @@ html {
 }
 @media (min-width: 34em) {
   html {
-    padding: 1em calc(45% - 16em);
+    padding: 1em calc(45% - 17em);
   }
 }
 
 .content {
-  width: 100%;
+  border: 1px solid #e9ecef;
+  padding: 0 1em;
+}
+
+@media (max-width: 992px) {
+  .content {
+    padding: 0 0.2em;
+  }
 }
 
 .content h1 {
@@ -36,7 +43,6 @@ html {
 }
 
 #params-form {
-  width: 100%;
   border: 1px solid #e9ecef;
   padding: 1rem;
   display: grid;
@@ -48,6 +54,14 @@ code {
   font-size: 1rem;
 }
 
+@media (max-width: 1200px) {
+  code {
+    font-size: calc(0.5rem + 0.7vw);
+  }
+}
+
 img {
   margin: 0.5rem auto 1.5rem;
+  max-width: 100%;
+  height: auto;
 }

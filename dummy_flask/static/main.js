@@ -13,13 +13,16 @@
     main();
   }
 
-  function makeEndpoint({ width, height, bg, fg, fmt, imageText }) {
+  function makeEndpoint({ width, height, bg, fg, fmt, imageText, font }) {
     const path = `/api/${width}x${height}/${bg}/${fg}/${fmt}/`;
     const url = new URL(window.location.href);
     url.pathname = path;
     url.search = "";
     if (imageText) {
       url.searchParams.append("text", imageText);
+    }
+    if (font) {
+      url.searchParams.append("font", font);
     }
     return url;
   }

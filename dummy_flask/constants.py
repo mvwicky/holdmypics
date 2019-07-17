@@ -15,7 +15,9 @@ HERE = Path(os.path.dirname(os.path.abspath(__file__)))
 font_dir = HERE / "fonts"
 font_files = {
     "overpass": font_dir / "overpass.ttf",
-    "fira": font_dir / "fira-sans.ttf",
+    "fira-sans": font_dir / "fira-sans.ttf",
+    "roboto": font_dir / "roboto.ttf",
+    "spectral": font_dir / "spectral.ttf",
 }
 font_sizes = list(range(4, 289, 4))
 fonts = {

@@ -25,8 +25,8 @@
     <h2>Images Created: {{ count }}</h2>
 
     <div class="image-container">
-      <img id="example-image" src="{{ img_url }}?text={{ img_query }}" alt="Example image.">
-      <code id="endpoint">{{ img_url }}?text={{ img_query }}</code>
+      <img id="example-image" src="{{ img_url }}?{{ img_query }}" alt="Example image.">
+      <code id="endpoint">{{ img_url }}?{{ img_query }}</code>
       <i
         id="copy-button"
         data-feather="copy"
@@ -53,6 +53,17 @@
         <option selected value="webp">webp</option>
         <option value="png">png</option>
         <option value="jpg">jpg</option>
+      </select>
+
+      <label for="font">Font</label>
+      <select name="font" id="font">
+        {% for value, name in font_names %}
+        {% if value == "overpass" %}
+        <option selected value="{{ value }}">{{ name }}</option>
+        {% else %}
+        <option value="{{ value }}">{{ name }}</option>
+        {% endif %}
+        {% endfor %}
       </select>
 
       <label for="imageText">Text</label>
