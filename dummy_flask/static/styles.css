@@ -46,8 +46,24 @@ html {
   border: 1px solid #e9ecef;
   padding: 1rem;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 2fr;
   gap: 1.1em 0;
+  justify-items: stretch;
+}
+
+input {
+  width: 100%;
+  border-radius: 3px;
+
+  --validity-color: rgb(204, 204, 204);
+  --validity-shadow: none;
+  border: 1px solid var(--validity-color);
+  box-shadow: var(--validity-shadow);
+}
+
+input:invalid {
+  --validity-color: rgba(240, 0, 0, 0.8);
+  --validity-shadow: 0 0 5px 1px var(--validity-color);
 }
 
 code {
@@ -64,4 +80,25 @@ img {
   margin: 0.5rem auto 1.5rem;
   max-width: 100%;
   height: auto;
+}
+
+.help-text {
+  grid-column-start: 2;
+  margin-top: -1em;
+  color: gray;
+}
+
+#routes {
+  padding-bottom: 1em;
+}
+
+footer {
+  border: 1px solid #e9ecef;
+  margin: 1em 0 0.2em;
+  padding: 1em;
+  text-align: center;
+}
+
+footer h6 {
+  margin: 0.5rem;
 }

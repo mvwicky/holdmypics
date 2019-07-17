@@ -43,6 +43,7 @@ def create_app(config_class=Config):
             if len(parts) == 3:
                 res.headers["Cache-Control"] = CACHE_CONTROL_MAX
 
+        res.headers["X-Powered-By"] = "Flask"
         res.headers["X-Processed-Time"] = time.monotonic() - request.start_time
 
         return res

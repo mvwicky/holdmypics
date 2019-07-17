@@ -1,16 +1,16 @@
 import functools
 from typing import Optional, Text
 
-from flask import current_app, request
+from flask import request, send_file
 
 from .. import redis_client
 from .._types import Dimension
-from ..utils import make_rules
+from ..utils import make_rules, config_value
 from . import bp
 from .utils import make_image
 
 
-@functools.lru_cache()
+@functools.lru_cache(maxsize=1)
 def image_response(
     size: Dimension,
     bg_color: Text,
@@ -20,7 +20,7 @@ def image_response(
     filename: Optional[Text] = None,
     font_name: Optional[Text] = None,
 ):
-    cache_time = current_app.config.get("MAX_AGE", 0)
+
     im = make_image(size, bg_color, fg_color, fmt, text, font_name)
     if filename is None:
         filename = "img-{0}-{1}.{2}".format(
@@ -28,13 +28,14 @@ def image_response(
         )
     if not filename.endswith("." + fmt):
         filename = ".".join([filename, fmt])
-    return (
-        im.getvalue(),
-        {
-            "Content-Type": f"image/{fmt}",
-            "Cache-Control": f"public, max-age={cache_time}",
-        },
-    )
+    return im
+    # return (
+    #     im.getvalue(),
+    #     {
+    #         "Content-Type": f"image/{fmt}",
+    #         "Cache-Control": f"public, max-age={cache_time}",
+    #     },
+    # )
 
 
 def make_route():
@@ -56,10 +57,11 @@ def make_route():
 @make_route()
 def image_route(size, bg_color, fg_color, fmt):
     redis_client.incr("image_count")
+    cache_time = config_value("MAX_AGE", 0)
     text = request.args.get("text", None)
     filename = request.args.get("filename")
     font_name = request.args.get("font")
-    return image_response(
+    path = image_response(
         size,
         bg_color,
         fg_color,
@@ -68,3 +70,4 @@ def image_route(size, bg_color, fg_color, fmt):
         filename=filename,
         font_name=font_name,
     )
+    return send_file(path, cache_timeout=cache_time)

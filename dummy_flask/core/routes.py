@@ -5,7 +5,7 @@ from flask import render_template, url_for
 from .. import redis_client
 from ..hashed_file import HashedFile
 from ..utils import make_rules
-from ..constants import FONT_NAMES
+from ..constants import FONT_NAMES, img_formats
 from . import bp
 
 style_file = HashedFile("styles.css", strip_newlines=False)
@@ -25,6 +25,7 @@ def index():
     bg_color, fg_color = "cef", "555"
     fmt = "webp"
     text = "Something Funny"
+    font = "overpass"
     img_url = url_for(
         "api.image_route",
         size=(width, height),
@@ -32,7 +33,8 @@ def index():
         fg_color=fg_color,
         fmt=fmt,
     )
-    img_query = urlencode({"text": text, "font": "overpass"})
+    color_pattern = r"([a-fA-F0-9]{3})|([a-fA-F0-9]{6})"
+    img_query = urlencode({"text": text, "font": font})
     font_names = [(n, n.replace("-", " ").title()) for n in sorted(FONT_NAMES)]
     kw = {
         "rules": ["api/<size>/" + r + "/" for r in rules],
@@ -48,5 +50,8 @@ def index():
         "fmt": fmt,
         "text": text,
         "font_names": font_names,
+        "img_formats": img_formats,
+        "font": font,
+        "color_pattern": color_pattern,
     }
     return render_template("base.jinja", **kw)

@@ -58,6 +58,14 @@
     const copyButton = doc.getElementById("copy-button");
     const form = doc.querySelector("form");
 
+    const required = [exampleImage, endpoint, copyButton, form];
+    for (let i = 0; i < required.length; i++) {
+      if (required[i] === null) {
+        console.error(`A required element was not found. (${i})`);
+        return;
+      }
+    }
+
     const initialParams = gatherParams(form);
     const url = makeEndpoint(initialParams);
     copyButton.dataset.url = url.href;
@@ -74,6 +82,21 @@
       });
     }
 
+    // const textInput = doc.getElementById("imageText");
+    // textInput.addEventListener(
+    //   "input",
+    //   debounce(() => {
+    //     const params = gatherParams(form);
+    //     params.width = initialParams.width;
+    //     params.height = initialParams.height;
+    //     if (params !== null) {
+    //       const url = makeEndpoint(params);
+    //       console.log(url.href);
+    //       exampleImage.src = url.href;
+    //     }
+    //   }, 250)
+    // );
+
     const elements = form.elements;
     for (let i = 0; i < elements.length; i++) {
       function inputCallback() {
@@ -82,18 +105,27 @@
           const url = makeEndpoint(params);
           endpoint.textContent = `${url.pathname}${url.search}`;
           copyButton.dataset.url = url.href;
+          if (!["width", "height"].includes(elements[i].id)) {
+            exampleImage.src = url.href;
+          }
         }
       }
       elements[i].addEventListener("input", debounce(inputCallback, 1000));
     }
   }
+
   function gatherParams(f) {
     const elems = f.elements;
     const params = {};
     for (let j = 0; j < elems.length; j++) {
       const id = elems[j].id;
       if (elems[j].checkValidity()) {
-        params[id] = elems[j].value;
+        const value = elems[j].value;
+        if (value) {
+          params[id] = value.trim();
+        } else {
+          params[id] = value;
+        }
       } else {
         return null;
       }

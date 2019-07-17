@@ -14,7 +14,7 @@
 
 </head>
 <body>
-  <div class="content">
+  <main class="content">
     <h1>Placeholder Image Generator</h1>
 
     <p>
@@ -43,22 +43,30 @@
       <input id="height" type="number" min="1" step="1" value="{{ height }}">
 
       <label for="bg">Background Color</label>
-      <input id="bg" type="text" value="{{ bg_color }}" pattern="([a-fA-F0-9]{3})|([a-fA-F0-9]{6})">
+      <input id="bg" type="text" value="{{ bg_color }}" pattern="{{ color_pattern }}">
+      <small class="help-text">Three or six hex digits.</small>
 
       <label for="fg">Text Color</label>
-      <input id="fg" type="text" value="{{ fg_color }}">
+      <input id="fg" type="text" value="{{ fg_color }}" pattern="{{ color_pattern }}">
+      <small class="help-text">Three or six hex digits.</small>
+
 
       <label for="fmt">Format</label>
       <select name="fmt" id="fmt">
-        <option selected value="webp">webp</option>
-        <option value="png">png</option>
-        <option value="jpg">jpg</option>
+        {% for value in img_formats %}
+        {% if value == fmt %}
+        <option selected value="{{ value }}">{{ value }}</option>
+        {% else %}
+        <option value="{{ value }}">{{ value }}</option>
+        {% endif %}
+        {% endfor %}
       </select>
+      <small class="help-text">&lsquo;jpg&rsquo; and &lsquo;jpeg&rsquo; are equivalent.</small>
 
       <label for="font">Font</label>
       <select name="font" id="font">
         {% for value, name in font_names %}
-        {% if value == "overpass" %}
+        {% if value == font %}
         <option selected value="{{ value }}">{{ name }}</option>
         {% else %}
         <option value="{{ value }}">{{ name }}</option>
@@ -73,13 +81,18 @@
 
     <br><br>
 
-    <h3>Routes:</h3>
-    {% for rule in rules %}
-    <code>{{ rule|e }}</code>
-    <br><br>
-    {% endfor %}
-
-  </div>
+    <div id="routes">
+      <h3>Routes:</h3>
+      {% for rule in rules %}
+      <code>{{ rule|e }}</code>
+      <br><br>
+      {% endfor %}
+    </div>
+  </main>
+  <footer>
+    <h6>Powered by <a href="https://palletsprojects.com/p/flask/">Flask</a></h6>
+    <h6>And <a href="https://heroku.com">Heroku</a></h6>
+  </footer>
   <script src="{{ url_for('static', filename=main_js) }}"></script>
 </body>
 </html>

@@ -7,6 +7,8 @@ pytest-report/
 .tup/
 .anaconda
 
+dummy_flask/api/images/
+
 tokei-stats.json
 tokei-stats.yaml
 

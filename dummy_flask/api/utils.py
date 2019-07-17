@@ -1,11 +1,13 @@
 import io
+import os
 from string import hexdigits
 from typing import Optional, Text
 
 from PIL import Image, ImageDraw
 
 from .._types import Dimension
-from ..constants import fonts, font_sizes, MAX_SIZE, MIN_SIZE, FONT_NAMES
+from ..constants import FONT_NAMES, MAX_SIZE, MIN_SIZE, font_sizes, fonts
+from .files import files
 
 
 def px_to_pt(px: float) -> float:
@@ -51,7 +53,6 @@ def draw_text(im: Image.Image, color: Text, text: Text, font_name: Text):
     txt = Image.new("RGBA", im.size, (255, 255, 255, 0))
     d = ImageDraw.Draw(txt)
     font, tsize = get_font(d, (int(w * 0.9), h), text, font_name)
-    print(font.size)
     yc = int((h - tsize[1]) / 2)
     xc = int((w - tsize[0]) / 2)
     d.text((xc, yc), text, font=font, fill=color)
@@ -70,9 +71,21 @@ def make_image(
     if font_name not in FONT_NAMES:
         font_name = "overpass"
     fmt = "jpeg" if fmt == "jpg" else fmt
-    mode = "RGB" if fmt == "jpeg" else "RGBA"
+    mode = "RGBA"
     bg_color = get_color(bg_color)
     fg_color = get_color(fg_color)
+    path = files.get_file_name(size, bg_color, fg_color, fmt, text, font_name)
+    if os.path.isfile(path):
+        return path
+    else:
+        im = Image.new(mode, size, bg_color)
+        if text is not None:
+            im = draw_text(im, fg_color, text, font_name)
+        if fmt == "jpeg":
+            print("Converting to RGB")
+            im = im.convert("RGB")
+        im.save(path)
+        return path
     im = Image.new(mode, size, bg_color)
     if text is not None:
         im = draw_text(im, fg_color, text, font_name)

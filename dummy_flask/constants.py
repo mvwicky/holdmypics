@@ -9,7 +9,8 @@ fg_color_default = {"fg_color": "aaa"}
 bg_color_default = {"bg_color": "000"}
 fmt_default = {"fmt": "png"}
 all_defaults = merge(fg_color_default, bg_color_default, fmt_default)
-img_formats = ",".join(["jpg", "jpeg", "gif", "png", "webp"])
+img_formats = ["jpg", "jpeg", "gif", "png", "webp"]
+img_formats_str = ",".join(img_formats)
 
 HERE = Path(os.path.dirname(os.path.abspath(__file__)))
 font_dir = HERE / "fonts"
