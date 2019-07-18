@@ -70,14 +70,12 @@ def image_route(size, bg_color, fg_color, fmt):
         filename=filename,
         font_name=font_name,
     )
+    kw = {"cache_timeout": cache_time}
+
     if filename is not None:
         if not filename.endswith("." + fmt):
             filename = ".".join([filename, fmt])
-        return send_file(
-            path,
-            cache_timeout=cache_time,
-            as_attachment=True,
-            attachment_filename=filename,
-        )
-    else:
-        return send_file(path, cache_timeout=cache_time)
+        kw.update({"as_attachment": False, "attachment_filename": None})
+    res = send_file(path, **kw)
+    res.headers["Access-Control-Allow-Origin"] = "*"
+    return res
