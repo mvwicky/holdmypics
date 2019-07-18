@@ -46,6 +46,8 @@ def make_route():
         rule = "/<dim:size>/" + part + "/"
         rules.append((rule, defaults))
 
+    rules = [rules.pop()]
+
     def func(f):
         for rule, defaults in rules:
             bp.add_url_rule(rule, None, f, defaults=defaults)
