@@ -60,7 +60,6 @@ class GeneratedFiles(object):
         files = filter(os.path.isfile, files)
 
         files = sorted(files, key=os.path.getmtime)
-        print(files)
 
 
 files = GeneratedFiles()

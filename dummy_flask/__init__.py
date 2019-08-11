@@ -33,7 +33,7 @@ def create_app(config_class=Config):
         request.start_time = time.monotonic()
 
     @app.after_request
-    def after_request_db(res):
+    def after_request_cb(res):
         endpoint = request.endpoint
         if endpoint == "core.index":
             res.headers["Cache-Control"] = "max-age=0, no-store"
