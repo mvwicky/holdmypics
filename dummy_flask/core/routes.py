@@ -3,13 +3,9 @@ from urllib.parse import urlencode
 from flask import render_template, url_for
 
 from .. import redis_client
-from ..hashed_file import HashedFile
 from ..utils import make_rules
 from ..constants import FONT_NAMES, img_formats
 from . import bp
-
-style_file = HashedFile("styles.css", strip_newlines=False)
-main_js = HashedFile("main.js", strip_newlines=False)
 
 
 @bp.route("/")
@@ -39,8 +35,6 @@ def index():
     kw = {
         "rules": ["api/<size>/" + r + "/" for r in rules],
         "count": count.decode(),
-        "styles": style_file.file_name,
-        "main_js": main_js.file_name,
         "img_url": img_url,
         "img_query": img_query,
         "width": width,

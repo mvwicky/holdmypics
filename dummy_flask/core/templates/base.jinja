@@ -7,10 +7,9 @@
   <link href="https://unpkg.com/sanitize.css/typography.css" rel="stylesheet" />
   <link href="https://unpkg.com/sanitize.css/forms.css" rel="stylesheet" />
   <script src="https://unpkg.com/feather-icons"></script>
-  <link href="{{ url_for('static', filename=styles) }}" rel="stylesheet" />
+  {% include "css.html" %}
 
   <title>Image Stats</title>
-
 
 </head>
 <body>
@@ -27,11 +26,12 @@
     <div class="image-container">
       <img id="example-image" src="{{ img_url }}?{{ img_query }}" alt="Example image.">
       <code id="endpoint">{{ img_url }}?{{ img_query }}</code>
-      <i
-        id="copy-button"
-        data-feather="copy"
-        title="Copy to clipboard."
-      ></i>
+      <button id="copy-button" data-clipboard-text="{{ img_url }}?{{ img_query }}">
+        <i
+          data-feather="copy"
+          title="Copy to clipboard."
+        ></i>
+      </button>
     </div>
 
 
@@ -100,6 +100,7 @@
     <br>
     <h6>Created by Michael Van Wickle</h6>
   </footer>
-  <script src="{{ url_for('static', filename=main_js) }}"></script>
+  {# <script src="{{ url_for('static', filename=main_js) }}"></script> #}
+  {% include "js.html" %}
 </body>
 </html>

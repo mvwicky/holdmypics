@@ -4,6 +4,8 @@
 
 "use strict";
 
+import ClipboardJS from "clipboard";
+
 (function(global, doc) {
   if (doc.readyState === "loading") {
     doc.addEventListener("DOMContentLoaded", () => {
@@ -58,6 +60,8 @@
     const copyButton = doc.getElementById("copy-button");
     const form = doc.querySelector("form");
 
+    new ClipboardJS("#copy-button");
+
     const required = [exampleImage, endpoint, copyButton, form];
     for (let i = 0; i < required.length; i++) {
       if (required[i] === null) {
@@ -68,34 +72,19 @@
 
     const initialParams = gatherParams(form);
     const url = makeEndpoint(initialParams);
-    copyButton.dataset.url = url.href;
-    if ("clipboard" in navigator) {
-      copyButton.addEventListener("click", () => {
-        navigator.clipboard.writeText(copyButton.dataset.url).then(
-          () => {
-            console.log("Wrote text");
-          },
-          () => {
-            console.log("Failed to write text.");
-          }
-        );
-      });
-    }
-
-    // const textInput = doc.getElementById("imageText");
-    // textInput.addEventListener(
-    //   "input",
-    //   debounce(() => {
-    //     const params = gatherParams(form);
-    //     params.width = initialParams.width;
-    //     params.height = initialParams.height;
-    //     if (params !== null) {
-    //       const url = makeEndpoint(params);
-    //       console.log(url.href);
-    //       exampleImage.src = url.href;
-    //     }
-    //   }, 250)
-    // );
+    copyButton.dataset.clipboardText = url.href;
+    // if ("clipboard" in navigator) {
+    //   copyButton.addEventListener("click", () => {
+    //     navigator.clipboard.writeText(copyButton.dataset.url).then(
+    //       () => {
+    //         console.log("Wrote text");
+    //       },
+    //       () => {
+    //         console.log("Failed to write text.");
+    //       }
+    //     );
+    //   });
+    // }
 
     const elements = form.elements;
     for (let i = 0; i < elements.length; i++) {
@@ -104,7 +93,7 @@
         if (params !== null) {
           const url = makeEndpoint(params);
           endpoint.textContent = `${url.pathname}${url.search}`;
-          copyButton.dataset.url = url.href;
+          copyButton.dataset.clipboardText = url.href;
           if (!["width", "height"].includes(elements[i].id)) {
             exampleImage.src = url.href;
           }
