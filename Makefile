@@ -26,6 +26,8 @@ COPY_ALL=$(COPY_HTML) && $(COPY_JS) && $(COPY_MAP) && $(COPY_CSS)
 prod: clean
 prod: export NODE_ENV=production
 prod:
+	mkdir $(TEMPLATES_DIR)
+	mkdir $(STATIC_DIR)
 	$(PARCEL) $(PARCEL_OPTS)
 	$(COPY_ALL)
 
