@@ -1,16 +1,11 @@
-/*global
-  browser, feather
-*/
-
 "use strict";
 
 import ClipboardJS from "clipboard";
+import feather from "feather-icons";
 
 (function(global, doc) {
   if (doc.readyState === "loading") {
-    doc.addEventListener("DOMContentLoaded", () => {
-      main();
-    });
+    doc.addEventListener("DOMContentLoaded", main);
   } else {
     main();
   }
@@ -73,33 +68,25 @@ import ClipboardJS from "clipboard";
     const initialParams = gatherParams(form);
     const url = makeEndpoint(initialParams);
     copyButton.dataset.clipboardText = url.href;
-    // if ("clipboard" in navigator) {
-    //   copyButton.addEventListener("click", () => {
-    //     navigator.clipboard.writeText(copyButton.dataset.url).then(
-    //       () => {
-    //         console.log("Wrote text");
-    //       },
-    //       () => {
-    //         console.log("Failed to write text.");
-    //       }
-    //     );
-    //   });
-    // }
 
     const elements = form.elements;
-    for (let i = 0; i < elements.length; i++) {
-      function inputCallback() {
-        const params = gatherParams(form);
-        if (params !== null) {
-          const url = makeEndpoint(params);
-          endpoint.textContent = `${url.pathname}${url.search}`;
-          copyButton.dataset.clipboardText = url.href;
-          if (!["width", "height"].includes(elements[i].id)) {
-            exampleImage.src = url.href;
-          }
+    function inputCallback(i) {
+      const params = gatherParams(form);
+      if (params !== null) {
+        const url = makeEndpoint(params);
+        endpoint.textContent = `${url.pathname}${url.search}`;
+        copyButton.dataset.clipboardText = url.href;
+        if (!["width", "height"].includes(elements[i].id)) {
+          exampleImage.src = url.href;
         }
       }
-      elements[i].addEventListener("input", debounce(inputCallback, 1000));
+    }
+
+    for (let i = 0; i < elements.length; i++) {
+      elements[i].addEventListener(
+        "input",
+        debounce(inputCallback.bind(undefined, i), 1000)
+      );
     }
   }
 

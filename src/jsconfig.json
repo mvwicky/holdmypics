@@ -1,0 +1,7 @@
+{
+  "files": ["main.js"],
+  "exclude": ["node_modules"],
+  "compilerOptions": {
+    "target": "esnext"
+  }
+}
