@@ -19,9 +19,10 @@ def image_response(
     text: Optional[Text] = None,
     filename: Optional[Text] = None,
     font_name: Optional[Text] = None,
+    dpi: int = 72,
 ):
 
-    im = make_image(size, bg_color, fg_color, fmt, text, font_name)
+    im = make_image(size, bg_color, fg_color, fmt, text, font_name, dpi)
     if filename is None:
         filename = "img-{0}-{1}.{2}".format(
             "x".join(map(str, size)), bg_color.replace("#", ""), fmt
@@ -29,18 +30,11 @@ def image_response(
     if not filename.endswith("." + fmt):
         filename = ".".join([filename, fmt])
     return im
-    # return (
-    #     im.getvalue(),
-    #     {
-    #         "Content-Type": f"image/{fmt}",
-    #         "Cache-Control": f"public, max-age={cache_time}",
-    #     },
-    # )
 
 
 def make_route():
     rule_parts = make_rules()
-    rules = list()
+    rules = []
 
     for part, defaults in rule_parts:
         rule = "/<dim:size>/" + part + "/"
@@ -63,6 +57,8 @@ def image_route(size, bg_color, fg_color, fmt):
     text = request.args.get("text", None)
     filename = request.args.get("filename", None)
     font_name = request.args.get("font", "overpass")
+    dpi = request.args.get("dpi", 72, type=int)
+
     path = image_response(
         size,
         bg_color,
@@ -71,6 +67,7 @@ def image_route(size, bg_color, fg_color, fmt):
         text=text,
         filename=filename,
         font_name=font_name,
+        dpi=dpi,
     )
     kw = {"cache_timeout": cache_time}
 

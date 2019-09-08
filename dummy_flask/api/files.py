@@ -1,6 +1,6 @@
 import hashlib
 import os
-from typing import Text
+from typing import Text, Optional
 
 from funcy import ignore
 
@@ -13,24 +13,22 @@ ignore_file = ignore(FileNotFoundError, default=None)
 
 
 class GeneratedFiles(object):
-    __slots__ = ("files",)
+    __slots__ = ("files", "_max_files")
 
     hash_function = hashlib.md5
     extensions = ["png", "webp", "jpg", "jpeg"]
 
     def __init__(self):
-        self.files = list()
+        self.files = []
+        self._max_files: Optional[int] = None
 
-    def params_hash(
-        self,
-        size: Dimension,
-        bg: Text,
-        fg: Text,
-        fmt: Text,
-        text: Text,
-        font_name: Text,
-    ):
-        params = [size, bg, fg, fmt, text, font_name]
+    @property
+    def max_files(self):
+        if self._max_files is None:
+            self._max_files = config_value("SAVED_IMAGES_MAX_NUM", 1)
+        return self._max_files
+
+    def params_hash(self, *params):
         hasher = self.hash_function()
         for param in params:
             hasher.update(repr(param).encode("utf-8"))
@@ -44,11 +42,13 @@ class GeneratedFiles(object):
         fmt: Text,
         text: Text,
         font_name: Text,
+        dpi: int,
     ):
-        name = self.params_hash(size, bg, fg, fmt, text, font_name) + "." + fmt
+        phash = self.params_hash(size, bg, fg, fmt, text, font_name, dpi)
+        name = phash + "." + fmt
         path = os.path.join(bp.images_folder, name)
         self.files.append(path)
-        if len(self.files) >= config_value("SAVED_IMAGES_MAX_NUM", 1):
+        if len(self.files) >= self.max_files:
             self.clean()
         return path
 

@@ -1,4 +1,3 @@
-import io
 import os
 from string import hexdigits
 from typing import Optional, Text
@@ -67,6 +66,7 @@ def make_image(
     fmt: Text = "png",
     text: Optional[Text] = None,
     font_name: Optional[Text] = None,
+    dpi: int = 72,
 ):
     if font_name not in FONT_NAMES:
         font_name = "overpass"
@@ -74,24 +74,26 @@ def make_image(
     mode = "RGBA"
     bg_color = get_color(bg_color)
     fg_color = get_color(fg_color)
-    path = files.get_file_name(size, bg_color, fg_color, fmt, text, font_name)
+    path = files.get_file_name(
+        size, bg_color, fg_color, fmt, text, font_name, dpi
+    )
     if os.path.isfile(path):
         return path
     else:
+        save_kw = {}
+        if fmt in {"jpeg", "png"}:
+            save_kw.update({"optimize": True, "dpi": (dpi, dpi)})
+        elif fmt == "webp":
+            save_kw.update({"quality": 100, "method": 6})
+        elif fmt == "gif":
+            save_kw.update({"optimize": True})
         im = Image.new(mode, size, bg_color)
         if text is not None:
             im = draw_text(im, fg_color, text, font_name)
         if fmt == "jpeg":
-            print("Converting to RGB")
             im = im.convert("RGB")
-        im.save(path)
+        im.save(path, **save_kw)
         return path
-    im = Image.new(mode, size, bg_color)
-    if text is not None:
-        im = draw_text(im, fg_color, text, font_name)
-    fp = io.BytesIO()
-    im.save(fp, format=fmt)
-    return fp
 
 
 def get_color(color: Text):

@@ -16,8 +16,6 @@ def create_app(config_class=Config):
     app.config.from_object(config_class)
     app.url_map.converters["dim"] = DimensionConverter
 
-    print(app.static_folder)
-
     redis_client.init_app(app)
 
     from .core import bp as core_bp
