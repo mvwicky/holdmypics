@@ -4,14 +4,14 @@ from flask import render_template, url_for
 
 from .. import redis_client
 from ..utils import make_rules
-from ..constants import FONT_NAMES, img_formats
+from ..constants import FONT_NAMES, img_formats, COUNT_KEY
 from . import bp
 
 
 @bp.route("/")
 def index():
     rule_parts = make_rules()
-    count = redis_client.get("image_count")
+    count = redis_client.get(COUNT_KEY)
 
     rules = [
         e[0].replace("string:", "").replace("any", "") for e in rule_parts

@@ -5,7 +5,8 @@ from flask import request, send_file
 
 from .. import redis_client
 from .._types import Dimension
-from ..utils import make_rules, config_value
+from ..constants import COUNT_KEY
+from ..utils import config_value, make_rules
 from . import bp
 from .utils import make_image
 
@@ -52,7 +53,7 @@ def make_route():
 
 @make_route()
 def image_route(size, bg_color, fg_color, fmt):
-    redis_client.incr("image_count")
+    redis_client.incr(COUNT_KEY)
     cache_time = config_value("MAX_AGE", 0)
     text = request.args.get("text", None)
     filename = request.args.get("filename", None)
@@ -76,7 +77,6 @@ def image_route(size, bg_color, fg_color, fmt):
             filename = ".".join([filename, fmt])
         kw.update({"as_attachment": False, "attachment_filename": None})
     res = send_file(path, **kw)
-    res.headers["Access-Control-Allow-Origin"] = request.headers.get(
-        "Origin", "*"
-    )
+    allow_origins = request.headers.get("Origin", "*")
+    res.headers["Access-Control-Allow-Origin"] = allow_origins
     return res

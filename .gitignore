@@ -8,6 +8,8 @@ pytest-report/
 .anaconda
 
 dummy_flask/api/images/
+dummy_flask/templates/css.html
+dummy_flask/templates/js.html
 
 tokei-stats.json
 tokei-stats.yaml

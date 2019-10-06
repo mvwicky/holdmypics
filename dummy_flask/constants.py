@@ -24,3 +24,5 @@ fonts = {
 FONT_NAMES = set(list(font_files.keys()))
 MAX_SIZE = max(font_sizes)
 MIN_SIZE = min(font_sizes)
+
+COUNT_KEY = "image_count"

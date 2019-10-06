@@ -9,7 +9,7 @@ python = "^3.7"
 flask = "^1.1"
 funcy = "^1.12"
 gunicorn = { version = "^19.9", extras = ["gevent"] }
-environs = "^5.1"
+environs = "^6.0"
 flask-redis = "^0.4.0"
 Pillow = "^6.1.0"
 
