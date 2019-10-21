@@ -9,9 +9,7 @@ html {
   border: 1px solid #e9ecef;
   padding: 0 1em;
   @media (max-width: 992px) {
-    .content {
-      padding: 0 0.2em;
-    }
+    padding: 0 0.2em;
   }
 }
 
@@ -58,19 +56,15 @@ input {
   --validity-shadow: none;
   border: 1px solid var(--validity-color);
   box-shadow: var(--validity-shadow);
-}
-
-input:invalid {
-  --validity-color: rgba(240, 0, 0, 0.8);
-  --validity-shadow: 0 0 5px 1px var(--validity-color);
+  &:invalid {
+    --validity-color: rgba(240, 0, 0, 0.8);
+    --validity-shadow: 0 0 5px 1px var(--validity-color);
+  }
 }
 
 code {
   font-size: 1rem;
-}
-
-@media (max-width: 1200px) {
-  code {
+  @media (max-width: 1200px) {
     font-size: calc(0.5rem + 0.7vw);
   }
 }
@@ -84,7 +78,7 @@ img {
 .help-text {
   grid-column-start: 2;
   margin-top: -1em;
-  color: gray;
+  color: #000000;
 }
 
 #routes {
@@ -96,12 +90,10 @@ footer {
   margin: 1em 0 0.2em;
   padding: 2em;
   text-align: center;
-}
-
-footer span {
-  font-size: 70%;
-}
-
-footer h6 {
-  margin: 0.5rem;
+  span {
+    font-size: 70%;
+  }
+  h6 {
+    margin: 0.5rem;
+  }
 }
