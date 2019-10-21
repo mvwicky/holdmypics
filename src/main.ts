@@ -1,3 +1,7 @@
+import "../node_modules/sanitize.css/sanitize.css";
+import "../node_modules/sanitize.css/typography.css";
+import "../node_modules/sanitize.css/forms.css";
+
 import ClipboardJS from "clipboard";
 import feather from "feather-icons";
 
