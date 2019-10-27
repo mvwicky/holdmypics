@@ -70,7 +70,8 @@ def image_route(size, bg_color, fg_color, fmt):
         font_name=font_name,
         dpi=dpi,
     )
-    kw = {"cache_timeout": cache_time}
+    mime_fmt = "jpeg" if fmt == "jpg" else fmt
+    kw = {"cache_timeout": cache_time, "mimetype": f"image/{mime_fmt}"}
 
     if filename is not None:
         if not filename.endswith("." + fmt):
