@@ -1,8 +1,8 @@
+import "../node_modules/balloon-css/src/balloon.scss";
 import "../node_modules/sanitize.css/sanitize.css";
 import "../node_modules/sanitize.css/typography.css";
 import "../node_modules/sanitize.css/forms.css";
 
-import ClipboardJS from "clipboard";
 import feather from "feather-icons";
 
 function truthy<T>(input: T | null | undefined): input is T {
@@ -116,7 +116,29 @@ function isEndpointArgs(input: {
       return;
     }
 
-    new ClipboardJS(copyButton);
+    const copyIconEl = copyButton.querySelector<HTMLElement>(".feather-copy");
+    const checkIconEl = copyButton.querySelector<HTMLElement>(".feather-check");
+
+    // const copy = new ClipboardJS(copyButton);
+    if (truthy(copyIconEl) && truthy(checkIconEl)) {
+      const copyIcon = copyIconEl;
+      const checkIcon = checkIconEl;
+      import("clipboard").then(({ default: Clipboard }) => {
+        const copy = new Clipboard(copyButton);
+        copy.on("success", () => {
+          copyIcon.style.display = "none";
+          checkIcon.style.display = "inline-flex";
+          copyButton.dataset.balloonPos = "up";
+          copyButton.dataset.balloonVisible = "";
+          window.setTimeout(() => {
+            checkIcon.style.display = "none";
+            copyIcon.style.display = "inline-flex";
+            delete copyButton.dataset.balloonPos;
+            delete copyButton.dataset.balloonVisible;
+          }, 2000);
+        });
+      });
+    }
 
     const initialParams = gatherParams(form);
     if (truthy(initialParams) && isEndpointArgs(initialParams)) {

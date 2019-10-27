@@ -27,16 +27,26 @@ html {
   text-decoration: underline;
 }
 
-.feather-copy {
+.feather-copy,
+.feather-check {
   width: 1em;
   height: 1em;
   display: inline-flex;
   align-self: center;
-  top: 0.13em;
+  bottom: 0.1em;
   cursor: pointer;
   position: relative;
-  vertical-align: baseline;
-  margin-left: 0.33em;
+  vertical-align: middle;
+  margin-left: 0.1em;
+}
+
+#copy-button {
+  &:hover {
+    background-color: dodgerblue;
+    .feather-copy {
+      stroke: white;
+    }
+  }
 }
 
 #params-form {

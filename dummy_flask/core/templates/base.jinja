@@ -27,11 +27,16 @@
     <div class="image-container">
       <img id="example-image" src="{{ img_url }}?{{ img_query }}" alt="Example image.">
       <code id="endpoint">{{ img_url }}?{{ img_query }}</code>
-      <button id="copy-button" data-clipboard-text="{{ img_url }}?{{ img_query }}">
+      <button
+        id="copy-button"
+        data-clipboard-text="{{ img_url }}?{{ img_query }}"
+        aria-label="Copied to clipboard!"
+      >
         <i
           data-feather="copy"
           title="Copy to clipboard."
         ></i>
+        <i data-feather="check" title="Copied" style="display: none;"></i>
       </button>
     </div>
 

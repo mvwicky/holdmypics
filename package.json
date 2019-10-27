@@ -29,6 +29,7 @@
     "build": "./build.sh"
   },
   "dependencies": {
+    "balloon-css": "^1.0.3",
     "clipboard": "^2.0.4",
     "feather-icons": "^4.24.0",
     "sanitize.css": "^11.0.0"
