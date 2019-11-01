@@ -155,7 +155,7 @@ function isEndpointArgs(input: {
       if (truthy(params) && isEndpointArgs(params)) {
         const url = makeEndpoint(params);
         if (truthy(endpoint)) {
-          endpoint.textContent = url.href;
+          endpoint.textContent = url.pathname + url.search;
         }
         if (truthy(copyButton)) {
           copyButton.dataset.clipboardText = url.href;

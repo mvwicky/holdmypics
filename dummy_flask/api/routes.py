@@ -78,6 +78,6 @@ def image_route(size, bg_color, fg_color, fmt):
             filename = ".".join([filename, fmt])
         kw.update({"as_attachment": False, "attachment_filename": None})
     res = send_file(path, **kw)
-    allow_origins = request.headers.get("Origin", "*")
-    res.headers["Access-Control-Allow-Origin"] = allow_origins
+    # allow_origins = request.headers.get("Origin", "*")
+    # res.headers["Access-Control-Allow-Origin"] = allow_origins
     return res

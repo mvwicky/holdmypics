@@ -88,6 +88,18 @@ dotenv = ["python-dotenv"]
 
 [[package]]
 category = "main"
+description = "A Flask extension adding a decorator for CORS support"
+name = "flask-cors"
+optional = false
+python-versions = "*"
+version = "3.0.8"
+
+[package.dependencies]
+Flask = ">=0.9"
+Six = "*"
+
+[[package]]
+category = "main"
 description = "A nice way to use Redis in your Flask app"
 name = "flask-redis"
 optional = false
@@ -347,7 +359,7 @@ version = "3.3.11"
 hiredis = ["hiredis (>=0.1.3)"]
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Python 2 and 3 compatibility utilities"
 name = "six"
 optional = false
@@ -400,7 +412,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pathlib2", "contextlib2", "unittest2"]
 
 [metadata]
-content-hash = "694d8065d9b6caa5023ca6de1b4c758cca3522599157dfc4f571d6627ecad0eb"
+content-hash = "6cc90cf8b0ab8059bc478b8c5b9ae98be3913bd821db69d28b471a8b21c8642d"
 python-versions = "^3.7"
 
 [metadata.files]
@@ -459,6 +471,10 @@ environs = [
 flask = [
     {file = "Flask-1.1.1-py2.py3-none-any.whl", hash = "sha256:45eb5a6fd193d6cf7e0cf5d8a5b31f83d5faae0293695626f539a823e93b13f6"},
     {file = "Flask-1.1.1.tar.gz", hash = "sha256:13f9f196f330c7c2c5d7a5cf91af894110ca0215ac051b5844701f2bfd934d52"},
+]
+flask-cors = [
+    {file = "Flask-Cors-3.0.8.tar.gz", hash = "sha256:72170423eb4612f0847318afff8c247b38bd516b7737adfc10d1c2cdbb382d16"},
+    {file = "Flask_Cors-3.0.8-py2.py3-none-any.whl", hash = "sha256:f4d97201660e6bbcff2d89d082b5b6d31abee04b1b3003ee073a6fd25ad1d69a"},
 ]
 flask-redis = [
     {file = "flask-redis-0.4.0.tar.gz", hash = "sha256:e1fccc11e7ea35c2a4d68c0b9aa58226a098e45e834d615c7b6c4928b01ddd6c"},

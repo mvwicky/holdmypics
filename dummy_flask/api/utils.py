@@ -100,6 +100,6 @@ def get_color(color: Text):
     if color.startswith("#"):
         return color
     color_len = len(color)
-    if color_len in {3, 6} and all([e in hexdigits for e in color]):
+    if color_len in {3, 6} and all(e in hexdigits for e in color):
         return "#" + color
     return color

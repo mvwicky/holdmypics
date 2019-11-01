@@ -45,10 +45,10 @@ class GeneratedFiles(object):
         dpi: int,
     ):
         phash = self.params_hash(size, bg, fg, fmt, text, font_name, dpi)
-        name = phash + "." + fmt
+        name = ".".join([phash, fmt])
         path = os.path.join(bp.images_folder, name)
         self.files.append(path)
-        if len(self.files) >= self.max_files:
+        if len(self.files) > self.max_files:
             self.clean()
         return path
 
@@ -57,9 +57,12 @@ class GeneratedFiles(object):
             os.path.join(bp.images_folder, f)
             for f in os.listdir(bp.images_folder)
         ]
-        files = filter(os.path.isfile, files)
-
-        files = sorted(files, key=os.path.getmtime)
+        files = sorted(filter(os.path.isfile, files), key=os.path.getmtime)
+        num_deleted = 0
+        if len(files) > self.max_files:
+            to_delete = files[: self.max_files]
+            num_deleted = len([os.unlink(f) for f in to_delete])
+        return num_deleted
 
 
 files = GeneratedFiles()
