@@ -163,8 +163,7 @@ pillow==6.2.1 \
     --hash=sha256:5a47d2123a9ec86660fe0e8d0ebf0aa6bc6a17edc63f338b73ea20ba11713f12 \
     --hash=sha256:c7be4b8a09852291c3c48d3c25d1b876d2494a0a674980089ac9d5e0d78bd132 \
     --hash=sha256:bf4e972a88f8841d8fdc6db1a75e0f8d763e66e3754b03006cbc3854d89f1cb1
-pycparser==2.19; sys_platform == "win32" and platform_python_implementation ==
-"CPython" \
+pycparser==2.19; sys_platform == "win32" and platform_python_implementation == "CPython" \
     --hash=sha256:a988718abfad80b6b157acce7bf130a30876d27603738ac39f140993246b25b3
 python-dotenv==0.10.3 \
     --hash=sha256:f157d71d5fec9d4bd5f51c82746b6344dffa680ee85217c123f4a0c8117c4544 \
