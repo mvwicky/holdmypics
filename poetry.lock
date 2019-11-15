@@ -359,7 +359,7 @@ description = "pytest: simple powerful testing with Python"
 name = "pytest"
 optional = false
 python-versions = ">=3.5"
-version = "5.2.2"
+version = "5.2.3"
 
 [package.dependencies]
 atomicwrites = ">=1.0"
@@ -523,7 +523,7 @@ python-versions = ">=2.6, !=3.0.*, !=3.1.*"
 version = "1.13.0"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Python Library for Tom's Obvious, Minimal Language"
 name = "toml"
 optional = false
@@ -581,7 +581,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pathlib2", "contextlib2", "unittest2"]
 
 [metadata]
-content-hash = "6a93a175154ad50f99cd752fa7a28132c2904ec81c6577547e9c209218e0e2b5"
+content-hash = "a666da6ddf3e47f0e7b42956e2064d4f9b2594e3c23b07481b7eaaa54b1b78c2"
 python-versions = "^3.7"
 
 [metadata.files]
@@ -860,8 +860,8 @@ pyparsing = [
     {file = "pyparsing-2.4.5.tar.gz", hash = "sha256:4ca62001be367f01bd3e92ecbb79070272a9d4964dce6a48a82ff0b8bc7e683a"},
 ]
 pytest = [
-    {file = "pytest-5.2.2-py3-none-any.whl", hash = "sha256:58cee9e09242937e136dbb3dab466116ba20d6b7828c7620f23947f37eb4dae4"},
-    {file = "pytest-5.2.2.tar.gz", hash = "sha256:27abc3fef618a01bebb1f0d6d303d2816a99aa87a5968ebc32fe971be91eb1e6"},
+    {file = "pytest-5.2.3-py3-none-any.whl", hash = "sha256:b6cf7ad9064049ee486586b3a0ddd70dc5136c40e1147e7d286efd77ba66c5eb"},
+    {file = "pytest-5.2.3.tar.gz", hash = "sha256:15837d2880cb94821087bc07476892ea740696b20e90288fd6c19e44b435abdb"},
 ]
 pytest-base-url = [
     {file = "pytest-base-url-1.4.1.tar.gz", hash = "sha256:7425e8163345494ac7f544e99c6f3e5a08f4228bee5e26013b98c462a4d31f6e"},

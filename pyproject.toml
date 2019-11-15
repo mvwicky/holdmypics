@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dummy-flask"
-version = "0.3.1"
+version = "0.4.0"
 description = ""
 authors = ["Michael Van Wickle <mvanwickle@gmail.com>"]
 
@@ -15,6 +15,7 @@ funcy = "^1.12"
 gunicorn = { version = "^20.0", extras = ["gevent"] }
 humanize = "^0.5.1"
 Pillow = "^6.1.0"
+toml = "^0.10.0"
 
 [tool.poetry.dev-dependencies]
 isort = "^4.3"
@@ -22,7 +23,6 @@ pytest = "^5.0"
 pytest-cov = "^2.8.1"
 pytest-html = "^2.0.0"
 pytest-selenium = "^1.17.0"
-toml = "^0.10.0"
 
 [tool.isort]
 known_first_party=["config", "dummy_flask"]
