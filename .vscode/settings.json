@@ -1,5 +1,5 @@
 {
-  "python.pythonPath": "/Users/michael/.pyenv/versions/dummy-flask-3.7.3/bin/python",
+  "python.pythonPath": "/Users/michael/.pyenv/versions/dummy-flask-3.7.5/bin/python",
   "files.exclude": {
     "**/.git": true,
     "**/.svn": true,
@@ -11,6 +11,7 @@
     "**/dist": true,
     "dummy_flask/api/images": true,
     ".cache": true,
-    "*.sublime*": true
+    "*.sublime*": true,
+    "*.egg-info": true
   }
 }

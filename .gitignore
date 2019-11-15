@@ -6,6 +6,7 @@ pytest-report/
 .staticfiles
 .tup/
 .anaconda
+.cov
 
 dummy_flask/api/images/
 dummy_flask/templates/css.html

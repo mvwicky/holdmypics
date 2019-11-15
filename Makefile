@@ -15,29 +15,29 @@ PARCEL_URL=--public-url $(PUBLIC_URL)
 PARCEL_OPTS=$(PARCEL_INPUT) $(PARCEL_URL) $(PARCEL_OUTPUT)
 DEV_OPTS=--no-minify
 
-COPY_HTML=$(COPY) $(OUTPUT_DIR)/*.html $(TEMPLATES_DIR)
-COPY_CSS=$(COPY) $(OUTPUT_DIR)/*.css $(STATIC_DIR)
-COPY_JS=$(COPY) $(OUTPUT_DIR)/*.js $(STATIC_DIR)
-COPY_MAP=$(COPY) $(OUTPUT_DIR)/*.map $(STATIC_DIR)
-
-COPY_ALL=$(COPY_HTML) && $(COPY_JS) && $(COPY_MAP) && $(COPY_CSS)
-
 .PHONY: prod
-prod: clean
 prod: export NODE_ENV=production
-prod:
-	-mkdir $(TEMPLATES_DIR)
-	-mkdir $(STATIC_DIR)
-	$(PARCEL) $(PARCEL_OPTS)
-	$(COPY_ALL)
+prod: clean build copy
 
 .PHONY: dev
-dev: clean
 dev: export NODE_ENV=development
-dev:
-	$(PARCEL) $(PARCEL_OPTS) $(DEV_OPTS)
-	$(COPY_ALL)
+dev: PARCEL_OPTS := $(PARCEL_OPTS) $(DEV_OPTS)
+dev: clean build copy
 
+build:
+	$(PARCEL) $(PARCEL_OPTS)
+
+copy: $(STATIC_DIR) $(TEMPLATES_DIR)
+	$(COPY) $(OUTPUT_DIR)/*.html $(TEMPLATES_DIR)
+	$(COPY) $(OUTPUT_DIR)/*.css $(STATIC_DIR)
+	$(COPY) $(OUTPUT_DIR)/*.js $(STATIC_DIR)
+	$(COPY) $(OUTPUT_DIR)/*.map $(STATIC_DIR)
+
+$(STATIC_DIR):
+	mkdir $(STATIC_DIR)
+
+$(TEMPLATES_DIR):
+	mkdir $(TEMPLATES_DIR)
 
 .PHONY: clean
 clean:
@@ -46,6 +46,5 @@ clean:
 
 .PHONY: full_clean
 full_clean: clean
-full_clean:
 	-rm -rf .cache
 

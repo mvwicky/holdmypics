@@ -1,0 +1,18 @@
+[run]
+branch = True
+data_file = .cov/.coverage
+[report]
+precision = 2
+sort = Cover
+skip_covered = False
+exclude_lines =
+    # Standard pragma
+    pragma: no cover
+    # Don't care about covering these
+    def __repr__
+    # Don't care about debug only code
+    if settings.DEBUG
+    # type: ignore
+[html]
+title = Dummy Flask Coverage Report
+directory = .cov/htmlcov

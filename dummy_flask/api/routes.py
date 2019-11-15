@@ -11,7 +11,7 @@ from . import bp
 from .utils import make_image
 
 
-@functools.lru_cache(maxsize=1)
+@functools.lru_cache()
 def image_response(
     size: Dimension,
     bg_color: Text,
@@ -22,7 +22,6 @@ def image_response(
     font_name: Optional[Text] = None,
     dpi: int = 72,
 ):
-
     im = make_image(size, bg_color, fg_color, fmt, text, font_name, dpi)
     if filename is None:
         filename = "img-{0}-{1}.{2}".format(
@@ -33,7 +32,7 @@ def image_response(
     return im
 
 
-def make_route():
+def make_route(prefix=""):
     rule_parts = make_rules()
     rules = []
 
@@ -45,7 +44,7 @@ def make_route():
 
     def func(f):
         for rule, defaults in rules:
-            bp.add_url_rule(rule, None, f, defaults=defaults)
+            bp.add_url_rule(prefix + rule, None, f, defaults=defaults)
         return f
 
     return func
@@ -81,3 +80,13 @@ def image_route(size, bg_color, fg_color, fmt):
     # allow_origins = request.headers.get("Origin", "*")
     # res.headers["Access-Control-Allow-Origin"] = allow_origins
     return res
+
+
+@make_route(prefix="anim")
+def anim_route(size, bg_color, fg_color, fmt):
+    return "ANIM"
+
+
+@bp.route("/text")
+def text_route():
+    return "TEXT"

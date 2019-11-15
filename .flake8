@@ -11,3 +11,4 @@ application-import-names =
     config
 max-complexity = 10
 enable-extensions = E704
+max-line-length = 88

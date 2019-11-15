@@ -1,6 +1,6 @@
 {
   "name": "dummy-flask",
-  "version": "1.0.0",
+  "version": "0.3.1",
   "description": "Placeholder image generator",
   "main": "dummy_flask/static/main.js",
   "repository": "https://github.com/mvwicky/dummy-flask.git",

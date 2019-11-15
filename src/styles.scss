@@ -1,22 +1,27 @@
 html {
   padding: 1em;
   @media (min-width: 34em) {
-    padding: 1em calc(45% - 17em);
+    padding: 1em calc(40% - 17em);
   }
 }
 
 .content {
   border: 1px solid #e9ecef;
   padding: 0 1em;
+  // display: flex;
   @media (max-width: 992px) {
     padding: 0 0.2em;
   }
-}
-
-.content {
   h1 {
     margin-bottom: 1.5rem;
   }
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: center;
 }
 
 .image-container {
@@ -41,6 +46,8 @@ html {
 }
 
 #copy-button {
+  border-radius: 5px;
+  margin-left: 0.33em;
   &:hover {
     background-color: dodgerblue;
     .feather-copy {
@@ -52,14 +59,28 @@ html {
 #params-form {
   border: 1px solid #e9ecef;
   padding: 1rem;
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 1.1em 0;
-  justify-items: stretch;
+  // display: flex;
+  // justify-content: space-between;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 0.8em;
+
+  label {
+    flex-grow: 0;
+  }
+  & > input,
+  .input-group {
+    flex-basis: 50%;
+    flex-grow: 0;
+  }
 }
 
 input {
-  width: 100%;
+  // width: 100%;
   border-radius: 3px;
 
   --validity-color: rgb(204, 204, 204);
@@ -72,10 +93,21 @@ input {
   }
 }
 
+.input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.help-text {
+  grid-column-start: 2;
+  // margin-top: -1em;
+  color: #000000;
+}
+
 code {
-  font-size: 1rem;
+  font-size: 1em;
   @media (max-width: 1200px) {
-    font-size: calc(0.5rem + 0.7vw);
+    font-size: calc(0.5em + 0.7vw);
   }
 }
 
@@ -85,14 +117,9 @@ img {
   height: auto;
 }
 
-.help-text {
-  grid-column-start: 2;
-  margin-top: -1em;
-  color: #000000;
-}
-
 #routes {
   padding-bottom: 1em;
+  padding-left: 1.5em;
 }
 
 footer {
@@ -100,10 +127,15 @@ footer {
   margin: 1em 0 0.2em;
   padding: 2em;
   text-align: center;
-  span {
-    font-size: 70%;
+  width: 80%;
+  .footer-group {
+    padding-bottom: 1em;
+  }
+  div {
+    font-size: 0.7rem;
   }
   h6 {
+    font-size: 0.75rem;
     margin: 0.5rem;
   }
 }

@@ -6,6 +6,7 @@ from .. import redis_client
 from ..utils import make_rules
 from ..constants import FONT_NAMES, img_formats, COUNT_KEY
 from . import bp
+from ..__version__ import __version__
 
 
 @bp.route("/")
@@ -47,5 +48,6 @@ def index():
         "img_formats": img_formats,
         "font": font,
         "color_pattern": color_pattern,
+        "version": __version__,
     }
     return render_template("base.jinja", **kw)

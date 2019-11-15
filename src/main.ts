@@ -119,7 +119,6 @@ function isEndpointArgs(input: {
     const copyIconEl = copyButton.querySelector<HTMLElement>(".feather-copy");
     const checkIconEl = copyButton.querySelector<HTMLElement>(".feather-check");
 
-    // const copy = new ClipboardJS(copyButton);
     if (truthy(copyIconEl) && truthy(checkIconEl)) {
       const copyIcon = copyIconEl;
       const checkIcon = checkIconEl;
