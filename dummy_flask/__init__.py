@@ -6,7 +6,7 @@ from flask_redis import FlaskRedis
 
 from config import Config
 from .__version__ import __version__
-from .converters import DimensionConverter
+from .converters import DimensionConverter, ColorConverter
 
 redis_client = FlaskRedis()
 
@@ -48,7 +48,8 @@ def create_app(config_class=Config):
         }
     )
 
-    app.url_map.converters["dim"] = DimensionConverter
+    app.url_map.redirect_defaults = False
+    app.url_map.converters.update({"dim": DimensionConverter, "col": ColorConverter})
 
     redis_client.init_app(app)
 

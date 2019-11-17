@@ -16,3 +16,7 @@ class DimensionConverter(BaseConverter):
 
     def to_url(self, parts):
         return "x".join(super(DimensionConverter, self).to_url(p) for p in parts)
+
+
+class ColorConverter(BaseConverter):
+    regex = r"^(?:(?:[A-Fa-f0-9]{3}){1,2})$"
