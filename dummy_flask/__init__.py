@@ -1,12 +1,11 @@
 import logging.config
 import time
-import subprocess
 
-import click
 from flask import Flask, request, send_from_directory
 from flask_redis import FlaskRedis
 
 from config import Config
+from .__version__ import __version__
 from .converters import DimensionConverter
 
 redis_client = FlaskRedis()
@@ -18,13 +17,13 @@ def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
-    gmsg = click.style("{message}", fg="green")
+    gmsg = "{message}"
     logging.config.dictConfig(
         {
             "version": 1,
             "disable_existing_loggers": False,
             "formatters": {
-                "default": {
+                "wsgi": {
                     "format": "[{asctime}] {levelname} {name} in {module}: {message}",
                     "style": "{",
                 },
@@ -34,7 +33,7 @@ def create_app(config_class=Config):
                 "wsgi": {
                     "class": "logging.StreamHandler",
                     "stream": "ext://sys.stderr",
-                    "formatter": "default",
+                    "formatter": "wsgi",
                 },
                 "werk": {
                     "class": "logging.StreamHandler",
@@ -65,12 +64,7 @@ def create_app(config_class=Config):
 
     cli.register(app)
 
-    if app.config.get("ENV") == "development":
-
-        @app.before_first_request
-        def _before_first():
-            app.logger.info(click.style("BEFORE", fg="yellow"))
-            subprocess.run(["make", "dev"])
+    # print(app.url_map)
 
     @app.before_request
     def before_request_cb():
@@ -96,5 +90,9 @@ def create_app(config_class=Config):
     @app.route("/favicon.ico")
     def _favicon_route():
         return send_from_directory(app.root_path, "fav.png")
+
+    @app.context_processor
+    def _ctx():
+        return {"version": __version__}
 
     return app

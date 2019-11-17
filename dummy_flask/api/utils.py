@@ -1,12 +1,12 @@
 import os
 from string import hexdigits
-from typing import Optional, Text
 
 from PIL import Image, ImageDraw
 
 from .._types import Dimension
-from ..constants import FONT_NAMES, MAX_SIZE, MIN_SIZE, font_sizes, fonts
+from ..constants import MAX_SIZE, MIN_SIZE, font_sizes, fonts
 from .files import files
+from .image_args import ImageArgs
 
 
 def px_to_pt(px: float) -> float:
@@ -17,7 +17,7 @@ def pt_to_px(pt: float) -> float:
     return pt / 0.75
 
 
-def guess_size(height: int, font_name: Text):
+def guess_size(height: int, font_name: str):
     font = fonts[font_name]
     s = int(px_to_pt(int(height * 0.75)))
     if s in font:
@@ -35,7 +35,7 @@ def guess_size(height: int, font_name: Text):
             return font[sz], i
 
 
-def get_font(d: ImageDraw.Draw, sz: Dimension, text: Text, font_name: Text):
+def get_font(d: ImageDraw.Draw, sz: Dimension, text: str, font_name: str):
     face = fonts[font_name]
     width, height = sz
     font, idx = guess_size(height, font_name)
@@ -47,7 +47,7 @@ def get_font(d: ImageDraw.Draw, sz: Dimension, text: Text, font_name: Text):
     return font, tsize
 
 
-def draw_text(im: Image.Image, color: Text, text: Text, font_name: Text):
+def draw_text(im: Image.Image, color: str, text: str, font_name: str):
     w, h = im.size
     txt = Image.new("RGBA", im.size, (255, 255, 255, 0))
     d = ImageDraw.Draw(txt)
@@ -60,23 +60,14 @@ def draw_text(im: Image.Image, color: Text, text: Text, font_name: Text):
 
 
 def make_image(
-    size: Dimension,
-    bg_color: Text,
-    fg_color: Text,
-    fmt: Text = "png",
-    text: Optional[Text] = None,
-    font_name: Optional[Text] = None,
-    dpi: int = 72,
+    size: Dimension, bg_color: str, fg_color: str, fmt: str, args: ImageArgs
 ):
-    if font_name not in FONT_NAMES:
-        font_name = "overpass"
+    text, font_name, dpi = args.text, args.font_name, args.dpi
     fmt = "jpeg" if fmt == "jpg" else fmt
     mode = "RGBA"
     bg_color = get_color(bg_color)
     fg_color = get_color(fg_color)
-    path = files.get_file_name(
-        size, bg_color, fg_color, fmt, text, font_name, dpi
-    )
+    path = files.get_file_name(size, bg_color, fg_color, fmt, text, font_name, dpi)
     if os.path.isfile(path):
         return path
     else:
@@ -96,9 +87,8 @@ def make_image(
         return path
 
 
-def get_color(color: Text):
-    if color.startswith("#"):
-        return color
+def get_color(color: str) -> str:
+    color = color.lstrip("#")
     color_len = len(color)
     if color_len in {3, 6} and all(e in hexdigits for e in color):
         return "#" + color

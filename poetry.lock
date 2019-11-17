@@ -22,6 +22,14 @@ tests = ["coverage", "hypothesis", "pympler", "pytest (>=4.3.0)", "six", "zope.i
 
 [[package]]
 category = "dev"
+description = "A screamingly fast Python 2 + 3 WSGI server written in C."
+name = "bjoern"
+optional = false
+python-versions = "*"
+version = "3.1.0"
+
+[[package]]
+category = "dev"
 description = "Python package for providing Mozilla's CA Bundle."
 name = "certifi"
 optional = false
@@ -330,6 +338,17 @@ dev = ["pre-commit", "tox"]
 
 [[package]]
 category = "dev"
+description = "Cross-platform lib for process and system monitoring in Python."
+name = "psutil"
+optional = false
+python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+version = "5.6.5"
+
+[package.extras]
+enum = ["enum34"]
+
+[[package]]
+category = "dev"
 description = "library with cross-python path, ini-parsing, io, code, log facilities"
 name = "py"
 optional = false
@@ -581,7 +600,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pathlib2", "contextlib2", "unittest2"]
 
 [metadata]
-content-hash = "a666da6ddf3e47f0e7b42956e2064d4f9b2594e3c23b07481b7eaaa54b1b78c2"
+content-hash = "cb62b5ab696f42ee11c075307e8747dfab690b2b1f73e9665c02530ae7aceeb0"
 python-versions = "^3.7"
 
 [metadata.files]
@@ -592,6 +611,9 @@ atomicwrites = [
 attrs = [
     {file = "attrs-19.3.0-py2.py3-none-any.whl", hash = "sha256:08a96c641c3a74e44eb59afb61a24f2cb9f4d7188748e76ba4bb5edfa3cb7d1c"},
     {file = "attrs-19.3.0.tar.gz", hash = "sha256:f7b7ce16570fe9965acd6d30101a28f62fb4a7f9e926b3bbc9b61f8b04247e72"},
+]
+bjoern = [
+    {file = "bjoern-3.1.0.tar.gz", hash = "sha256:01f3b601cf0ab0a9c7cb9c8f944ab7c738baaa6043ca82db20e9bd7a9be5767b"},
 ]
 certifi = [
     {file = "certifi-2019.9.11-py2.py3-none-any.whl", hash = "sha256:fd7c7c74727ddcf00e9acd26bba8da604ffec95bf1c2144e67aff7a8b50e6cef"},
@@ -847,6 +869,19 @@ pillow = [
 pluggy = [
     {file = "pluggy-0.13.0-py2.py3-none-any.whl", hash = "sha256:0db4b7601aae1d35b4a033282da476845aa19185c1e6964b25cf324b5e4ec3e6"},
     {file = "pluggy-0.13.0.tar.gz", hash = "sha256:fa5fa1622fa6dd5c030e9cad086fa19ef6a0cf6d7a2d12318e10cb49d6d68f34"},
+]
+psutil = [
+    {file = "psutil-5.6.5-cp27-none-win32.whl", hash = "sha256:145e0f3ab9138165f9e156c307100905fd5d9b7227504b8a9d3417351052dc3d"},
+    {file = "psutil-5.6.5-cp27-none-win_amd64.whl", hash = "sha256:3feea46fbd634a93437b718518d15b5dd49599dfb59a30c739e201cc79bb759d"},
+    {file = "psutil-5.6.5-cp35-cp35m-win32.whl", hash = "sha256:348ad4179938c965a27d29cbda4a81a1b2c778ecd330a221aadc7bd33681afbd"},
+    {file = "psutil-5.6.5-cp35-cp35m-win_amd64.whl", hash = "sha256:474e10a92eeb4100c276d4cc67687adeb9d280bbca01031a3e41fb35dfc1d131"},
+    {file = "psutil-5.6.5-cp36-cp36m-win32.whl", hash = "sha256:e3f5f9278867e95970854e92d0f5fe53af742a7fc4f2eba986943345bcaed05d"},
+    {file = "psutil-5.6.5-cp36-cp36m-win_amd64.whl", hash = "sha256:dfb8c5c78579c226841908b539c2374da54da648ee5a837a731aa6a105a54c00"},
+    {file = "psutil-5.6.5-cp37-cp37m-win32.whl", hash = "sha256:021d361439586a0fd8e64f8392eb7da27135db980f249329f1a347b9de99c695"},
+    {file = "psutil-5.6.5-cp37-cp37m-win_amd64.whl", hash = "sha256:e9649bb8fc5cea1f7723af53e4212056a6f984ee31784c10632607f472dec5ee"},
+    {file = "psutil-5.6.5-cp38-cp38-win32.whl", hash = "sha256:47aeb4280e80f27878caae4b572b29f0ec7967554b701ba33cd3720b17ba1b07"},
+    {file = "psutil-5.6.5-cp38-cp38-win_amd64.whl", hash = "sha256:73a7e002781bc42fd014dfebb3fc0e45f8d92a4fb9da18baea6fb279fbc1d966"},
+    {file = "psutil-5.6.5.tar.gz", hash = "sha256:d051532ac944f1be0179e0506f6889833cf96e466262523e57a871de65a15147"},
 ]
 py = [
     {file = "py-1.8.0-py2.py3-none-any.whl", hash = "sha256:64f65755aee5b381cea27766a3a147c3f15b9b6b9ac88676de66ba2ae36793fa"},

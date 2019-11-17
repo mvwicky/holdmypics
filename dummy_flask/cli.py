@@ -12,11 +12,21 @@ from .package import Package
 
 def register(app: Flask):
     @app.cli.command("freeze")
-    @click.option("--dev/--not-dev", "-d/ ", default=False)
-    def freeze_reqs(dev: bool):
+    @click.option(
+        "--dev/--not-dev",
+        "-d/ ",
+        default=False,
+        help="Freeze development requirements.",
+    )
+    @click.option(
+        "--hashes/--no-hashes",
+        default=True,
+        help="Create lock file without file hashes.",
+    )
+    def freeze_reqs(dev: bool, hashes: bool):
         """Create a requirements.txt file."""
         package: Package = Package.find_root()
-        package.freeze(dev)
+        package.freeze(dev, not hashes)
 
     @app.cli.command()
     def sync_versions():

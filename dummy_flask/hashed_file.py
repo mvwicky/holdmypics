@@ -1,6 +1,5 @@
 import hashlib
 import os
-from typing import Text
 
 from .constants import HERE
 from .utils import get_debug
@@ -17,7 +16,7 @@ class HashedFile(object):
 
     static_dir = HERE / "static"
 
-    def __init__(self, file_name: Text, strip_newlines: bool = True):
+    def __init__(self, file_name: str, strip_newlines: bool = True):
         self._orig_file = self.static_dir / file_name
         self.strip_newlines = strip_newlines
         self._last_mtime = 0

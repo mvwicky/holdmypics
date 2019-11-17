@@ -1,17 +1,12 @@
-from typing import Any, Optional, Text
+from typing import Any, Optional
 
 from flask import current_app
 from funcy import merge
 
-from .constants import (
-    bg_color_default,
-    fg_color_default,
-    fmt_default,
-    img_formats_str,
-)
+from .constants import bg_color_default, fg_color_default, fmt_default, img_formats_str
 
 
-def config_value(name: Text, default: Optional[Any] = None):
+def config_value(name: str, default: Optional[Any] = None):
     return current_app.config.get(name, default)
 
 
@@ -27,6 +22,6 @@ def make_rules():
         ("<string:bg_color>", merge(fg_color_default, fmt_default)),
         ("<string:bg_color>/<string:fg_color>", fmt_default),
         (f"<string:bg_color>/{fmt_rule}", fg_color_default),
-        (f"<string:bg_color>/<string:fg_color>/{fmt_rule}", dict()),
+        (f"<string:bg_color>/<string:fg_color>/{fmt_rule}", {}),
     ]
     return rule_parts

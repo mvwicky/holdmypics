@@ -9,6 +9,7 @@ exclude =
     __pycache__
 application-import-names =
     config
+    dummy_flask
 max-complexity = 10
 enable-extensions = E704
 max-line-length = 88

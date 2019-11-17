@@ -10,11 +10,9 @@ class DimensionConverter(BaseConverter):
             parts = parts * 2
         if len(parts) != 2:
             raise ValidationError
-        if not all([p.isnumeric() for p in parts]):
+        if not all(p.isnumeric() for p in parts):
             raise ValidationError
-        return tuple([int(p) for p in parts])
+        return tuple(int(p) for p in parts)
 
     def to_url(self, parts):
-        return "x".join(
-            super(DimensionConverter, self).to_url(p) for p in parts
-        )
+        return "x".join(super(DimensionConverter, self).to_url(p) for p in parts)

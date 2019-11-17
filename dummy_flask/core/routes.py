@@ -1,22 +1,18 @@
 from urllib.parse import urlencode
 
-from flask import render_template, url_for
+from flask import Markup, render_template, url_for
 
 from .. import redis_client
+from ..constants import COUNT_KEY, FONT_NAMES, img_formats
 from ..utils import make_rules
-from ..constants import FONT_NAMES, img_formats, COUNT_KEY
 from . import bp
-from ..__version__ import __version__
 
 
-@bp.route("/")
-def index():
+def get_context():
     rule_parts = make_rules()
     count = redis_client.get(COUNT_KEY)
 
-    rules = [
-        e[0].replace("string:", "").replace("any", "") for e in rule_parts
-    ]
+    rules = [e[0].replace("string:", "").replace("any", "") for e in rule_parts]
 
     width, height = 638, 328
     bg_color, fg_color = "cef", "555"
@@ -33,7 +29,23 @@ def index():
     color_pattern = r"([a-fA-F0-9]{3})|([a-fA-F0-9]{6})"
     img_query = urlencode({"text": text, "font": font})
     font_names = [(n, n.replace("-", " ").title()) for n in sorted(FONT_NAMES)]
-    kw = {
+    num_fields = {"width": width, "height": height}
+    col_fields = {
+        "bg": {"value": bg_color, "label": "Background Color"},
+        "fg": {"value": fg_color, "label": "Text Color"},
+    }
+    fmt_help = Markup("<q>jpg</q> and <q>jpeg</q> are equivalent.")
+    sel_fields = {
+        "fmt": {
+            "value": fmt,
+            "options": [(f, f) for f in img_formats],
+            "label": "Format",
+            "help_text": fmt_help,
+        },
+        "font": {"value": font, "options": font_names, "label": "Font"},
+    }
+
+    return {
         "rules": ["api/<size>/" + r + "/" for r in rules],
         "count": count.decode(),
         "img_url": img_url,
@@ -48,6 +60,17 @@ def index():
         "img_formats": img_formats,
         "font": font,
         "color_pattern": color_pattern,
-        "version": __version__,
+        "num_fields": num_fields,
+        "col_fields": col_fields,
+        "sel_fields": sel_fields,
     }
-    return render_template("base.jinja", **kw)
+
+
+@bp.route("/")
+def index():
+    return render_template("base.jinja", **get_context())
+
+
+@bp.route("/grid/")
+def grid():
+    return render_template("grid.jinja", **get_context())

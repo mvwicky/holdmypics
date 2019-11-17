@@ -1,7 +1,8 @@
 COPY=cp
 YARN=yarn
 YARN_RUN=$(YARN) run
-PARCEL=$(YARN_RUN) parcel build
+PARCEL=$(YARN_RUN) parcel
+PARCEL_BUILD=$(PARCEL) build
 
 INPUT_DIR=src
 TEMPLATES_DIR=dummy_flask/templates
@@ -19,13 +20,18 @@ DEV_OPTS=--no-minify
 prod: export NODE_ENV=production
 prod: clean build copy
 
+.PHONY: dev_opts
+dev_opts: export NODE_ENV=development
+dev_opts: PARCEL_OPTS := $(PARCEL_OPTS) $(DEV_OPTS)
+
 .PHONY: dev
-dev: export NODE_ENV=development
 dev: PARCEL_OPTS := $(PARCEL_OPTS) $(DEV_OPTS)
+dev: export NODE_ENV=development
 dev: clean build copy
 
+.PHONY: build
 build:
-	$(PARCEL) $(PARCEL_OPTS)
+	$(PARCEL_BUILD) $(PARCEL_OPTS)
 
 copy: $(STATIC_DIR) $(TEMPLATES_DIR)
 	$(COPY) $(OUTPUT_DIR)/*.html $(TEMPLATES_DIR)
@@ -38,6 +44,11 @@ $(STATIC_DIR):
 
 $(TEMPLATES_DIR):
 	mkdir $(TEMPLATES_DIR)
+
+.PHONY: watch
+watch: export NODE_ENV=development
+watch:
+	$(PARCEL) watch $(PARCEL_OPTS)
 
 .PHONY: clean
 clean:

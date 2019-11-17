@@ -1,7 +1,7 @@
-import "../node_modules/balloon-css/src/balloon.scss";
-import "../node_modules/sanitize.css/sanitize.css";
-import "../node_modules/sanitize.css/typography.css";
-import "../node_modules/sanitize.css/forms.css";
+import "balloon-css/src/balloon.scss";
+import "sanitize.css/sanitize.css";
+import "sanitize.css/typography.css";
+import "sanitize.css/forms.css";
 
 import feather from "feather-icons";
 
@@ -13,12 +13,12 @@ function isInput(input: Element | RadioNodeList): input is HTMLInputElement {
   return "checkValidity" in input;
 }
 
+const ARGS = ["width", "height", "bg", "fg", "fmt", "imageText", "font"];
+
 function isEndpointArgs(input: {
   [k: string]: string;
 }): input is MakeEndpointArgs {
-  return ["width", "height", "bg", "fg", "fmt", "imageText", "font"].every(
-    (key) => key in input
-  );
+  return ARGS.every(key => key in input);
 }
 
 (function(doc: Document, global: typeof globalThis) {
@@ -65,33 +65,28 @@ function isEndpointArgs(input: {
     return params;
   }
 
-  function debounce(
-    func: AnyFunc,
+  function debounce<F extends AnyFunc>(
+    func: F,
     wait: number = 250,
     immediate: boolean = false
   ) {
     let timeout: number | undefined;
 
-    return function debouncedFunction(...a: any[]) {
-      //@ts-ignore
-      let context: any = this;
-      let args = Array.from(arguments);
+    return function debouncedFunction(this: ThisType<F>, ...a: Parameters<F>) {
+      const context = this;
 
-      let later = function() {
+      const later = function() {
         timeout = undefined;
         if (!immediate) {
-          //@ts-ignore
-          func.apply(context, ...args);
+          func.apply(context, a);
         }
       };
-      let callNow = immediate && !timeout;
-      clearTimeout(timeout);
+      const callNow = immediate && !timeout;
+      window.clearTimeout(timeout);
 
-      //@ts-ignore
-      timeout = setTimeout(later, wait);
+      timeout = window.setTimeout(later, wait);
       if (callNow) {
-        //@ts-ignore
-        func.apply(context, ...args);
+        func.apply(context, a);
       }
     };
   }

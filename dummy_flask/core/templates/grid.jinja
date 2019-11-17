@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  {% include "grid.html" %}
+  <title>Another Placeholder Image Generator</title>
+  <meta name="description" content="A site that can generate a variety of images.">
+</head>
+<body>
+  <main class="content grid">
+    <div class="col-start-3 col-end-11 text-center">
+      <h1 class="page-title">Placeholder Image Generator</h1>
+    </div>
+    <div class="col-start-3 col-end-11 text-center">
+      <p>
+        Ever needed to create some placeholder images?
+      </p>
+      <p>
+        Here's an easy way to do that.
+      </p>
+    </div>
+
+    <div class="col-start-3 col-end-11 text-center">
+      <h3>Images Created: <span id="img-count">{{ count }}</span></h3>
+    </div>
+
+    <img
+      class="col-start-3 col-end-11"
+      id="example-image"
+      src="{{ img_url }}?{{ img_query }}"
+      alt="Example image."
+    >
+
+    <div class="col-start-3 col-end-11 text-center">
+      <code id="endpoint">{{ img_url }}?{{ img_query }}</code>
+      <button
+        id="copy-button"
+        data-clipboard-text="{{ img_url }}?{{ img_query }}"
+        aria-label="Copied to clipboard!"
+      >
+        <i
+          data-feather="copy"
+          title="Copy to clipboard."
+        ></i>
+        <i data-feather="check" title="Copied" style="display: none;"></i>
+      </button>
+    </div>
+
+    <form class="col-start-5 col-end-9" id="params-form" action="">
+      {% for name, value in num_fields.items() %}
+      <label for="{{ name }}">{{ name|capitalize }}</label>
+      <input class="form-input" id="{{ name }}" type="number" min="1" step="1" value="{{ value }}">
+      {% endfor %}
+
+      {% for name, attrs in col_fields.items() %}
+      <label for="{{ name }}">{{ attrs.label }}</label>
+      <div class="input-group form-input">
+        <input
+          id="{{ name }}"
+          type="text"
+          value="{{ attrs.value }}"
+          pattern="{{ color_pattern }}"
+        >
+        <small class="help-text">Three or six hex digits.</small>
+      </div>
+      {% endfor %}
+
+      {% for name, attrs in sel_fields.items() %}
+
+      <label for="{{ name }}">{{ attrs.label }}</label>
+      <div class="input-group form-input">
+        <select name="{{ name }}" id="{{ name }}">
+          {% for opt_value, opt_name in attrs.options %}
+          {% if opt_value == attrs.value %}
+          <option selected value="{{ opt_value }}">{{ opt_name }}</option>
+          {% else %}
+          <option value="{{ opt_value }}">{{ opt_name }}</option>
+          {% endif %}
+          {% endfor %}
+        </select>
+        {% if attrs.help_text %}
+        <small class="help-text">{{ attrs.help_text }}</small>
+        {% endif %}
+      </div>
+
+      {% endfor %}
+      <label for="imageText">Text</label>
+      <input class="form-input" id="imageText" type="text" value="{{ text }}" maxlength="30">
+    </form>
+
+
+    <br><br>
+
+    <div class="col-start-4 col-end-11" id="routes">
+      <h3>Routes:</h3>
+      {% for rule in rules %}
+      <div class="rule col-start-3">
+        <code>{{ rule|e }}</code>
+      </div>
+
+      {% endfor %}
+    </div>
+  </main>
+  <footer>
+      <div class="footer-group">
+        <h6>Licenses</h6>
+        <small>Fira Mono, Fira Sans, Overpass, and Spectral are licensed under the <a href="{{ url_for('static', filename='licenses/ofl.txt') }}">Open Font License</a>.</small>
+        <small>Roboto is licensed under the <a href="{{ url_for('static', filename='licenses/apache.txt') }}">Apache License</a>.</small>
+      </div>
+      <div class="footer-group powered-by">
+        <h6>Powered by <a href="https://palletsprojects.com/p/flask/">Flask</a></h6>
+        <h6>and <a href="https://heroku.com">Heroku</a></h6>
+      </div>
+      <div class="footer-group">
+        <h6>Created by Michael Van Wickle</h6>
+        <h6>Version: <code>{{ version }}</code></h6>
+      </div>
+    </footer>
+
+  {% include "js.html" %}
+</body>
+</html>

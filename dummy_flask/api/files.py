@@ -1,6 +1,6 @@
 import hashlib
 import os
-from typing import Text, Optional
+from typing import Optional
 
 from funcy import ignore
 
@@ -37,13 +37,13 @@ class GeneratedFiles(object):
     def get_file_name(
         self,
         size: Dimension,
-        bg: Text,
-        fg: Text,
-        fmt: Text,
-        text: Text,
-        font_name: Text,
+        bg: str,
+        fg: str,
+        fmt: str,
+        text: str,
+        font_name: str,
         dpi: int,
-    ):
+    ) -> str:
         phash = self.params_hash(size, bg, fg, fmt, text, font_name, dpi)
         name = ".".join([phash, fmt])
         path = os.path.join(bp.images_folder, name)
@@ -54,8 +54,7 @@ class GeneratedFiles(object):
 
     def clean(self):
         files = [
-            os.path.join(bp.images_folder, f)
-            for f in os.listdir(bp.images_folder)
+            os.path.join(bp.images_folder, f) for f in os.listdir(bp.images_folder)
         ]
         files = sorted(filter(os.path.isfile, files), key=os.path.getmtime)
         num_deleted = 0
