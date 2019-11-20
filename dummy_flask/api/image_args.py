@@ -4,12 +4,17 @@ import attr
 from flask import request
 
 
+def clamp_alpha(a: float) -> float:
+    return max(0.0, min(float(a), 1.0))
+
+
 @attr.s(slots=True, auto_attribs=True, frozen=True)
 class ImageArgs(object):
     text: Optional[str] = None
     filename: Optional[str] = None
     font_name: str = "overpass"
     dpi: int = 72
+    alpha: float = attr.ib(default=1.0, converter=clamp_alpha)
 
     @classmethod
     def from_request(cls):
@@ -19,5 +24,6 @@ class ImageArgs(object):
             "filename": request.args.get("filename", None),
             "font_name": font_name,
             "dpi": request.args.get("dpi", 72, type=int),
+            "alpha": request.args.get("alpha", 1.0, type=float),
         }
         return cls(**kw)

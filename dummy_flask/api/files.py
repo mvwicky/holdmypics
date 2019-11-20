@@ -2,12 +2,11 @@ import hashlib
 import os
 from typing import Optional
 
-from funcy import ignore
+from funcy import ignore, re_tester
 
-from . import bp
-from ..utils import config_value
 from .._types import Dimension
-
+from ..utils import config_value
+from . import bp
 
 ignore_file = ignore(FileNotFoundError, default=None)
 
@@ -19,14 +18,25 @@ class GeneratedFiles(object):
     extensions = ["png", "webp", "jpg", "jpeg"]
 
     def __init__(self):
-        self.files = []
+        self.files = set()
         self._max_files: Optional[int] = None
 
+    def find_current(self):
+        fmts = "\\.({0})$".format("|".join(self.extensions))
+        pred = re_tester(fmts)
+        files = filter(pred, os.listdir(bp.images_folder))
+        for file in files:
+            self.files.add(os.path.join(bp.images_folder, file))
+
     @property
-    def max_files(self):
+    def max_files(self) -> int:
         if self._max_files is None:
             self._max_files = config_value("SAVED_IMAGES_MAX_NUM", 1)
         return self._max_files
+
+    @property
+    def need_to_clean(self) -> bool:
+        return len(self.files) > self.max_files
 
     def params_hash(self, *params):
         hasher = self.hash_function()
@@ -34,22 +44,12 @@ class GeneratedFiles(object):
             hasher.update(repr(param).encode("utf-8"))
         return hasher.hexdigest()
 
-    def get_file_name(
-        self,
-        size: Dimension,
-        bg: str,
-        fg: str,
-        fmt: str,
-        text: str,
-        font_name: str,
-        dpi: int,
-    ) -> str:
-        phash = self.params_hash(size, bg, fg, fmt, text, font_name, dpi)
+    def get_file_name(self, size: Dimension, bg: str, fg: str, fmt: str, *args,) -> str:
+        phash = self.params_hash(size, bg, fg, fmt, *args)
         name = ".".join([phash, fmt])
         path = os.path.join(bp.images_folder, name)
-        self.files.append(path)
-        if len(self.files) > self.max_files:
-            self.clean()
+        self.files.add(path)
+
         return path
 
     def clean(self):
@@ -61,6 +61,8 @@ class GeneratedFiles(object):
         if len(files) > self.max_files:
             to_delete = files[: self.max_files]
             num_deleted = len([os.unlink(f) for f in to_delete])
+        self.files.clear()
+        self.find_current()
         return num_deleted
 
 

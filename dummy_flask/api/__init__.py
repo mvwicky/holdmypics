@@ -15,5 +15,11 @@ def api_setup(state: BlueprintSetupState):
     os.makedirs(images_folder, exist_ok=True)
     bp.images_folder = images_folder
 
+    @bp.before_app_first_request
+    def _before_cb():
+        from .files import files
+
+        files.find_current()
+
 
 from . import routes  # noqa: F401

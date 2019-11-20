@@ -19,6 +19,7 @@ class BaseConfig(object):
 
 class Config(BaseConfig):
     MAX_AGE = env.int("MAX_AGE", default=86400)
+    SEND_FILE_MAX_AGE_DEFAULT = env.int("SEND_FILE_MAX_AGE_DEFAULT", default=86400)
     IMAGE_CACHE_SIZE = env.int(
         "IMAGE_CACHE_SIZE", default=128, validate=lambda s: s >= 0
     )

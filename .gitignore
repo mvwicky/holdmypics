@@ -9,8 +9,8 @@ pytest-report/
 .cov
 
 dummy_flask/api/images/
-dummy_flask/templates/css.html
-dummy_flask/templates/js.html
+dummy_flask/templates/*.html
+
 
 tokei-stats.json
 tokei-stats.yaml

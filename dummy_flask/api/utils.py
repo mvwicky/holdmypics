@@ -1,6 +1,9 @@
 import os
 from string import hexdigits
 
+import attr
+import click
+from flask import after_this_request
 from PIL import Image, ImageDraw
 
 from .._types import Dimension
@@ -47,40 +50,57 @@ def get_font(d: ImageDraw.Draw, sz: Dimension, text: str, font_name: str):
     return font, tsize
 
 
-def draw_text(im: Image.Image, color: str, text: str, font_name: str):
+def draw_text(im: Image.Image, color: str, args: ImageArgs):
     w, h = im.size
     txt = Image.new("RGBA", im.size, (255, 255, 255, 0))
     d = ImageDraw.Draw(txt)
-    font, tsize = get_font(d, (int(w * 0.9), h), text, font_name)
+    font, tsize = get_font(d, (int(w * 0.9), h), args.text, args.font_name)
     yc = int((h - tsize[1]) / 2)
     xc = int((w - tsize[0]) / 2)
-    d.text((xc, yc), text, font=font, fill=color)
+    d.text((xc, yc), args.text, font=font, fill=color)
 
     return Image.alpha_composite(im, txt)
+
+
+fmt_kw = {
+    "jpeg": lambda args: {"optimize": True, "dpi": (args.dpi, args.dpi)},
+    "png": lambda args: {"optimize": True, "dpi": (args.dpi, args.dpi)},
+    "webp": lambda _: {"quality": 100, "method": 6},
+    "gif": lambda _: {"optimize": True},
+}
 
 
 def make_image(
     size: Dimension, bg_color: str, fg_color: str, fmt: str, args: ImageArgs
 ):
-    text, font_name, dpi = args.text, args.font_name, args.dpi
     fmt = "jpeg" if fmt == "jpg" else fmt
     mode = "RGBA"
     bg_color = get_color(bg_color)
     fg_color = get_color(fg_color)
-    path = files.get_file_name(size, bg_color, fg_color, fmt, text, font_name, dpi)
+    path = files.get_file_name(size, bg_color, fg_color, fmt, *attr.astuple(args))
+
+    if files.need_to_clean:
+
+        @after_this_request
+        def _clean(res):
+            click.echo("Cleaning")
+            files.clean()
+            return res
+
     if os.path.isfile(path):
         return path
     else:
         save_kw = {}
-        if fmt in {"jpeg", "png"}:
-            save_kw.update({"optimize": True, "dpi": (dpi, dpi)})
-        elif fmt == "webp":
-            save_kw.update({"quality": 100, "method": 6})
-        elif fmt == "gif":
-            save_kw.update({"optimize": True})
+        kw_func = fmt_kw.get(fmt, None)
+        if kw_func is not None:
+            save_kw.update(kw_func(args))
+
         im = Image.new(mode, size, bg_color)
-        if text is not None:
-            im = draw_text(im, fg_color, text, font_name)
+        if args.alpha < 1:
+            alpha_im = Image.new("L", size, int(args.alpha * 255))
+            im.putalpha(alpha_im)
+        if args.text is not None and fmt != "jpeg":
+            im = draw_text(im, fg_color, args)
         if fmt == "jpeg":
             im = im.convert("RGB")
         im.save(path, **save_kw)

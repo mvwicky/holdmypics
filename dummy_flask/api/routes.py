@@ -1,13 +1,13 @@
 import functools
 from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 
-from flask import redirect, request, send_file
+from flask import abort, current_app, redirect, request, send_file
 from funcy import merge
 
 from .. import redis_client
 from .._types import Dimension
-from ..constants import COUNT_KEY, FONT_NAMES
-from ..utils import config_value, make_rules
+from ..constants import COUNT_KEY, FONT_NAMES, img_formats
+from ..utils import make_rules
 from . import bp
 from .image_args import ImageArgs
 from .utils import make_image
@@ -36,9 +36,9 @@ def make_route(prefix: str = ""):
 
 @make_route()
 def image_route(size: Dimension, bg_color: str, fg_color: str, fmt: str):
-    redis_client.incr(COUNT_KEY)
-    cache_time = config_value("MAX_AGE", 0)
-
+    fmt = fmt.lower()
+    if fmt not in img_formats:
+        abort(403)
     args = ImageArgs.from_request()
     font_name = args.font_name
     if font_name not in FONT_NAMES and font_name.lower() in FONT_NAMES:
@@ -47,10 +47,15 @@ def image_route(size: Dimension, bg_color: str, fg_color: str, fmt: str):
         query_list = [(k, v) for k, v in query.items()]
         url = urlunsplit(parts._replace(query=urlencode(query_list, doseq=True)))
         return redirect(url)
+    redis_client.incr(COUNT_KEY)
 
     path = image_response(size, bg_color, fg_color, fmt, args)
     mime_fmt = "jpeg" if fmt == "jpg" else fmt
-    kw = {"cache_timeout": cache_time, "mimetype": f"image/{mime_fmt}"}
+    kw = {
+        "mimetype": f"image/{mime_fmt}",
+        "add_etags": not current_app.debug,
+        "conditional": True,
+    }
 
     filename = args.filename
     if filename is not None:
