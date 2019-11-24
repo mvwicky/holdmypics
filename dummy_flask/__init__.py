@@ -5,7 +5,6 @@ from flask import Flask, request, send_from_directory
 from flask_redis import FlaskRedis
 
 from config import Config
-from .__version__ import __version__
 from .converters import DimensionConverter, ColorConverter
 
 redis_client = FlaskRedis()
@@ -91,6 +90,8 @@ def create_app(config_class=Config):
     @app.route("/favicon.ico")
     def _favicon_route():
         return send_from_directory(app.root_path, "fav.png")
+
+    from .__version__ import __version__
 
     @app.context_processor
     def _ctx():
