@@ -4,9 +4,8 @@ from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 from flask import abort, current_app, redirect, request, send_file
 from funcy import merge
 
-from .. import redis_client
 from .._types import Dimension
-from ..constants import COUNT_KEY, FONT_NAMES, img_formats
+from ..constants import FONT_NAMES, img_formats
 from ..utils import make_rules
 from . import bp
 from .image_args import ImageArgs
@@ -47,7 +46,6 @@ def image_route(size: Dimension, bg_color: str, fg_color: str, fmt: str):
         query_list = [(k, v) for k, v in query.items()]
         url = urlunsplit(parts._replace(query=urlencode(query_list, doseq=True)))
         return redirect(url)
-    redis_client.incr(COUNT_KEY)
 
     path = image_response(size, bg_color, fg_color, fmt, args)
     mime_fmt = "jpeg" if fmt == "jpg" else fmt

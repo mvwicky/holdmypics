@@ -6,8 +6,9 @@ import click
 from flask import after_this_request
 from PIL import Image, ImageDraw
 
+from .. import redis_client
 from .._types import Dimension
-from ..constants import MAX_SIZE, MIN_SIZE, font_sizes, fonts
+from ..constants import COUNT_KEY, MAX_SIZE, MIN_SIZE, font_sizes, fonts
 from .files import files
 from .image_args import ImageArgs
 
@@ -90,6 +91,7 @@ def make_image(
     if os.path.isfile(path):
         return path
     else:
+        redis_client.incr(COUNT_KEY)
         save_kw = {}
         kw_func = fmt_kw.get(fmt, None)
         if kw_func is not None:
