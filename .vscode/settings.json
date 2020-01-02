@@ -1,5 +1,5 @@
 {
-  "python.pythonPath": "${env:HOME}/.pyenv/versions/dummy-flask-3.7.5/bin/python",
+  "python.pythonPath": "/Users/michael/.pyenv/versions/dummy-flask-3.7.5/bin/python",
   "python.linting.flake8Args": ["--config=${workspaceFolder}/.flake8"],
   "python.sortImports.path": "${env:HOME}/.pyenv/versions/dummy-flask-3.7.5/bin/isort",
   "files.exclude": {
