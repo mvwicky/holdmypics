@@ -1,37 +1,44 @@
 import hashlib
 import os
-from typing import Optional
+from typing import Callable, ClassVar, List, Optional, Set, Union
 
+import attr
 from funcy import ignore, re_tester
 
-from .._types import Dimension
-from ..utils import config_value
-from . import bp
+from config import Config
+from ..._types import Dimension
 
 ignore_file = ignore(FileNotFoundError, default=None)
 
+HashFunction = Callable[[Union[bytes, bytearray, memoryview]], "hashlib._Hash"]
 
+
+@attr.s(slots=True, auto_attribs=True)
 class GeneratedFiles(object):
-    __slots__ = ("files", "_max_files")
+    hash_function: ClassVar[HashFunction] = hashlib.md5
+    extensions: ClassVar[List[str]] = ["png", "webp", "jpg", "jpeg", "gif"]
 
-    hash_function = hashlib.md5
-    extensions = ["png", "webp", "jpg", "jpeg"]
+    files: Set[str] = attr.ib(factory=set)
+    _max_files: Optional[int] = None
+    _images_folder: Optional[str] = None
 
-    def __init__(self):
-        self.files = set()
-        self._max_files: Optional[int] = None
+    @property
+    def images_folder(self):
+        if self._images_folder is None:
+            self._images_folder = Config.SAVED_IMAGES_CACHE_DIR
+        return self._images_folder
 
     def find_current(self):
         fmts = "\\.({0})$".format("|".join(self.extensions))
         pred = re_tester(fmts)
-        files = filter(pred, os.listdir(bp.images_folder))
+        files = filter(pred, os.listdir(self.images_folder))
         for file in files:
-            self.files.add(os.path.join(bp.images_folder, file))
+            self.files.add(os.path.join(self.images_folder, file))
 
     @property
     def max_files(self) -> int:
         if self._max_files is None:
-            self._max_files = config_value("SAVED_IMAGES_MAX_NUM", 1)
+            self._max_files = Config.SAVED_IMAGES_MAX_NUM
         return self._max_files
 
     @property
@@ -47,14 +54,14 @@ class GeneratedFiles(object):
     def get_file_name(self, size: Dimension, bg: str, fg: str, fmt: str, *args,) -> str:
         phash = self.params_hash(size, bg, fg, fmt, *args)
         name = ".".join([phash, fmt])
-        path = os.path.join(bp.images_folder, name)
+        path = os.path.join(self.images_folder, name)
         self.files.add(path)
 
         return path
 
     def clean(self):
         files = [
-            os.path.join(bp.images_folder, f) for f in os.listdir(bp.images_folder)
+            os.path.join(self.images_folder, f) for f in os.listdir(self.images_folder)
         ]
         files = sorted(filter(os.path.isfile, files), key=os.path.getmtime)
         num_deleted = 0

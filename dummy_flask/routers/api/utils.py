@@ -1,16 +1,20 @@
-import os
+import enum
+import io
 from string import hexdigits
 
-import attr
-import click
-from flask import after_this_request
 from PIL import Image, ImageDraw
 
-from .. import redis_client
-from .._types import Dimension
-from ..constants import COUNT_KEY, MAX_SIZE, MIN_SIZE, font_sizes, fonts
-from .files import files
-from .image_args import ImageArgs
+from ..._types import Dimension
+from ...constants import MAX_SIZE, MIN_SIZE, font_sizes, fonts
+from .image_args import ImageQueryArgs
+
+
+class ImageFormat(str, enum.Enum):
+    jpg = "jpeg"
+    jpeg = "jpeg"
+    png = "png"
+    gif = "gif"
+    webp = "webp"
 
 
 def px_to_pt(px: float) -> float:
@@ -51,7 +55,7 @@ def get_font(d: ImageDraw.Draw, sz: Dimension, text: str, font_name: str):
     return font, tsize
 
 
-def draw_text(im: Image.Image, color: str, args: ImageArgs):
+def draw_text(im: Image.Image, color: str, args: ImageQueryArgs):
     w, h = im.size
     txt = Image.new("RGBA", im.size, (255, 255, 255, 0))
     d = ImageDraw.Draw(txt)
@@ -71,42 +75,58 @@ fmt_kw = {
 }
 
 
-def make_image(
-    size: Dimension, bg_color: str, fg_color: str, fmt: str, args: ImageArgs
-):
-    fmt = "jpeg" if fmt == "jpg" else fmt
+def create_image_sync(
+    size: Dimension, bg_color: str, fg_color: str, fmt: str, args: ImageQueryArgs
+) -> Image.Image:
     mode = "RGBA"
     bg_color = get_color(bg_color)
     fg_color = get_color(fg_color)
-    path = files.get_file_name(size, bg_color, fg_color, fmt, *attr.astuple(args))
+    im = Image.new(mode, size, bg_color)
+    if args.alpha < 1:
+        alpha_im = Image.new("L", size, int(args.alpha * 255))
+        im.putalpha(alpha_im)
+    if args.text is not None and fmt != "jpeg":
+        im = draw_text(im, fg_color, args)
+    if fmt == "jpeg":
+        im = im.convert("RGB")
+    return im
 
-    if files.need_to_clean:
 
-        @after_this_request
-        def _clean(res):
-            click.echo("Cleaning")
-            files.clean()
-            return res
+def im_to_bytes(im: Image.Image, fmt: str, args: ImageQueryArgs) -> io.BytesIO:
+    save_kw = {"format": fmt}
+    kw_func = fmt_kw.get(fmt, lambda _: {})
+    save_kw.update(kw_func(args))
+    output = io.BytesIO()
+    im.save(output, **save_kw)
+    return output
 
-    if os.path.isfile(path):
-        return path
-    else:
-        redis_client.incr(COUNT_KEY)
-        save_kw = {}
-        kw_func = fmt_kw.get(fmt, None)
-        if kw_func is not None:
-            save_kw.update(kw_func(args))
 
-        im = Image.new(mode, size, bg_color)
-        if args.alpha < 1:
-            alpha_im = Image.new("L", size, int(args.alpha * 255))
-            im.putalpha(alpha_im)
-        if args.text is not None and fmt != "jpeg":
-            im = draw_text(im, fg_color, args)
-        if fmt == "jpeg":
-            im = im.convert("RGB")
-        im.save(path, **save_kw)
-        return path
+# def make_image(
+#     size: Dimension, bg_color: str, fg_color: str, fmt: str, args: ImageQueryArgs
+# ):
+#     fmt = "jpeg" if fmt == "jpg" else fmt
+#     bg_color = get_color(bg_color)
+#     fg_color = get_color(fg_color)
+#     path = files.get_file_name(size, bg_color, fg_color, fmt, *attr.astuple(args))
+
+#     if files.need_to_clean:
+
+#         @after_this_request
+#         def _clean(res):
+#             click.echo("Cleaning")
+#             files.clean()
+#             return res
+
+#     if os.path.isfile(path):
+#         return path
+#     else:
+#         im = create_image(size, bg_color, fg_color, fmt, args)
+#         save_kw = {}
+#         kw_func = fmt_kw.get(fmt, None)
+#         if kw_func is not None:
+#             save_kw.update(kw_func(args))
+#         im.save(path, **save_kw)
+#         return path
 
 
 def get_color(color: str) -> str:

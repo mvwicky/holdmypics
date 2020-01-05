@@ -1,3 +1,4 @@
+import enum
 import os
 from pathlib import Path
 
@@ -20,9 +21,11 @@ fonts = {
     name: {sz: ImageFont.truetype(str(file), size=sz) for sz in font_sizes}
     for (name, file) in font_files.items()
 }
-
-FONT_NAMES = set(list(font_files.keys()))
+FONT_NAME_LIST = sorted(font_files)
+FONT_NAMES = set(FONT_NAME_LIST)
 MAX_SIZE = max(font_sizes)
 MIN_SIZE = min(font_sizes)
 
 COUNT_KEY = "image_count"
+
+Fonts = enum.Enum("Fonts", [(name, name) for name in FONT_NAME_LIST], type=str)

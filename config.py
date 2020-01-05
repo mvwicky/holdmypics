@@ -14,6 +14,7 @@ _img_cache = str(HERE / ".cache" / "images")
 
 class BaseConfig(object):
     DEBUG = env.bool("DEBUG", default=False)
+    APP_TITLE = env("APP_TITLE", default="Hold My Pics")
     REDIS_URL = env("REDIS_URL")
 
 
