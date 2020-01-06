@@ -10,6 +10,7 @@ from .converters import DimensionConverter, ColorConverter
 redis_client = FlaskRedis()
 
 CACHE_CONTROL_MAX = "max-age=315360000, public, immutable"
+HSTS_HEADER = "max-age=300; includeSubDomains"
 
 
 def create_app(config_class=Config):
@@ -81,6 +82,7 @@ def create_app(config_class=Config):
             if len(parts) == 3:
                 res.headers["Cache-Control"] = CACHE_CONTROL_MAX
 
+        res.headers["Strict-Transport-Security"] = HSTS_HEADER
         res.headers["X-Powered-By"] = "Flask"
         elapsed = time.monotonic() - request.start_time
         res.headers["X-Processing-Time"] = elapsed
