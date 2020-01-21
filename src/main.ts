@@ -3,7 +3,7 @@ import "sanitize.css/sanitize.css";
 import "sanitize.css/typography.css";
 import "sanitize.css/forms.css";
 
-import feather from "feather-icons";
+import "./styles.scss";
 
 function truthy<T>(input: T | null | undefined): input is T {
   return input !== null && input !== undefined;
@@ -92,7 +92,9 @@ function isEndpointArgs(input: {
   }
 
   function main() {
-    feather.replace();
+    getFeather().then(feather => {
+      feather.replace();
+    });
 
     const exampleImage = doc.querySelector<HTMLImageElement>("#example-image");
     if (!truthy(exampleImage)) {
@@ -117,7 +119,7 @@ function isEndpointArgs(input: {
     if (truthy(copyIconEl) && truthy(checkIconEl)) {
       const copyIcon = copyIconEl;
       const checkIcon = checkIconEl;
-      import("clipboard").then(({ default: Clipboard }) => {
+      getClipboard().then(({ default: Clipboard }) => {
         const copy = new Clipboard(copyButton);
         copy.on("success", () => {
           copyIcon.style.display = "none";
@@ -166,3 +168,11 @@ function isEndpointArgs(input: {
     }
   }
 })(document, window);
+
+function getClipboard() {
+  return import(/* webpackChunkName: "clipboard" */ "clipboard");
+}
+
+function getFeather() {
+  return import(/* webpackChunkName: "feather" */ "feather-icons");
+}

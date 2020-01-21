@@ -9,29 +9,10 @@ pytest-report/
 .cov
 
 dummy_flask/api/images/
-dummy_flask/templates/*.html
-
-
-tokei-stats.json
-tokei-stats.yaml
-
-sell/tests/emails_and_phone_numbers.json
-sell/tests/test_images/*
-
-devdocs/
+dummy_flask/core/templates/*.html
 
 *.pem
 .envrc
-fuel_econ.csv
-fuel_econ_filtered.csv
-fuel_econ_test.csv
-fuel_econ.csv.gz
-fuel_econ_filtered.csv.gz
-fuel_econ_test.csv.gz
-vins.txt.gz
-
-bundles/**/*.*
-!bundles/Tupfile
 
 ### Webpack ###
 # ProfilingPlugin
@@ -44,8 +25,6 @@ webpack-custom-stats.json
 webpack-profile.json
 profile.json
 
-staticfiles/
-!staticfiles/assets.py
 
 pip-wheel-metadata/
 

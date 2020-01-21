@@ -1,7 +1,7 @@
 {
-  "python.pythonPath": "/Users/michael/.pyenv/versions/dummy-flask-3.7.5/bin/python",
+  "python.pythonPath": "/Users/michael/.pyenv/versions/dummy-flask-3.8.0/bin/python",
   "python.linting.flake8Args": ["--config=${workspaceFolder}/.flake8"],
-  "python.sortImports.path": "${env:HOME}/.pyenv/versions/dummy-flask-3.7.5/bin/isort",
+  "python.sortImports.path": "${env:HOME}/.pyenv/versions/dummy-flask-3.8.0/bin/isort",
   "files.exclude": {
     "**/.git": true,
     "**/.svn": true,
@@ -10,15 +10,19 @@
     "**/.DS_Store": true,
     "**/__pycache__": true,
     "node_modules": true,
-    "**/dist": true,
+    "./dist/": true,
     "dummy_flask/api/images": true,
     ".cache": true,
     "*.sublime*": true,
     "*.egg-info": true
   },
-  "python.testing.pytestPath": "${env:HOME}/.pyenv/versions/dummy-flask-3.7.5/bin/pytest",
+  "python.testing.pytestPath": "${env:HOME}/.pyenv/versions/dummy-flask-3.8.0/bin/pytest",
   "python.testing.pytestArgs": ["tests"],
   "python.testing.unittestEnabled": false,
   "python.testing.nosetestsEnabled": false,
-  "python.testing.pytestEnabled": true
+  "python.testing.pytestEnabled": true,
+  "editor.tabSize": 2,
+  "[python]": {
+    "editor.tabSize": 4
+  }
 }

@@ -1,37 +1,66 @@
 {
   "name": "dummy-flask",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Placeholder image generator",
-  "main": "dummy_flask/static/main.js",
   "repository": "https://github.com/mvwicky/dummy-flask.git",
-  "author": "Michael Van Wickle <mvanwickle@gmail.com>",
   "license": "MIT",
-  "engines": {
-    "node": ">=10",
-    "yarn": "1.x"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.0.0-0",
-    "@babel/preset-env": "^7.5.5",
-    "@babel/preset-react": "^7.0.0",
-    "@types/clipboard": "^2.0.1",
-    "@types/feather-icons": "^4.7.0",
-    "cross-env": "^6.0.0",
-    "eslint": "^6.1.0",
-    "eslint-config-prettier": "^6.0.0",
-    "eslint-plugin-prettier": "^3.1.0",
-    "node-sass": "^4.12.0",
-    "parcel-bundler": "^1.12.3",
-    "prettier": "^1.18.2",
-    "typescript": "^3.6.3"
-  },
+  "author": "Michael Van Wickle <mvanwickle@gmail.com>",
+  "main": "./src/main.ts",
   "scripts": {
-    "build": "make prod"
+    "build": "cross-env NODE_ENV=production webpack --config webpack.config.ts --progress",
+    "build:dev": "cross-env NODE_ENV=development webpack --config webpack.config.ts --progress",
+    "build:prod": "cross-env NODE_ENV=production webpack --config webpack.config.ts --progress"
   },
   "dependencies": {
     "balloon-css": "^1.0.3",
     "clipboard": "^2.0.4",
     "feather-icons": "^4.24.0",
     "sanitize.css": "^11.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.0.0-0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.8.3",
+    "@babel/plugin-proposal-optional-chaining": "^7.8.3",
+    "@babel/preset-env": "^7.8.3",
+    "@babel/preset-react": "^7.0.0",
+    "@babel/preset-typescript": "^7.8.3",
+    "@types/clipboard": "^2.0.1",
+    "@types/feather-icons": "^4.7.0",
+    "@types/mini-css-extract-plugin": "^0.9.0",
+    "@types/node": "^13.1.8",
+    "@types/optimize-css-assets-webpack-plugin": "^5.0.1",
+    "@types/terser-webpack-plugin": "^2.2.0",
+    "@types/webpack": "^4.41.2",
+    "autoprefixer": "^9.7.4",
+    "babel-loader": "^8.0.6",
+    "clean-webpack-plugin": "^3.0.0",
+    "core-js": "^3.6.4",
+    "cross-env": "^6.0.0",
+    "css-loader": "^3.4.2",
+    "eslint": "^6.1.0",
+    "eslint-config-prettier": "^6.0.0",
+    "eslint-plugin-prettier": "^3.1.0",
+    "html-webpack-plugin": "^4.0.0-beta.11",
+    "mini-css-extract-plugin": "^0.9.0",
+    "node-sass": "^4.12.0",
+    "optimize-css-assets-webpack-plugin": "^5.0.3",
+    "parcel-bundler": "^1.12.3",
+    "postcss-loader": "^3.0.0",
+    "prettier": "^1.18.2",
+    "sass": "^1.25.0",
+    "sass-loader": "^8.0.2",
+    "style-loader": "^1.1.3",
+    "terser-webpack-plugin": "^2.3.2",
+    "ts-node": "^8.6.2",
+    "typescript": "^3.6.3",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10"
+  },
+  "engines": {
+    "node": ">=10",
+    "yarn": "1.x"
+  },
+  "entry": {
+    "main": "./src/main.ts"
   }
 }

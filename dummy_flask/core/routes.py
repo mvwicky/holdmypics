@@ -68,9 +68,9 @@ def get_context():
 
 @bp.route("/")
 def index():
-    return render_template("base.jinja", **get_context())
+    return render_template("base-out.html", **get_context())
 
 
-@bp.route("/grid/")
-def grid():
-    return render_template("grid.jinja", **get_context())
+# @bp.route("/grid/")
+# def grid():
+#     return render_template("grid.jinja", **get_context())

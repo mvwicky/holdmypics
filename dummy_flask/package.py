@@ -13,13 +13,18 @@ FileMeta = Dict[str, str]
 FileMetaList = List[FileMeta]
 
 
+def find_path_named(name: str, start: Path = CWD, file_only: bool = False) -> Path:
+    p = start / name
+    if p.exists():
+        if not file_only or p.is_file():
+            return p
+    if p.parent == p:
+        raise RuntimeError(f"Traversed to root, unable to find {name}")
+    return find_path_named(name, p.parent, file_only=file_only)
+
+
 def find_pyproject(start: Path = CWD) -> Path:
-    pyproj = start / "pyproject.toml"
-    if pyproj.is_file():
-        return pyproj
-    if start.parent == start:
-        raise RuntimeError("Traversed to root, unable to find pyproject.toml")
-    return find_pyproject(start.parent)
+    return find_path_named("pyproject.toml", file_only=True)
 
 
 def fmt_hash(pkg_hash: str, indent: int = 4) -> str:
