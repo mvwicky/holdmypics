@@ -7,7 +7,7 @@
   "author": "Michael Van Wickle <mvanwickle@gmail.com>",
   "main": "./src/main.ts",
   "scripts": {
-    "build": "cross-env NODE_ENV=production webpack --config webpack.config.ts --progress",
+    "build": "cross-env NODE_ENV=production webpack --config webpack.config.ts",
     "build:dev": "cross-env NODE_ENV=development webpack --config webpack.config.ts --progress",
     "build:prod": "cross-env NODE_ENV=production webpack --config webpack.config.ts --progress"
   },
