@@ -5,7 +5,6 @@ from typing import Optional
 from funcy import ignore, re_tester
 
 from .._types import Dimension
-from ..utils import config_value
 from . import bp
 
 ignore_file = ignore(FileNotFoundError, default=None)
@@ -31,7 +30,7 @@ class GeneratedFiles(object):
     @property
     def max_files(self) -> int:
         if self._max_files is None:
-            self._max_files = config_value("SAVED_IMAGES_MAX_NUM", 1)
+            self._max_files = bp.max_files
         return self._max_files
 
     @property
@@ -52,11 +51,14 @@ class GeneratedFiles(object):
 
         return path
 
-    def clean(self):
+    def collect_for_cleaning(self):
         files = [
             os.path.join(bp.images_folder, f) for f in os.listdir(bp.images_folder)
         ]
-        files = sorted(filter(os.path.isfile, files), key=os.path.getmtime)
+        return sorted(filter(os.path.isfile, files), key=os.path.getmtime)
+
+    def clean(self):
+        files = self.collect_for_cleaning()
         num_deleted = 0
         if len(files) > self.max_files:
             to_delete = files[: self.max_files]

@@ -1,9 +1,8 @@
 import os
+import random
 from string import hexdigits
 
 import attr
-import click
-from flask import after_this_request
 from PIL import Image, ImageDraw
 
 from .. import redis_client
@@ -11,6 +10,10 @@ from .._types import Dimension
 from ..constants import COUNT_KEY, MAX_SIZE, MIN_SIZE, font_sizes, fonts
 from .files import files
 from .image_args import ImageArgs
+
+
+def random_color():
+    return "".join([f"{random.randrange(256):02x}" for _ in range(3)])
 
 
 def px_to_pt(px: float) -> float:
@@ -79,14 +82,6 @@ def make_image(
     bg_color = get_color(bg_color)
     fg_color = get_color(fg_color)
     path = files.get_file_name(size, bg_color, fg_color, fmt, *attr.astuple(args))
-
-    if files.need_to_clean:
-
-        @after_this_request
-        def _clean(res):
-            click.echo("Cleaning")
-            files.clean()
-            return res
 
     if os.path.isfile(path):
         return path

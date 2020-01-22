@@ -13,7 +13,16 @@ function isInput(input: Element | RadioNodeList): input is HTMLInputElement {
   return "checkValidity" in input;
 }
 
-const ARGS = ["width", "height", "bg", "fg", "fmt", "imageText", "font"];
+const ARGS = [
+  "width",
+  "height",
+  "bg",
+  "fg",
+  "fmt",
+  "imageText",
+  "font",
+  "seed"
+];
 
 function isEndpointArgs(input: {
   [k: string]: string;
@@ -29,16 +38,18 @@ function isEndpointArgs(input: {
   }
 
   function makeEndpoint(args: MakeEndpointArgs) {
-    const { width, height, bg, fg, fmt, imageText, font } = args;
+    const { width, height, bg, fg, fmt, imageText, font, seed } = args;
     const path = `/api/${width}x${height}/${bg}/${fg}/${fmt}/`;
-    const url = new URL(global.location.href);
-    url.pathname = path;
+    const url = new URL(path, global.location.href);
     url.search = "";
     if (imageText) {
       url.searchParams.append("text", imageText);
     }
     if (font) {
       url.searchParams.append("font", font);
+    }
+    if (seed) {
+      url.searchParams.append("seed", seed);
     }
     return url;
   }

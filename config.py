@@ -15,10 +15,12 @@ _img_cache = str(HERE / ".cache" / "images")
 class BaseConfig(object):
     DEBUG = env.bool("DEBUG", default=False)
     REDIS_URL = env("REDIS_URL")
+    LOG_DIR = env("LOG_DIR", default=None)
 
 
 class Config(BaseConfig):
     MAX_AGE = env.int("MAX_AGE", default=86400)
+    HSTS_SECONDS = env.int("HSTS_SECONDS", default=600)
     SEND_FILE_MAX_AGE_DEFAULT = env.int("SEND_FILE_MAX_AGE_DEFAULT", default=86400)
     IMAGE_CACHE_SIZE = env.int(
         "IMAGE_CACHE_SIZE", default=128, validate=lambda s: s >= 0

@@ -7,7 +7,7 @@ import toml
 from flask import Flask
 
 from . import __version__
-from .package import Package, find_path_named
+from .package import Package
 
 
 def register(app: Flask):
@@ -69,16 +69,3 @@ def register(app: Flask):
                 subprocess.run(args)
         else:
             click.echo("No package.json found.")
-
-    @app.cli.command()
-    def icons():
-        from bs4 import BeautifulSoup
-
-        node_modules = find_path_named("node_modules")
-        icons_dir = node_modules / "feather-icons" / "dist" / "icons"
-        svgs = icons_dir.glob("*svg")
-        an_icon = next(svgs)
-        print(an_icon.name)
-        soup = BeautifulSoup(an_icon.read_text(), "xml")
-        p = soup.find("path")
-        print(p.attrs["d"])

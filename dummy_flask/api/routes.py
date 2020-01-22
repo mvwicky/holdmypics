@@ -1,15 +1,20 @@
 import functools
+import random
 from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 
-from flask import abort, current_app, redirect, request, send_file
+from flask import abort, after_this_request, current_app, redirect, request, send_file
 from funcy import merge
 
 from .._types import Dimension
 from ..constants import FONT_NAMES, img_formats
 from ..utils import make_rules
 from . import bp
+from .files import files
 from .image_args import ImageArgs
-from .utils import make_image
+from .utils import make_image, random_color
+
+
+RAND_STR = "rand".casefold()
 
 
 @functools.lru_cache()
@@ -33,6 +38,16 @@ def make_route(prefix: str = ""):
     return func
 
 
+def do_cleanup(res):
+    n = files.clean()
+    current_app.logger.info("Cleaned %d files", n)
+    return res
+
+
+# @bp.route("/rand/<dim:size>/")
+# def random_image()
+
+
 @make_route()
 def image_route(size: Dimension, bg_color: str, fg_color: str, fmt: str):
     fmt = fmt.lower()
@@ -47,7 +62,17 @@ def image_route(size: Dimension, bg_color: str, fg_color: str, fmt: str):
         url = urlunsplit(parts._replace(query=urlencode(query_list, doseq=True)))
         return redirect(url)
 
+    if RAND_STR in map(str.casefold, [bg_color, fg_color]):
+        random.seed(args.seed)
+        if bg_color.casefold() == RAND_STR:
+            bg_color = random_color()
+        if fg_color.casefold() == RAND_STR:
+            fg_color = random_color()
+
     path = image_response(size, bg_color, fg_color, fmt, args)
+    if files.need_to_clean:
+        after_this_request(do_cleanup)
+
     mime_fmt = "jpeg" if fmt == "jpg" else fmt
     kw = {
         "mimetype": f"image/{mime_fmt}",

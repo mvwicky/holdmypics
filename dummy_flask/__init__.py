@@ -1,24 +1,23 @@
-import logging.config
+import os
 import time
+from logging.config import dictConfig
 
 from flask import Flask, request, send_from_directory
 from flask_redis import FlaskRedis
 
 from config import Config
-from .converters import DimensionConverter, ColorConverter
+from .converters import ColorConverter, DimensionConverter
 
 redis_client = FlaskRedis()
 
 CACHE_CONTROL_MAX = "max-age=315360000, public, immutable"
-HSTS_HEADER = "max-age=300; includeSubDomains"
+
+CWD = os.getcwd()
 
 
-def create_app(config_class=Config):
-    app = Flask(__name__)
-    app.config.from_object(config_class)
-
-    gmsg = "{message}"
-    logging.config.dictConfig(
+def config_logging(log_dir=CWD):
+    log_file = os.path.join(log_dir, f"{__name__}.log")
+    dictConfig(
         {
             "version": 1,
             "disable_existing_loggers": False,
@@ -27,7 +26,7 @@ def create_app(config_class=Config):
                     "format": "[{asctime}] {levelname} {name} in {module}: {message}",
                     "style": "{",
                 },
-                "werk": {"format": gmsg, "style": "{"},
+                "werk": {"format": "{message}", "style": "{"},
             },
             "handlers": {
                 "wsgi": {
@@ -40,13 +39,31 @@ def create_app(config_class=Config):
                     "stream": "ext://sys.stderr",
                     "formatter": "werk",
                 },
+                __name__: {
+                    "class": "logging.handlers.RotatingFileHandler",
+                    "level": "DEBUG",
+                    "filename": log_file,
+                    "formatter": "wsgi",
+                    "maxBytes": int(1 << 20),
+                    "backupCount": 6,
+                },
             },
             "loggers": {
                 "werkzeug": {"handlers": ["werk"]},
-                app.name: {"level": "INFO", "handlers": ["wsgi"]},
+                __name__: {"level": "INFO", "handlers": ["wsgi", __name__]},
             },
         }
     )
+
+
+def create_app(config_class=Config):
+    config_logging(config_class.LOG_DIR or CWD)
+
+    app = Flask(__name__)
+    app.config.from_object(config_class)
+
+    hsts_seconds = app.config["HSTS_SECONDS"]
+    HSTS_HEADER = f"max-age={hsts_seconds}; includeSubDomains"
 
     app.url_map.redirect_defaults = False
     app.url_map.converters.update({"dim": DimensionConverter, "col": ColorConverter})
@@ -64,8 +81,6 @@ def create_app(config_class=Config):
     from . import cli
 
     cli.register(app)
-
-    # print(app.url_map)
 
     @app.before_request
     def before_request_cb():

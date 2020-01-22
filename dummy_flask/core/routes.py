@@ -26,7 +26,7 @@ def get_context():
         fg_color=fg_color,
         fmt=fmt,
     )
-    color_pattern = r"([a-fA-F0-9]{3})|([a-fA-F0-9]{6})"
+    color_pattern = r"(([a-fA-F0-9]{3})|([a-fA-F0-9]{6}))|rand"
     img_query = urlencode({"text": text, "font": font})
     font_names = [(n, n.replace("-", " ").title()) for n in sorted(FONT_NAMES)]
     num_fields = {"width": width, "height": height}
@@ -59,6 +59,7 @@ def get_context():
         "font_names": font_names,
         "img_formats": img_formats,
         "font": font,
+        "seed": None,
         "color_pattern": color_pattern,
         "num_fields": num_fields,
         "col_fields": col_fields,

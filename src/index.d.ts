@@ -7,6 +7,7 @@ interface MakeEndpointArgs {
   fmt: string;
   imageText: string;
   font: string;
+  seed: string;
 }
 
 interface AnyFunc {

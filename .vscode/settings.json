@@ -14,7 +14,10 @@
     "dummy_flask/api/images": true,
     ".cache": true,
     "*.sublime*": true,
-    "*.egg-info": true
+    "*.egg-info": true,
+    "pytest-report": true,
+    ".pytest_cache": true,
+    ".cov": true
   },
   "python.testing.pytestPath": "${env:HOME}/.pyenv/versions/dummy-flask-3.8.0/bin/pytest",
   "python.testing.pytestArgs": ["tests"],
