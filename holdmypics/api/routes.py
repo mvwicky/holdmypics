@@ -32,7 +32,6 @@ def make_route(prefix: str = ""):
 
     def func(f):
         for rule, defaults in rules:
-            print(rule)
             bp.add_url_rule(prefix + rule, None, f, defaults=defaults)
         return f
 

@@ -161,7 +161,24 @@ const config: webpack.Configuration = {
         new TerserPlugin({
           cache: true,
           parallel: true,
-          sourceMap: true
+          sourceMap: true,
+          terserOptions: {
+            parse: {
+              html5_comments: false,
+              shebang: false
+            },
+            compress: {
+              drop_console: true,
+              drop_debugger: true,
+              ecma: 2016,
+              passes: 2
+            },
+            output: {
+              comments: false,
+              ecma: 2016,
+              indent_level: 2
+            }
+          }
         })
       ),
       ifProd(
