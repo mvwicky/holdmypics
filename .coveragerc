@@ -13,5 +13,5 @@ exclude_lines =
     def __repr__
 
 [html]
-title = Dummy Flask Coverage Report
+title = Hold My Pics Coverage Report
 directory = .cov/htmlcov

@@ -1,8 +1,8 @@
 {
-  "name": "dummy-flask",
+  "name": "holdmypics",
   "version": "0.7.0",
   "description": "Placeholder image generator",
-  "repository": "https://github.com/mvwicky/dummy-flask.git",
+  "repository": "https://github.com/mvwicky/holdmypics.git",
   "license": "MIT",
   "author": "Michael Van Wickle <mvanwickle@gmail.com>",
   "main": "./src/main.ts",

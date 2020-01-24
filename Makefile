@@ -5,8 +5,9 @@ PARCEL=$(YARN_RUN) parcel
 PARCEL_BUILD=$(PARCEL) build
 
 INPUT_DIR=src
-TEMPLATES_DIR=dummy_flask/templates
-STATIC_DIR=dummy_flask/static/dist
+ROOT_DIR=holdmypics
+TEMPLATES_DIR=$(ROOT_DIR)/templates
+STATIC_DIR=$(ROOT_DIR)/static/dist
 
 PARCEL_INPUT=$(INPUT_DIR)/*.html
 OUTPUT_DIR=dist

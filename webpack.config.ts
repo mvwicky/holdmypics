@@ -46,11 +46,11 @@ const fontHash = `${hashFn}:hash:hex:${hashlength}`;
 const fontName = `[name].[${fontHash}].[ext]`;
 
 const srcDir = path.resolve(__dirname, "src");
-const dummyDir = path.resolve(__dirname, "dummy_flask");
+const rootDir = path.resolve(__dirname, "holdmypics");
 // const outPath = path.resolve(__dirname, "dist");
-const outPath = path.join(dummyDir, "static", "dist");
+const outPath = path.join(rootDir, "static", "dist");
 
-const templatesDir = path.join(dummyDir, "core", "templates");
+const templatesDir = path.join(rootDir, "core", "templates");
 
 const publicPath = "/static/dist/";
 

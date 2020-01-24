@@ -4,7 +4,7 @@ import pytest
 @pytest.fixture()
 def app():
     from config import Config
-    from dummy_flask import create_app
+    from holdmypics import create_app
 
     class TestConfig(Config):
         TESTING = True
@@ -14,7 +14,7 @@ def app():
 
     @app.before_first_request
     def _clean():
-        from dummy_flask.api.files import files
+        from holdmypics.api.files import files
 
         files.clean()
 

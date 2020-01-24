@@ -8,8 +8,8 @@ pytest-report/
 .anaconda
 .cov
 
-dummy_flask/api/images/
-dummy_flask/core/templates/*.html
+*/api/images/
+*/core/templates/*.html
 
 *.pem
 .envrc
