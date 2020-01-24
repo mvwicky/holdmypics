@@ -1,8 +1,3 @@
-import "balloon-css/src/balloon.scss";
-import "sanitize.css/sanitize.css";
-import "sanitize.css/typography.css";
-import "sanitize.css/forms.css";
-
 import "./styles.scss";
 
 function truthy<T>(input: T | null | undefined): input is T {
@@ -13,16 +8,7 @@ function isInput(input: Element | RadioNodeList): input is HTMLInputElement {
   return "checkValidity" in input;
 }
 
-const ARGS = [
-  "width",
-  "height",
-  "bg",
-  "fg",
-  "fmt",
-  "imageText",
-  "font",
-  "seed"
-];
+const ARGS = ["width", "height", "bg", "fg", "fmt", "imageText", "font"];
 
 function isEndpointArgs(input: {
   [k: string]: string;
@@ -103,10 +89,6 @@ function isEndpointArgs(input: {
   }
 
   function main() {
-    getFeather().then(feather => {
-      feather.replace();
-    });
-
     const exampleImage = doc.querySelector<HTMLImageElement>("#example-image");
     if (!truthy(exampleImage)) {
       return;
@@ -115,8 +97,8 @@ function isEndpointArgs(input: {
     if (!truthy(endpoint)) {
       return;
     }
-    const copyButton = doc.getElementById("copy-button");
-    if (!truthy(copyButton)) {
+    const btn = doc.getElementById("copy-button");
+    if (!truthy(btn)) {
       return;
     }
     const form = doc.querySelector("form");
@@ -124,33 +106,21 @@ function isEndpointArgs(input: {
       return;
     }
 
-    const copyIconEl = copyButton.querySelector<HTMLElement>(".feather-copy");
-    const checkIconEl = copyButton.querySelector<HTMLElement>(".feather-check");
+    getFeather().then(feather => {
+      feather.replace();
+      const copyIconEl = btn.querySelector<HTMLElement>(".feather-copy");
+      const checkIconEl = btn.querySelector<HTMLElement>(".feather-check");
+      if (truthy(copyIconEl) && truthy(checkIconEl)) {
+        afterFeather(btn, copyIconEl, checkIconEl);
+      }
+    });
 
-    if (truthy(copyIconEl) && truthy(checkIconEl)) {
-      const copyIcon = copyIconEl;
-      const checkIcon = checkIconEl;
-      getClipboard().then(({ default: Clipboard }) => {
-        const copy = new Clipboard(copyButton);
-        copy.on("success", () => {
-          copyIcon.style.display = "none";
-          checkIcon.style.display = "inline-flex";
-          copyButton.dataset.balloonPos = "up";
-          copyButton.dataset.balloonVisible = "";
-          window.setTimeout(() => {
-            checkIcon.style.display = "none";
-            copyIcon.style.display = "inline-flex";
-            delete copyButton.dataset.balloonPos;
-            delete copyButton.dataset.balloonVisible;
-          }, 2000);
-        });
-      });
-    }
+    console.log("Everything seems to exist.");
 
     const initialParams = gatherParams(form);
     if (truthy(initialParams) && isEndpointArgs(initialParams)) {
       const url = makeEndpoint(initialParams);
-      copyButton.dataset.clipboardText = url.href;
+      btn.dataset.clipboardText = url.href;
     }
 
     const elements = form.elements;
@@ -164,8 +134,8 @@ function isEndpointArgs(input: {
         if (truthy(endpoint)) {
           endpoint.textContent = url.pathname + url.search;
         }
-        if (truthy(copyButton)) {
-          copyButton.dataset.clipboardText = url.href;
+        if (truthy(btn)) {
+          btn.dataset.clipboardText = url.href;
         }
         const id = elements[i].id;
         if (truthy(exampleImage) && !["width", "height"].includes(id)) {
@@ -179,6 +149,29 @@ function isEndpointArgs(input: {
     }
   }
 })(document, window);
+
+function afterFeather(
+  copyBtn: HTMLElement,
+  copyIcon: HTMLElement,
+  checkIcon: HTMLElement
+) {
+  console.log("Check and copy icons exist.");
+  getClipboard().then(({ default: Clipboard }) => {
+    const copy = new Clipboard(copyBtn);
+    copy.on("success", () => {
+      copyIcon.style.display = "none";
+      checkIcon.style.display = "inline-flex";
+      copyBtn.dataset.balloonPos = "up";
+      copyBtn.dataset.balloonVisible = "";
+      window.setTimeout(() => {
+        checkIcon.style.display = "none";
+        copyIcon.style.display = "inline-flex";
+        delete copyBtn.dataset.balloonPos;
+        delete copyBtn.dataset.balloonVisible;
+      }, 1500);
+    });
+  });
+}
 
 function getClipboard() {
   return import(/* webpackChunkName: "clipboard" */ "clipboard");

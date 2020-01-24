@@ -16,7 +16,7 @@ def get_context():
 
     width, height = 638, 328
     bg_color, fg_color = "cef", "555"
-    fmt = "webp"
+    fmt = "png"
     text = "Something Funny"
     font = "overpass"
     img_url = url_for(

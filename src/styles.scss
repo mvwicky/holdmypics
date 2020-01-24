@@ -1,3 +1,8 @@
+@import "../node_modules/balloon-css/src/balloon";
+@import "../node_modules/sanitize.css/sanitize.css";
+@import "../node_modules/sanitize.css/typography.css";
+@import "../node_modules/sanitize.css/forms.css";
+
 html {
   padding: 1em;
   @media (min-width: 34em) {
@@ -31,8 +36,7 @@ html {
   text-decoration: underline;
 }
 
-.feather-copy,
-.feather-check {
+.feather {
   width: 1em;
   height: 1em;
   display: inline-flex;

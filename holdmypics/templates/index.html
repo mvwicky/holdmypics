@@ -96,15 +96,18 @@
     </div>
   </form>
 
-
-  <br><br>
-
   <div id="routes">
     <h3>Routes:</h3>
     {% for rule in rules %}
-    <code>{{ rule|e }}</code>
-    <br><br>
+    <p>
+      <code>{{ rule|e }}</code>
+    </p>
     {% endfor %}
+    <div class="size-explanation">
+      <small>
+        Where <code>&lt;size&gt;</code> is either the width and height of a rectangular image (<code>&lt;width&gt;&times;&lt;height&gt;</code>) or the length of each side of a square image (<code>&lt;side&gt;</code>).
+      </small>
+    </div>
   </div>
 </main>
 <div class="row">

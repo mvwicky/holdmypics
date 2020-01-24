@@ -40,6 +40,10 @@ const cleanOpts: CleanOptions = {
   ]
 };
 
+const relToNode = (...args: string[]) => {
+  return path.resolve(__dirname, "node_modules", ...args);
+};
+
 const hashFn = prodOr("sha256", "md5");
 const hashlength = prodOr(32, 10);
 const fontHash = `${hashFn}:hash:hex:${hashlength}`;
@@ -85,13 +89,13 @@ const config: webpack.Configuration = {
           {
             loader: "babel-loader",
             options: {
-              cacheDirectory: prodOr(false, path.resolve(__dirname, ".cache")),
+              // cacheDirectory: prodOr(false, path.resolve(__dirname, ".cache")),
               exclude: /node_modules/,
               presets: [
                 [
                   "@babel/preset-env",
                   {
-                    corejs: { version: 3, proposals: true },
+                    corejs: { version: 3, proposals: false },
                     modules: false,
                     debug: false,
                     useBuiltIns: "usage"
@@ -113,6 +117,11 @@ const config: webpack.Configuration = {
       },
       {
         test: /\.(s?css)$/,
+        include: [
+          path.join(__dirname, "src"),
+          relToNode("sanitize.css"),
+          relToNode("balloon-css")
+        ],
         use: compact([
           {
             loader: MiniCssExtractPlugin.loader
@@ -162,7 +171,29 @@ const config: webpack.Configuration = {
           canPrint: false
         })
       )
-    ])
+    ]),
+    splitChunks: {
+      cacheGroups: {
+        corejs_es: {
+          test: /node_modules[\\/]core-js[\\/]modules[\\/]es/,
+          name: "core-js-es",
+          minChunks: 1,
+          chunks: "all"
+        },
+        corejs_web: {
+          test: /node_modules[\\/]core-js[\\/]modules[\\/]web/,
+          name: "core-js-web",
+          minChunks: 1,
+          chunks: "all"
+        },
+        corejs_internal: {
+          test: /node_modules[\\/]core-js[\\/]internals[\\/]/,
+          name: "corejs-internal",
+          minChunks: 1,
+          chunks: "all"
+        }
+      }
+    }
   },
   resolve: {
     extensions: [".js"],

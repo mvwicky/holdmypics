@@ -20,7 +20,7 @@ def make_rules():
     rule_parts = [
         (fmt_rule, colors_default),
         ("<string:bg_color>", merge(fg_color_default, fmt_default)),
-        ("<string:bg_color>/<string:fg_color>", fmt_default),
+        # ("<string:bg_color>/<string:fg_color>", fmt_default),
         (f"<string:bg_color>/{fmt_rule}", fg_color_default),
         (f"<string:bg_color>/<string:fg_color>/{fmt_rule}", {}),
     ]

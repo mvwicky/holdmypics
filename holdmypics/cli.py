@@ -45,15 +45,18 @@ def register(app: Flask):
 
         click.secho(f"Current version: ", fg="green", nl=False)
         click.secho(f"{version}", bold=True)
+        version_mod = __version__.__name__
         if __version__.__version__ != version:
-            click.echo("Version module out of date.")
+            click.secho(f"{version_mod} out of date.", fg="yellow")
             ver_file = Path(__version__.__file__)
             ver_file.write_text(f'__version__ = "{version}"\n')
+        else:
+            click.secho(f"{version_mod} up to date.", fg="green")
 
         if pkg.is_file():
             pkg_data = json.loads(pkg.read_text())
             if pkg_data["version"] != version:
-                click.echo("package.json out of date.")
+                click.secho("package.json out of date.", fg="yellow")
                 pkg_data["version"] = version
                 pkg.write_text(json.dumps(pkg_data))
                 args = [
@@ -67,5 +70,7 @@ def register(app: Flask):
                     str(pkg),
                 ]
                 subprocess.run(args)
+            else:
+                click.secho("package.json up to date.", fg="green")
         else:
-            click.echo("No package.json found.")
+            click.secho("No package.json found.", fg="red")

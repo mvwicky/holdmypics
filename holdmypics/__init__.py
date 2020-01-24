@@ -1,4 +1,3 @@
-import os
 import time
 from logging.config import dictConfig
 
@@ -12,11 +11,8 @@ redis_client = FlaskRedis()
 
 CACHE_CONTROL_MAX = "max-age=315360000, public, immutable"
 
-CWD = os.getcwd()
 
-
-def config_logging(log_dir=CWD):
-    log_file = os.path.join(log_dir, f"{__name__}.log")
+def config_logging():
     dictConfig(
         {
             "version": 1,
@@ -39,25 +35,17 @@ def config_logging(log_dir=CWD):
                     "stream": "ext://sys.stderr",
                     "formatter": "werk",
                 },
-                __name__: {
-                    "class": "logging.handlers.RotatingFileHandler",
-                    "level": "DEBUG",
-                    "filename": log_file,
-                    "formatter": "wsgi",
-                    "maxBytes": int(1 << 20),
-                    "backupCount": 6,
-                },
             },
             "loggers": {
                 "werkzeug": {"handlers": ["werk"]},
-                __name__: {"level": "INFO", "handlers": ["wsgi", __name__]},
+                __name__: {"level": "INFO", "handlers": ["wsgi"]},
             },
         }
     )
 
 
 def create_app(config_class=Config):
-    config_logging(config_class.LOG_DIR or CWD)
+    config_logging()
 
     app = Flask(__name__)
     app.config.from_object(config_class)
