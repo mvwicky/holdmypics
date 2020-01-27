@@ -16,6 +16,7 @@ class ImageArgs(object):
     dpi: int = 72
     alpha: float = attr.ib(default=1.0, converter=clamp_alpha)
     seed: str = None
+    debug: bool = False
 
     @classmethod
     def from_request(cls):
@@ -27,5 +28,6 @@ class ImageArgs(object):
             "dpi": request.args.get("dpi", 72, type=int),
             "alpha": request.args.get("alpha", 1.0, type=float),
             "seed": request.args.get("seed", None),
+            "debug": request.args.get("debug", None) is not None,
         }
         return cls(**kw)

@@ -52,15 +52,18 @@ def do_cleanup(res):
 def image_route(size: Dimension, bg_color: str, fg_color: str, fmt: str):
     fmt = fmt.lower()
     if fmt not in img_formats:
-        abort(403)
+        abort(400)
     args = ImageArgs.from_request()
     font_name = args.font_name
-    if font_name not in FONT_NAMES and font_name.lower() in FONT_NAMES:
-        parts = urlsplit(request.url)
-        query = merge(parse_qs(parts.query), {"font": [font_name.lower()]})
-        query_list = [(k, v) for k, v in query.items()]
-        url = urlunsplit(parts._replace(query=urlencode(query_list, doseq=True)))
-        return redirect(url)
+    if font_name not in FONT_NAMES:
+        if font_name.lower() in FONT_NAMES:
+            parts = urlsplit(request.url)
+            query = merge(parse_qs(parts.query), {"font": [font_name.lower()]})
+            query_list = [(k, v) for k, v in query.items()]
+            url = urlunsplit(parts._replace(query=urlencode(query_list, doseq=True)))
+            return redirect(url)
+        else:
+            abort(400)
 
     if RAND_STR in map(str.casefold, [bg_color, fg_color]):
         random.seed(args.seed)

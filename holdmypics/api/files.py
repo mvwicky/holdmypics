@@ -61,7 +61,7 @@ class GeneratedFiles(object):
         files = self.collect_for_cleaning()
         num_deleted = 0
         if len(files) > self.max_files:
-            to_delete = files[: self.max_files]
+            to_delete = files[: -self.max_files]
             num_deleted = len([os.unlink(f) for f in to_delete])
         self.files.clear()
         self.find_current()
