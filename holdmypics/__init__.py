@@ -50,8 +50,17 @@ def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
-    hsts_seconds = app.config["HSTS_SECONDS"]
-    HSTS_HEADER = f"max-age={hsts_seconds}; includeSubDomains"
+    hsts_seconds = app.config.get("HSTS_SECONDS", 0)
+    hsts_preload = app.config.get("HSTS_PRELOAD", False)
+    if hsts_seconds:
+        parts = [
+            f"max-age={hsts_seconds}",
+            "includeSubDomains",
+            "preload" if hsts_preload else False,
+        ]
+        HSTS_HEADER = "; ".join(filter(bool, parts))
+    else:
+        HSTS_HEADER = None
 
     app.url_map.redirect_defaults = False
     app.url_map.converters.update({"dim": DimensionConverter, "col": ColorConverter})
@@ -85,7 +94,8 @@ def create_app(config_class=Config):
             if len(parts) == 3:
                 res.headers["Cache-Control"] = CACHE_CONTROL_MAX
 
-        res.headers["Strict-Transport-Security"] = HSTS_HEADER
+        if HSTS_HEADER is not None:
+            res.headers["Strict-Transport-Security"] = HSTS_HEADER
         res.headers["X-Powered-By"] = "Flask"
         elapsed = time.monotonic() - request.start_time
         res.headers["X-Processing-Time"] = elapsed

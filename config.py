@@ -20,7 +20,9 @@ class BaseConfig(object):
 
 class Config(BaseConfig):
     MAX_AGE = env.int("MAX_AGE", default=86400)
-    HSTS_SECONDS = env.int("HSTS_SECONDS", default=600)
+    with env.prefixed("HSTS_"):
+        HSTS_SECONDS = env.int("SECONDS", default=0)
+        HSTS_PRELOAD = env.bool("PRELOAD", default=False)
     SEND_FILE_MAX_AGE_DEFAULT = env.int("SEND_FILE_MAX_AGE_DEFAULT", default=86400)
     IMAGE_CACHE_SIZE = env.int(
         "IMAGE_CACHE_SIZE", default=128, validate=lambda s: s >= 0
