@@ -20,7 +20,7 @@ marshmallow==3.3.0
 pillow==7.0.0
 pycparser==2.19; sys_platform == "win32" and platform_python_implementation == "CPython"
 python-dotenv==0.10.5
-redis==3.4.0
+redis==3.3.11
 six==1.14.0
 soupsieve==1.9.5
 toml==0.10.0
