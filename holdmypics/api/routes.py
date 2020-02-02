@@ -1,4 +1,3 @@
-import functools
 import random
 from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 
@@ -17,7 +16,6 @@ from .utils import make_image, random_color
 RAND_STR = "rand".casefold()
 
 
-@functools.lru_cache()
 def image_response(size: Dimension, bg: str, fg: str, fmt: str, args: ImageArgs):
     return make_image(size, bg, fg, fmt, args)
 
@@ -40,12 +38,9 @@ def make_route(prefix: str = ""):
 
 def do_cleanup(res):
     n = files.clean()
-    current_app.logger.info("Cleaned %d files", n)
+    if n > 0:
+        current_app.logger.info("Cleaned %d file%s", n, "" if n == 1 else "s")
     return res
-
-
-# @bp.route("/rand/<dim:size>/")
-# def random_image()
 
 
 @make_route()

@@ -2,12 +2,15 @@ import hashlib
 import os
 from typing import Optional
 
+from flask import current_app
 from funcy import ignore, re_tester
 
 from .._types import Dimension
 from . import bp
 
 ignore_file = ignore(FileNotFoundError, default=None)
+
+fname_tbl = str.maketrans({"#": "", " ": "-", ".": ""})
 
 
 class GeneratedFiles(object):
@@ -44,8 +47,13 @@ class GeneratedFiles(object):
         return hasher.hexdigest()
 
     def get_file_name(self, size: Dimension, bg: str, fg: str, fmt: str, *args,) -> str:
-        phash = self.params_hash(size, bg, fg, fmt, *args)
-        name = ".".join([phash, fmt])
+        if current_app.config.get("DEBUG", False):
+            parts = ["x".join(map(str, size)), bg, fg] + list(args)
+            base_name = "-".join(map(str, parts)).translate(fname_tbl)
+            name = ".".join([base_name, fmt])
+        else:
+            phash = self.params_hash(size, bg, fg, fmt, *args)
+            name = ".".join([phash, fmt])
         path = os.path.join(bp.images_folder, name)
         self.files.add(path)
 
@@ -55,13 +63,14 @@ class GeneratedFiles(object):
         files = [
             os.path.join(bp.images_folder, f) for f in os.listdir(bp.images_folder)
         ]
-        return sorted(filter(os.path.isfile, files), key=os.path.getmtime)
+        return sorted(filter(os.path.isfile, files), key=os.path.getatime)
 
     def clean(self):
         files = self.collect_for_cleaning()
-        num_deleted = 0
+        num_deleted, num_files = 0, len(files)
         if len(files) > self.max_files:
-            to_delete = files[: -self.max_files]
+            num = num_files - self.max_files
+            to_delete = files[:num]
             num_deleted = len([os.unlink(f) for f in to_delete])
         self.files.clear()
         self.find_current()

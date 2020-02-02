@@ -103,6 +103,7 @@ def make_image(
     path = files.get_file_name(size, bg_color, fg_color, fmt, *attr.astuple(args))
 
     if os.path.isfile(path):
+        os.utime(path)
         return path
     else:
         redis_client.incr(COUNT_KEY)

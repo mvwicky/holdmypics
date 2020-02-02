@@ -13,7 +13,6 @@ $italic: $regular-base + "-italic";
 $mono: $mono-base + "-regular";
 
 @mixin make-font-face($name, $file-name, $style, $weight) {
-  @debug "#{$font-dir}#{$file-name}";
   @include font-face($name, $font-dir + $file-name, $file-types, false) {
     font-display: $font-display;
     font-style: $style;

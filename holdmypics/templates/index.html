@@ -22,7 +22,7 @@
       <code id="endpoint">{{ img_url }}?{{ img_query }}</code>
       <button
         id="copy-button"
-        data-clipboard-target="#endpoint"
+        data-clipboard-text="{{ img_url }}?{{ img_query }}"
         aria-label="Copied to clipboard!"
       >
         <i
@@ -37,11 +37,11 @@
   <form id="params-form" action="">
     <div class="form-group">
       <label for="width">Width</label>
-      <input id="width" type="number" min="1" step="1" value="{{ width }}">
+      <input id="width" type="number" min="1" step="1" value="{{ width }}" required>
     </div>
     <div class="form-group">
       <label for="height">Height</label>
-      <input id="height" type="number" min="1" step="1" value="{{ height }}">
+      <input id="height" type="number" min="1" step="1" value="{{ height }}" required>
     </div>
     <div class="form-group">
       <label for="bg">Background Color</label>

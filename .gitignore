@@ -8,6 +8,9 @@ pytest-report/
 .anaconda
 .cov
 
+**/screenshots
+**/videos
+
 */api/images/
 */core/templates/*.html
 

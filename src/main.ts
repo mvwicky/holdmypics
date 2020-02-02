@@ -153,6 +153,9 @@ function main() {
       if (truthy(endpoint)) {
         endpoint.textContent = url.pathname + url.search;
       }
+      if (truthy(btn)) {
+        btn.dataset.clipboardText = url.href;
+      }
       const id = elements[i].id;
       if (truthy(exampleImage) && !["width", "height"].includes(id)) {
         exampleImage.src = url.href;
