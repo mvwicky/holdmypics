@@ -1,0 +1,8 @@
+version: '2.1'
+
+services:
+  holdmypics:
+    image: holdmypics
+    build:
+      context: .
+      dockerfile: Dockerfile

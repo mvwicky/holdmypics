@@ -1,0 +1,21 @@
+.feather {
+  width: 1em;
+  height: 1em;
+  align-self: center;
+  bottom: 0.1em;
+  cursor: pointer;
+  position: relative;
+  vertical-align: middle;
+  margin-left: 0.1em;
+}
+
+#copy-button {
+  border-radius: 5px;
+  margin-left: 0.33em;
+  &:hover {
+    background-color: dodgerblue;
+    .feather-copy {
+      stroke: white;
+    }
+  }
+}

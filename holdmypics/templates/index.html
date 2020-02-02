@@ -1,35 +1,35 @@
 <main class="content">
-  <div class="row">
+  <div class="row justify-content-center text-row">
     <h1>Placeholder Image Generator</h1>
   </div>
-  <div class="row">
+  <div class="row justify-content-center text-row">
     <p>
       Ever needed to create some placeholder images?
       Here's an easy way to do that.
     </p>
   </div>
 
-  <div class="row">
+  <div class="row justify-content-center text-row">
     <h2>Images Created: <span id="img-count">{{ count }}</span></h2>
   </div>
 
   <div class="image-container">
-    <div class="row">
+    <div class="row justify-content-center">
       <img id="example-image" src="{{ img_url }}?{{ img_query }}" alt="Example image.">
     </div>
 
-    <div class="row">
+    <div class="row align-items-center justify-content-between endpoint-container">
       <code id="endpoint">{{ img_url }}?{{ img_query }}</code>
       <button
         id="copy-button"
-        data-clipboard-text="{{ img_url }}?{{ img_query }}"
+        data-clipboard-target="#endpoint"
         aria-label="Copied to clipboard!"
       >
         <i
           data-feather="copy"
           title="Copy to clipboard."
         ></i>
-        <i data-feather="check" title="Copied" style="display: none;"></i>
+        <i class="d-none" data-feather="check" title="Copied"></i>
       </button>
     </div>
   </div>

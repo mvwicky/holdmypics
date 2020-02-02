@@ -1,0 +1,22 @@
+version: "2.1"
+
+services:
+  holdmypics:
+    image: holdmypics
+    build: .
+    ports:
+      - "4000:80"
+    networks:
+      - web
+    depends_on:
+      - redis
+  redis:
+    image: redis:5.0
+    ports:
+      - "6379:6379"
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+    command: redis-server --appendonly yes
+    networks:
+      - web

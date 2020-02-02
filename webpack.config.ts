@@ -17,7 +17,7 @@ import * as pkg from "./package.json";
 const prod = process.env.NODE_ENV === "production";
 
 function compact<T>(arr: (T | undefined)[]): T[] {
-  return arr.filter(e => e !== undefined && typeof e !== "undefined") as T[];
+  return arr.filter((e) => e !== undefined && typeof e !== "undefined") as T[];
 }
 
 function prodOr<P = any, D = any>(pVal: P, dVal: D): P | D {
@@ -51,7 +51,6 @@ const fontName = `[name].[${fontHash}].[ext]`;
 
 const srcDir = path.resolve(__dirname, "src");
 const rootDir = path.resolve(__dirname, "holdmypics");
-// const outPath = path.resolve(__dirname, "dist");
 const outPath = path.join(rootDir, "static", "dist");
 
 const templatesDir = path.join(rootDir, "core", "templates");
@@ -79,6 +78,9 @@ const config: webpack.Configuration = {
       template: path.join(srcDir, "template.html"),
       minify: false,
       inject: true
+    }),
+    new webpack.DefinePlugin({
+      PRODUCTION: JSON.stringify(prod)
     })
   ],
   module: {
@@ -89,14 +91,14 @@ const config: webpack.Configuration = {
           {
             loader: "babel-loader",
             options: {
-              // cacheDirectory: prodOr(false, path.resolve(__dirname, ".cache")),
+              cacheDirectory: prodOr(false, path.resolve(__dirname, ".cache")),
+              cacheCompression: true,
               exclude: /node_modules/,
               presets: [
                 [
                   "@babel/preset-env",
                   {
-                    corejs: { version: 3, proposals: false },
-                    modules: false,
+                    corejs: { version: 3 },
                     debug: false,
                     useBuiltIns: "usage"
                   }
@@ -104,7 +106,7 @@ const config: webpack.Configuration = {
                 "@babel/typescript"
               ],
               plugins: [
-                "@babel/plugin-proposal-optional-chaining",
+                ["@babel/plugin-transform-runtime", { useESModules: true }],
                 "@babel/proposal-object-rest-spread"
               ],
               parserOpts: {
@@ -117,11 +119,11 @@ const config: webpack.Configuration = {
       },
       {
         test: /\.(s?css)$/,
-        include: [
-          path.join(__dirname, "src"),
-          relToNode("sanitize.css"),
-          relToNode("balloon-css")
-        ],
+        // include: [
+        //   path.join(__dirname, "src", "scss"),
+        //   relToNode("sanitize.css"),
+        //   relToNode("tippy.js")
+        // ],
         use: compact([
           {
             loader: MiniCssExtractPlugin.loader
@@ -190,12 +192,14 @@ const config: webpack.Configuration = {
       )
     ]),
     splitChunks: {
+      automaticNameDelimiter: "-",
       cacheGroups: {
         corejs_es: {
           test: /node_modules[\\/]core-js[\\/]modules[\\/]es/,
           name: "core-js-es",
           minChunks: 1,
-          chunks: "all"
+          chunks: "all",
+          priority: 20
         },
         corejs_web: {
           test: /node_modules[\\/]core-js[\\/]modules[\\/]web/,
@@ -205,7 +209,7 @@ const config: webpack.Configuration = {
         },
         corejs_internal: {
           test: /node_modules[\\/]core-js[\\/]internals[\\/]/,
-          name: "corejs-internal",
+          name: "core-js-internal",
           minChunks: 1,
           chunks: "all"
         }

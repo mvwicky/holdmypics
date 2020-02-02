@@ -1,6 +1,6 @@
 {
   "name": "holdmypics",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "Placeholder image generator",
   "repository": "https://github.com/mvwicky/holdmypics.git",
   "license": "MIT",
@@ -9,21 +9,20 @@
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack --config webpack.config.ts",
     "build:dev": "cross-env NODE_ENV=development webpack --config webpack.config.ts --progress",
-    "build:prod": "cross-env NODE_ENV=production webpack --config webpack.config.ts --progress"
+    "build:prod": "cross-env NODE_ENV=production webpack --config webpack.config.ts --progress",
+    "watch": "yarn run build:dev --watch"
   },
-  "dependencies": {
-    "balloon-css": "^1.0.3",
-    "clipboard": "^2.0.4",
-    "feather-icons": "^4.24.0",
-    "sanitize.css": "^11.0.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@babel/core": "^7.0.0-0",
     "@babel/plugin-proposal-object-rest-spread": "^7.8.3",
-    "@babel/plugin-proposal-optional-chaining": "^7.8.3",
+    "@babel/plugin-transform-regenerator": "^7.8.3",
+    "@babel/plugin-transform-runtime": "^7.8.3",
     "@babel/preset-env": "^7.8.3",
     "@babel/preset-typescript": "^7.8.3",
+    "@babel/runtime": "^7.8.4",
     "@types/clipboard": "^2.0.1",
+    "@types/debug": "^4.1.5",
     "@types/feather-icons": "^4.7.0",
     "@types/mini-css-extract-plugin": "^0.9.0",
     "@types/node": "^13.1.8",
@@ -33,22 +32,27 @@
     "autoprefixer": "^9.7.4",
     "babel-loader": "^8.0.6",
     "clean-webpack-plugin": "^3.0.0",
+    "clipboard": "^2.0.4",
     "core-js": "^3.6.4",
     "cross-env": "^6.0.0",
     "css-loader": "^3.4.2",
+    "debug": "^4.1.1",
     "eslint": "^6.1.0",
     "eslint-config-prettier": "^6.0.0",
     "eslint-plugin-prettier": "^3.1.0",
+    "feather-icons": "^4.24.0",
     "html-webpack-plugin": "^4.0.0-beta.11",
     "mini-css-extract-plugin": "^0.9.0",
-    "node-sass": "^4.12.0",
     "optimize-css-assets-webpack-plugin": "^5.0.3",
     "postcss-loader": "^3.0.0",
     "prettier": "^1.18.2",
+    "sanitize.css": "^11.0.0",
     "sass": "^1.25.0",
     "sass-loader": "^8.0.2",
+    "sass-mq": "^5.0.1",
     "style-loader": "^1.1.3",
     "terser-webpack-plugin": "^2.3.2",
+    "tippy.js": "^5.2.0",
     "ts-node": "^8.6.2",
     "typescript": "^3.6.3",
     "webpack": "^4.41.5",
@@ -60,5 +64,9 @@
   },
   "entry": {
     "main": "./src/main.ts"
+  },
+  "prettier": {
+    "arrowParens": "always",
+    "tabWidth": 2
   }
 }

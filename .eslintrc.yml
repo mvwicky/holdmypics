@@ -4,6 +4,8 @@ env:
   node: false
 extends:
   - "eslint:recommended"
+  - plugin:prettier/recommended
+plugins:
 globals:
   Atomics: readonly
   SharedArrayBuffer: readonly

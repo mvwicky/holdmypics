@@ -1,0 +1,56 @@
+$h-spacing: 5rem;
+
+#params-form {
+  border: 1px solid #e9ecef;
+  padding: 1rem;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+  @include mq($from: "md") {
+    margin-left: $h-spacing;
+    margin-right: $h-spacing;
+  }
+}
+
+#routes,
+.endpoint-container {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  @include mq($from: "md") {
+    padding-left: $h-spacing;
+    padding-right: $h-spacing;
+  }
+}
+
+#routes {
+  padding-bottom: 1em;
+}
+
+.image-container {
+  margin-bottom: 1.5rem;
+}
+
+#endpoint {
+  margin-bottom: 0.5rem;
+  @include mq($from: "md") {
+    margin-bottom: 0;
+  }
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.endpoint-container {
+  flex-direction: column;
+  @include mq($from: "md") {
+    flex-direction: row;
+  }
+}
+
+.text-row {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  @include mq($from: "md") {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}

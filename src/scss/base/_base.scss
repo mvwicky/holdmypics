@@ -1,0 +1,41 @@
+html {
+  padding: 1em;
+  @media (min-width: 34em) {
+    padding: 1em calc(40% - 17em);
+  }
+}
+
+.content {
+  border: 1px solid #e9ecef;
+  padding: 0 1rem 1rem;
+  @media (max-width: 992px) {
+    padding: 0 0.2rem;
+  }
+  h1 {
+    margin-bottom: 1.5rem;
+  }
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: center;
+}
+
+code {
+  font-size: 1em;
+  @media (max-width: 1200px) {
+    font-size: calc(0.5em + 0.7vw);
+  }
+}
+
+img {
+  margin: 0.5rem auto 1.5rem;
+  max-width: 100%;
+  height: auto;
+}
+
+.d-none {
+  display: none;
+}

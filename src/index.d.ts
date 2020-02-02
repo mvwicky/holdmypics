@@ -13,3 +13,4 @@ interface MakeEndpointArgs {
 interface AnyFunc {
   (...args: any[]): any;
 }
+declare const PRODUCTION: boolean;
