@@ -5,6 +5,21 @@ html {
   }
 }
 
+body {
+  font-family: $font-family-base;
+}
+
+a[href] {
+  color: hsl(200, 100%, 30%);
+}
+
+pre,
+code,
+kbd,
+samp {
+  font-family: $font-family-mono;
+}
+
 .content {
   border: 1px solid #e9ecef;
   padding: 0 1rem 1rem;
@@ -38,4 +53,8 @@ img {
 
 .d-none {
   display: none;
+}
+
+.rule {
+  display: block;
 }

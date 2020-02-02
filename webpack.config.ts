@@ -33,21 +33,21 @@ const cleanOpts: CleanOptions = {
   dry: false,
   cleanOnceBeforeBuildPatterns: [
     "**/*",
-    "!fonts",
-    "!fonts/**/*",
+    "!**/fonts",
+    "!**/fonts/**/*",
     "!img",
     "!img/**/*"
   ]
 };
 
-const relToNode = (...args: string[]) => {
-  return path.resolve(__dirname, "node_modules", ...args);
-};
+const relToRoot = (...args: string[]) => path.resolve(__dirname, ...args);
+const relToNode = (...args: string[]) => relToRoot("node_modules", ...args);
+const relToSrc = (...args: string[]) => relToRoot("src", ...args);
 
 const hashFn = prodOr("sha256", "md5");
 const hashlength = prodOr(32, 10);
 const fontHash = `${hashFn}:hash:hex:${hashlength}`;
-const fontName = `[name].[${fontHash}].[ext]`;
+const fontName = `[path][name].[${fontHash}].[ext]`;
 
 const srcDir = path.resolve(__dirname, "src");
 const rootDir = path.resolve(__dirname, "holdmypics");
@@ -154,6 +154,20 @@ const config: webpack.Configuration = {
             }
           }
         ])
+      },
+      {
+        test: /\.(woff|woff2|eot|ttf|otf|svg)$/,
+        include: [relToSrc("scss")],
+        use: [
+          {
+            loader: "file-loader",
+            options: {
+              context: "src/scss/theme",
+              name: fontName,
+              esModule: false
+            }
+          }
+        ]
       }
     ]
   },
@@ -224,7 +238,9 @@ const config: webpack.Configuration = {
   stats: {
     modules: false,
     children: false,
-    excludeAssets: [/^fonts\//]
+    excludeAssets: [/^fonts\//],
+    publicPath: true,
+    cachedAssets: true
   }
 };
 

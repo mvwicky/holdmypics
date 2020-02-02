@@ -4,3 +4,14 @@ $mq-breakpoints: (
   md: 768px,
   lg: 992px
 );
+
+$base-font-fallback: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+  "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
+  "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+$font-family-base: "Spectral", $base-font-fallback;
+
+$mono-fallback: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+  "Courier New", monospace;
+
+$font-family-mono: "Fira Mono", $mono-fallback;

@@ -108,8 +108,15 @@
     </p>
     {% endfor %}
     <div class="size-explanation">
+
       <small>
-        Where <code>&lt;size&gt;</code> is either the width and height of a rectangular image (<code>&lt;width&gt;&times;&lt;height&gt;</code>) or the length of each side of a square image (<code>&lt;side&gt;</code>).
+        Where <code>&lt;size&gt;</code> is either the width and height of a rectangular image (<code>width&times;height</code>) or the length of each side of a square image (<code>side</code>), in pixels.
+        <p>
+          <!-- <code class="rule">&lt;bg_color&gt;&nbsp;⟶&nbsp;width&times;height|</code> -->
+          <!-- <code class="rule">&lt;fg_color&gt;&nbsp;⟶&nbsp;width&times;height</code> -->
+          <code class="rule">&lt;size&gt;&nbsp;⟶&nbsp;width&times;height&nbsp;</code>
+          <code class="rule">&lt;size&gt;&nbsp;⟶&nbsp;length</code>
+        </p>
       </small>
     </div>
   </div>
@@ -118,7 +125,10 @@
   <footer>
     <div class="footer-group">
       <h6>Licenses</h6>
-      <div>Fira Mono, Fira Sans, Overpass, and Spectral are licensed under the <a href="{{ url_for('static', filename='licenses/ofl.txt') }}">Open Font License</a>.</div>
+
+      <div>
+        Fira Mono, Fira Sans, Overpass, and Spectral are licensed under the <a href="{{ url_for('static', filename='licenses/ofl.txt') }}">Open Font License</a>.
+      </div>
       <div>Roboto is licensed under the <a href="{{ url_for('static', filename='licenses/apache.txt') }}">Apache License</a>.</div>
     </div>
     <div class="footer-group">

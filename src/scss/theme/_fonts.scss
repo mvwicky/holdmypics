@@ -1,0 +1,27 @@
+@import "../../../node_modules/bourbon/core/bourbon";
+
+$font-dir: "./theme/fonts/";
+$regular-base: "spectral-v6-latin";
+$mono-base: "fira-mono-v8-latin";
+$file-types: ("eot", "woff", "woff2", "ttf", "svg");
+$font-display: fallback;
+
+$regular: $regular-base + "-regular";
+$light: $regular-base + "-200";
+$bold: $regular-base + "-700";
+$italic: $regular-base + "-italic";
+$mono: $mono-base + "-regular";
+
+@mixin make-font-face($name, $file-name, $style, $weight) {
+  @debug "#{$font-dir}#{$file-name}";
+  @include font-face($name, $font-dir + $file-name, $file-types, false) {
+    font-display: $font-display;
+    font-style: $style;
+    font-weight: $weight;
+  }
+}
+@include make-font-face("Spectral", $regular, normal, 400);
+@include make-font-face("Spectral", $bold, normal, 700);
+@include make-font-face("Spectral", $light, normal, 200);
+@include make-font-face("Spectral", $italic, italic, 400);
+@include make-font-face("Fira Mono", $mono, normal, 400);

@@ -12,6 +12,9 @@
 
 @import "./pages/index";
 
+@import "./theme/fonts";
+@import "./theme/theme";
+
 /* HACK: b/c for some reason vendor stuff isn't working. */
 @import "../../node_modules/sanitize.css/sanitize.css";
 @import "../../node_modules/sanitize.css/typography.css";
