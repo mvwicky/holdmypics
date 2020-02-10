@@ -5,7 +5,7 @@ from string import hexdigits
 import attr
 from PIL import Image, ImageDraw
 
-from .. import redis_client
+from .. import redisw
 from .._types import Dimension
 from ..constants import COUNT_KEY, MAX_SIZE, MIN_SIZE, font_sizes, fonts
 from .files import files
@@ -106,7 +106,7 @@ def make_image(
         os.utime(path)
         return path
     else:
-        redis_client.incr(COUNT_KEY)
+        redisw.client.incr(COUNT_KEY)
         save_kw = {}
         kw_func = fmt_kw.get(fmt, None)
         if kw_func is not None:

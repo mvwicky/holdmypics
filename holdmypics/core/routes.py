@@ -2,7 +2,7 @@ from urllib.parse import urlencode
 
 from flask import Markup, render_template, url_for
 
-from .. import redis_client
+from .. import redisw  # redis_client
 from ..constants import COUNT_KEY, FONT_NAMES, img_formats
 from ..utils import make_rules
 from . import bp
@@ -10,7 +10,7 @@ from . import bp
 
 def get_context():
     rule_parts = make_rules()
-    count = redis_client.get(COUNT_KEY)
+    count = redisw.client.get(COUNT_KEY)
 
     rules = [e[0].replace("string:", "").replace("any", "") for e in rule_parts]
 

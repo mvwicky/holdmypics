@@ -5,6 +5,8 @@ $mq-breakpoints: (
   lg: 992px
 );
 
+@import "../../../node_modules/sass-mq/mq";
+
 $base-font-fallback: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
   "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
   "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";

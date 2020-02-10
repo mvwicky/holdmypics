@@ -1,8 +1,24 @@
-version: '2.1'
-
+version: "3.7"
 services:
   holdmypics:
     image: holdmypics
-    build:
-      context: .
-      dockerfile: Dockerfile
+    env_file: .compose.env
+    build: .
+    ports:
+      - "4000:80"
+    networks:
+      - web
+    depends_on:
+      - redis
+  redis:
+    image: redis:5.0-alpine
+    ports:
+      - "6379:6379"
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+    command: redis-server --appendonly yes
+    networks:
+      - web
+networks:
+  web:

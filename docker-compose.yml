@@ -1,8 +1,8 @@
-version: "2.1"
-
+version: "3.7"
 services:
   holdmypics:
     image: holdmypics
+    env_file: .compose.env
     build: .
     ports:
       - "4000:80"

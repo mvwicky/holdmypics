@@ -45,7 +45,7 @@ const relToNode = (...args: string[]) => relToRoot("node_modules", ...args);
 const relToSrc = (...args: string[]) => relToRoot("src", ...args);
 
 const hashFn = prodOr("sha256", "md5");
-const hashlength = prodOr(32, 10);
+const hashlength = prodOr(28, 10);
 const fontHash = `${hashFn}:hash:hex:${hashlength}`;
 const fontName = `[path][name].[${fontHash}].[ext]`;
 
@@ -62,9 +62,10 @@ const config: webpack.Configuration = {
   output: {
     filename: `[name].[contenthash:${hashlength}].js`,
     path: outPath,
-    hashFunction: "sha256",
+    hashFunction: hashFn,
     hashDigestLength: 64,
-    publicPath
+    publicPath,
+    pathinfo: !prod
   },
   devtool: prodOr("source-map", "cheap-module-eval-source-map"),
   mode: prodOr("production", "development"),
@@ -118,12 +119,18 @@ const config: webpack.Configuration = {
         include: path.join(srcDir)
       },
       {
+        test: /\.svg$/,
+        use: [
+          {
+            loader: "html-loader",
+            options: {
+              esModule: false
+            }
+          }
+        ]
+      },
+      {
         test: /\.(s?css)$/,
-        // include: [
-        //   path.join(__dirname, "src", "scss"),
-        //   relToNode("sanitize.css"),
-        //   relToNode("tippy.js")
-        // ],
         use: compact([
           {
             loader: MiniCssExtractPlugin.loader
@@ -187,7 +194,11 @@ const config: webpack.Configuration = {
               drop_console: true,
               drop_debugger: true,
               ecma: 2016,
-              passes: 2
+              passes: 2,
+              global_defs: {
+                PRODUCTION: true
+              },
+              pure_funcs: ["log"]
             },
             output: {
               comments: false,
@@ -238,7 +249,7 @@ const config: webpack.Configuration = {
   stats: {
     modules: false,
     children: false,
-    excludeAssets: [/^fonts\//],
+    excludeAssets: [/^fonts\//, /\.map$/, /\.LICENSE\.txt$/],
     publicPath: true,
     cachedAssets: true
   }

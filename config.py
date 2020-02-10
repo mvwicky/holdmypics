@@ -14,7 +14,7 @@ _img_cache = str(HERE / ".cache" / "images")
 
 class BaseConfig(object):
     DEBUG = env.bool("DEBUG", default=False)
-    REDIS_URL = env("REDIS_URL")
+    REDIS_URL = env("REDIS_URL", default=None)
     LOG_DIR = env("LOG_DIR", default=None)
 
 

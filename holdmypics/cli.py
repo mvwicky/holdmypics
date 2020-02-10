@@ -8,9 +8,10 @@ from flask import Flask
 
 from . import __version__
 from .package import Package
+from .server import Server
 
 
-def register(app: Flask):
+def register(app: Flask):  # noqa: C901
     @app.cli.command("freeze")
     @click.option(
         "--dev/--not-dev",
@@ -74,3 +75,11 @@ def register(app: Flask):
                 click.secho("package.json up to date.", fg="green")
         else:
             click.secho("No package.json found.", fg="red")
+
+    @app.cli.command()
+    @click.option("--run/--no-run", default=True)
+    @click.option("--yarn/--no-yarn", default=True)
+    def serve(run: bool, yarn: bool):
+        server = Server(start_run=run, start_yarn=yarn)
+        server.start()
+        server.loop()

@@ -1,23 +1,21 @@
 import "./scss/main.scss";
+import checkSvg from "./icons/check.svg";
+import copySvg from "./icons/copy.svg";
 
 import debug from "debug";
 
-let log: (...args: any[]) => void;
-if (PRODUCTION) {
-  log = (...args: any[]) => {
-    /* Does Nothing */
-  };
-} else {
+const log = PRODUCTION ? (...args: any[]) => {} : debug("holdmypics");
+if (!PRODUCTION) {
   window.localStorage.setItem("debug", "holdmypics*");
-  log = debug("holdmypics");
 }
+
+const ICON_CONTENTS: Map<string, string> = new Map([
+  ["check", checkSvg],
+  ["copy", copySvg]
+]);
 
 function getClipboard() {
   return import(/* webpackChunkName: "clipboard" */ "clipboard");
-}
-
-function getFeather() {
-  return import(/* webpackChunkName: "feather" */ "feather-icons");
 }
 
 function getTippy() {
@@ -30,6 +28,40 @@ function truthy<T>(input: T | null | undefined): input is T {
 
 function isInput(input: Element | RadioNodeList): input is HTMLInputElement {
   return "checkValidity" in input;
+}
+
+function getAttrs(element: HTMLElement): Record<string, string> {
+  return Array.from(element.attributes).reduce((attrs, attr) => {
+    attrs[attr.name] = attr.value;
+    return attrs;
+  }, {} as Record<string, string>);
+}
+
+function replaceIcons() {
+  const toReplace = document.querySelectorAll<HTMLElement>("[data-icon]");
+  Array.from(toReplace, (element) => {
+    replaceIcon(element);
+  });
+}
+
+function replaceIcon(element: HTMLElement) {
+  const attrs = getAttrs(element);
+  const iconName = attrs["data-icon"];
+  delete attrs["data-icon"];
+  delete attrs["class"];
+  const cts = ICON_CONTENTS.get(iconName);
+  if (truthy(cts)) {
+    const svgDoc = new DOMParser().parseFromString(cts, "image/svg+xml");
+    const svgElem = svgDoc.querySelector("svg");
+    if (truthy(svgElem)) {
+      const classes = Array.from(element.classList);
+      svgElem.classList.add.apply(svgElem.classList, classes);
+      Object.entries(attrs).forEach(([name, value]) => {
+        svgElem.setAttribute(name, value);
+      });
+      element.parentNode?.replaceChild(svgElem, element);
+    }
+  }
 }
 
 const ARGS = ["width", "height", "bg", "fg", "fmt", "imageText", "font"];
@@ -105,7 +137,7 @@ function debounce<F extends AnyFunc>(
   };
 }
 
-function main() {
+async function main() {
   const exampleImage = document.querySelector<HTMLImageElement>(
     "#example-image"
   );
@@ -125,14 +157,12 @@ function main() {
     return;
   }
 
-  getFeather().then((feather) => {
-    feather.replace();
-    const copyIconEl = btn.querySelector<HTMLElement>(".feather-copy");
-    const checkIconEl = btn.querySelector<HTMLElement>(".feather-check");
-    if (truthy(copyIconEl) && truthy(checkIconEl)) {
-      afterFeather(btn, copyIconEl, checkIconEl);
-    }
-  });
+  replaceIcons();
+  const copyIconEl = btn.querySelector<HTMLElement>(".feather-copy");
+  const checkIconEl = btn.querySelector<HTMLElement>(".feather-check");
+  if (truthy(copyIconEl) && truthy(checkIconEl)) {
+    afterFeather(btn, copyIconEl, checkIconEl);
+  }
 
   log("Everything seems to exist.");
 
@@ -142,28 +172,28 @@ function main() {
     btn.dataset.clipboardText = url.href;
   }
 
-  const elements = form.elements;
-  function inputCallback(i: number) {
-    if (!truthy(form)) {
-      return;
-    }
-    const params = gatherParams(form);
+  function inputCallback(args: InputCallbackArgs) {
+    const params = gatherParams(args.form);
     if (truthy(params) && isEndpointArgs(params)) {
       const url = makeEndpoint(params);
-      if (truthy(endpoint)) {
-        endpoint.textContent = url.pathname + url.search;
-      }
-      if (truthy(btn)) {
-        btn.dataset.clipboardText = url.href;
-      }
-      const id = elements[i].id;
-      if (truthy(exampleImage) && !["width", "height"].includes(id)) {
-        exampleImage.src = url.href;
+      args.endpoint.textContent = url.pathname + url.search;
+      args.btn.dataset.clipboardText = url.href;
+      if (!["width", "height"].includes(args.id)) {
+        args.image.src = url.href;
       }
     }
   }
-  for (let i = 0; i < elements.length; i++) {
-    const cb = debounce(inputCallback.bind(null, i), 750);
+  const elements = form.elements;
+  const numElements = form.elements.length;
+  for (let i = 0; i < numElements; i++) {
+    const args: InputCallbackArgs = {
+      form,
+      endpoint,
+      btn,
+      image: exampleImage,
+      id: elements[i].id
+    };
+    const cb = debounce(inputCallback.bind(null, args), 750);
     elements[i].addEventListener("input", cb);
   }
 }
@@ -173,23 +203,27 @@ async function afterFeather(
   copyIcon: HTMLElement,
   checkIcon: HTMLElement
 ) {
-  const { default: tippy, roundArrow, animateFill } = await getTippy();
+  const { default: tippy, roundArrow } = await getTippy();
   const { default: Clipboard } = await getClipboard();
   const tip = tippy(copyBtn, {
     trigger: "manual",
     ignoreAttributes: true,
     content: "Copied to Clipboard",
-    theme: "light light-border",
+    theme: "light light-border clipboard-tooltip",
     arrow: roundArrow,
-    offset: "0, 8",
-    plugins: [animateFill],
-    onHidden: (inst) => {
-      checkIcon.classList.add("d-none");
-      copyIcon.classList.remove("d-none");
+    offset: "0, 12",
+    animation: "shift-away",
+    onHidden: () => {
+      window.requestAnimationFrame(() => {
+        checkIcon.classList.add("d-none");
+        copyIcon.classList.remove("d-none");
+      });
     },
-    onShown: (inst) => {
-      checkIcon.classList.remove("d-none");
-      copyIcon.classList.add("d-none");
+    onShow: () => {
+      window.requestAnimationFrame(() => {
+        checkIcon.classList.remove("d-none");
+        copyIcon.classList.add("d-none");
+      });
     }
   });
   log("Check and copy icons exist.");
@@ -202,10 +236,10 @@ async function afterFeather(
   });
 }
 
-(function(doc: Document) {
-  if (doc.readyState === "loading") {
-    doc.addEventListener("DOMContentLoaded", main);
+(function(d: Document, global: Window) {
+  if (d.readyState === "loading") {
+    d.addEventListener("DOMContentLoaded", main);
   } else {
     main();
   }
-})(document);
+})(document, window);

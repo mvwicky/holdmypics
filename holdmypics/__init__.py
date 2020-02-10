@@ -3,13 +3,23 @@ from logging.config import dictConfig
 
 from flask import Flask, request, send_from_directory
 from flask_redis import FlaskRedis
+from funcy import memoize
 
 from config import Config
 from .converters import ColorConverter, DimensionConverter
+from .wrapped_redis import WrappedRedis
 
+redisw = WrappedRedis()
 redis_client = FlaskRedis()
 
 CACHE_CONTROL_MAX = "max-age=315360000, public, immutable"
+
+
+@memoize
+def get_version() -> str:
+    from .__version__ import __version__
+
+    return __version__
 
 
 def config_logging():
@@ -19,7 +29,7 @@ def config_logging():
             "disable_existing_loggers": False,
             "formatters": {
                 "wsgi": {
-                    "format": "[{asctime}] {levelname} {name} in {module}: {message}",
+                    "format": "[{asctime}] {levelname} {name} {module}: {message}",
                     "style": "{",
                 },
                 "werk": {"format": "{message}", "style": "{"},
@@ -65,15 +75,15 @@ def create_app(config_class=Config):
     app.url_map.redirect_defaults = False
     app.url_map.converters.update({"dim": DimensionConverter, "col": ColorConverter})
 
-    redis_client.init_app(app)
+    redisw.init_app(app, redis_client)
 
-    from .core import bp as core_bp
+    from . import core
 
-    app.register_blueprint(core_bp)
+    app.register_blueprint(core.bp)
 
-    from .api import bp as api_bp
+    from . import api
 
-    app.register_blueprint(api_bp, url_prefix="/api")
+    app.register_blueprint(api.bp, url_prefix="/api")
 
     from . import cli
 
@@ -104,12 +114,10 @@ def create_app(config_class=Config):
 
     @app.route("/favicon.ico")
     def _favicon_route():
-        return send_from_directory(app.root_path, "fav.png")
-
-    from .__version__ import __version__
+        return send_from_directory(app.root_path, "fav.ico")
 
     @app.context_processor
     def _ctx():
-        return {"version": __version__}
+        return {"version": get_version()}
 
     return app

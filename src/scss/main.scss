@@ -1,5 +1,4 @@
 @import "./abstracts/variables";
-@import "../../node_modules/sass-mq/mq";
 
 @import "./base/base";
 
@@ -15,13 +14,11 @@
 @import "./theme/fonts";
 @import "./theme/theme";
 
-/* HACK: b/c for some reason vendor stuff isn't working. */
+/* TODO: Vendor stuff isn't working. */
 @import "../../node_modules/sanitize.css/sanitize.css";
-@import "../../node_modules/sanitize.css/typography.css";
 @import "../../node_modules/sanitize.css/forms.css";
 @import "../../node_modules/tippy.js/dist/backdrop.css";
 @import "../../node_modules/tippy.js/dist/svg-arrow.css";
-@import "../../node_modules/tippy.js/themes/material.css";
 @import "../../node_modules/tippy.js/themes/light.css";
 @import "../../node_modules/tippy.js/themes/light-border.css";
-@import "../../node_modules/tippy.js/themes/translucent.css";
+@import "../../node_modules/tippy.js/animations/shift-away.css";
