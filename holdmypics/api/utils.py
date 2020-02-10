@@ -1,18 +1,18 @@
-import os
 import random
 from string import hexdigits
+from typing import Callable, Dict, Tuple, Union
 
-import attr
 from PIL import Image, ImageDraw
+from PIL.ImageFont import ImageFont
 
-from .. import redisw
 from .._types import Dimension
-from ..constants import COUNT_KEY, MAX_SIZE, MIN_SIZE, font_sizes, fonts
-from .files import files
-from .image_args import ImageArgs
+from ..constants import MAX_SIZE, MIN_SIZE, font_sizes, fonts
+from .args import ImageArgs
+
+OptValues = Union[str, bool, int, Tuple[int, int]]
 
 
-def random_color():
+def random_color() -> str:
     return "".join([f"{random.randrange(256):02x}" for _ in range(3)])
 
 
@@ -25,7 +25,7 @@ def pt_to_px(pt: float) -> float:
     return pt / 0.75
 
 
-def guess_size(height: int, font_name: str):
+def guess_size(height: int, font_name: str) -> Tuple[ImageFont, int]:
     """Try and figure out the correct font size for a given height and font.
 
     Arguments:
@@ -56,7 +56,9 @@ def guess_size(height: int, font_name: str):
             return font[sz], i
 
 
-def get_font(d: ImageDraw.Draw, sz: Dimension, text: str, font_name: str):
+def get_font(
+    d: ImageDraw.Draw, sz: Dimension, text: str, font_name: str
+) -> Tuple[ImageFont, Tuple[int, int]]:
     face = fonts[font_name]
     width, height = sz
     font, idx = guess_size(height, font_name)
@@ -68,7 +70,7 @@ def get_font(d: ImageDraw.Draw, sz: Dimension, text: str, font_name: str):
     return font, tsize
 
 
-def draw_text(im: Image.Image, color: str, args: ImageArgs):
+def draw_text(im: Image.Image, color: str, args: ImageArgs) -> Image.Image:
     w, h = im.size
     txt = Image.new("RGBA", im.size, (255, 255, 255, 0))
     d = ImageDraw.Draw(txt)
@@ -85,43 +87,12 @@ def draw_text(im: Image.Image, color: str, args: ImageArgs):
     return Image.alpha_composite(im, txt)
 
 
-fmt_kw = {
+fmt_kw: Dict[str, Callable[[ImageArgs], Dict[str, OptValues]]] = {
     "jpeg": lambda args: {"optimize": True, "dpi": (args.dpi, args.dpi)},
     "png": lambda args: {"optimize": True, "dpi": (args.dpi, args.dpi)},
     "webp": lambda _: {"quality": 100, "method": 6},
     "gif": lambda _: {"optimize": True},
 }
-
-
-def make_image(
-    size: Dimension, bg_color: str, fg_color: str, fmt: str, args: ImageArgs
-):
-    fmt = "jpeg" if fmt == "jpg" else fmt
-    mode = "RGBA"
-    bg_color = get_color(bg_color)
-    fg_color = get_color(fg_color)
-    path = files.get_file_name(size, bg_color, fg_color, fmt, *attr.astuple(args))
-
-    if os.path.isfile(path):
-        os.utime(path)
-        return path
-    else:
-        redisw.client.incr(COUNT_KEY)
-        save_kw = {}
-        kw_func = fmt_kw.get(fmt, None)
-        if kw_func is not None:
-            save_kw.update(kw_func(args))
-
-        im = Image.new(mode, size, bg_color)
-        if args.alpha < 1:
-            alpha_im = Image.new("L", size, int(args.alpha * 255))
-            im.putalpha(alpha_im)
-        if args.text is not None and fmt != "jpeg":
-            im = draw_text(im, fg_color, args)
-        if fmt == "jpeg":
-            im = im.convert("RGB")
-        im.save(path, **save_kw)
-        return path
 
 
 def get_color(color: str) -> str:

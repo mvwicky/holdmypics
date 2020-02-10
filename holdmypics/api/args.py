@@ -31,3 +31,13 @@ class ImageArgs(object):
             "debug": request.args.get("debug", None) is not None,
         }
         return cls(**kw)
+
+
+@attr.s(slots=True, auto_attribs=True, frozen=True)
+class AnimArgs(object):
+    frames: int = 10
+
+    @classmethod
+    def from_request(cls):
+        kw = {"frames": request.args.get("frames", 10, type=int)}
+        return cls(**kw)

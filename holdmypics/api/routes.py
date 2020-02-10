@@ -3,17 +3,21 @@ from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 
 from flask import abort, after_this_request, current_app, redirect, request, send_file
 from funcy import merge
+from PIL import features
 
 from .._types import Dimension
 from ..constants import FONT_NAMES, img_formats
 from ..utils import make_rules
 from . import bp
+from .anim import make_anim
 from .files import files
-from .image_args import ImageArgs
-from .utils import make_image, random_color
+from .args import ImageArgs
+from .img import make_image
+from .utils import random_color
 
-
-RAND_STR = "rand".casefold()
+WEBP_ANIM = features.check_feature("webp_anim")
+ANIM_FMTS = {"gif"}.union({"webp"} if WEBP_ANIM else set())
+RAND_STR = "rand"
 
 
 def image_response(size: Dimension, bg: str, fg: str, fmt: str, args: ImageArgs):
@@ -43,6 +47,17 @@ def do_cleanup(res):
     return res
 
 
+def font_redirect(font_name: str):
+    if font_name.lower() in FONT_NAMES:
+        parts = urlsplit(request.url)
+        query = merge(parse_qs(parts.query), {"font": [font_name.lower()]})
+        query_list = [(k, v) for k, v in query.items()]
+        url = urlunsplit(parts._replace(query=urlencode(query_list, doseq=True)))
+        return redirect(url)
+    else:
+        abort(400)
+
+
 @make_route()
 def image_route(size: Dimension, bg_color: str, fg_color: str, fmt: str):
     fmt = fmt.lower()
@@ -51,20 +66,14 @@ def image_route(size: Dimension, bg_color: str, fg_color: str, fmt: str):
     args = ImageArgs.from_request()
     font_name = args.font_name
     if font_name not in FONT_NAMES:
-        if font_name.lower() in FONT_NAMES:
-            parts = urlsplit(request.url)
-            query = merge(parse_qs(parts.query), {"font": [font_name.lower()]})
-            query_list = [(k, v) for k, v in query.items()]
-            url = urlunsplit(parts._replace(query=urlencode(query_list, doseq=True)))
-            return redirect(url)
-        else:
-            abort(400)
+        return font_redirect(font_name)
 
-    if RAND_STR in map(str.casefold, [bg_color, fg_color]):
+    bg_lower, fg_lower = map(str.lower, [bg_color, fg_color])  # type: str, str
+    if RAND_STR in {bg_lower, fg_lower}:
         random.seed(args.seed)
-        if bg_color.casefold() == RAND_STR:
+        if bg_lower == RAND_STR:
             bg_color = random_color()
-        if fg_color.casefold() == RAND_STR:
+        if fg_lower == RAND_STR:
             fg_color = random_color()
 
     path = image_response(size, bg_color, fg_color, fmt, args)
@@ -84,14 +93,17 @@ def image_route(size: Dimension, bg_color: str, fg_color: str, fmt: str):
             filename = ".".join([filename, fmt])
         kw.update({"as_attachment": False, "attachment_filename": None})
     res = send_file(path, **kw)
-    # allow_origins = request.headers.get("Origin", "*")
-    # res.headers["Access-Control-Allow-Origin"] = allow_origins
     return res
 
 
 @make_route(prefix="anim")
 def anim_route(size: Dimension, bg_color: str, fg_color: str, fmt: str):
-    return "ANIM"
+    if fmt not in ANIM_FMTS:
+        abort(400)
+    anim = make_anim(size, bg_color, fg_color, fmt)
+    print(len(anim.getvalue()))
+
+    return send_file(anim, mimetype=f"image/{fmt}")
 
 
 @bp.route("/text")

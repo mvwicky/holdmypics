@@ -1,16 +1,17 @@
 from urllib.parse import urlencode
 
 from flask import Markup, render_template, url_for
+from funcy import memoize, merge
 
-from .. import redisw  # redis_client
+from .. import redisw
 from ..constants import COUNT_KEY, FONT_NAMES, img_formats
 from ..utils import make_rules
 from . import bp
 
 
-def get_context():
+@memoize
+def get_context() -> dict:
     rule_parts = make_rules()
-    count = redisw.client.get(COUNT_KEY)
 
     rules = [e[0].replace("string:", "").replace("any", "") for e in rule_parts]
 
@@ -47,7 +48,6 @@ def get_context():
 
     return {
         "rules": ["api/<size>/" + r + "/" for r in rules],
-        "count": count.decode(),
         "img_url": img_url,
         "img_query": img_query,
         "width": width,
@@ -64,14 +64,11 @@ def get_context():
         "num_fields": num_fields,
         "col_fields": col_fields,
         "sel_fields": sel_fields,
+        "title": "Hold My Pics",
     }
 
 
 @bp.route("/")
 def index():
-    return render_template("base-out.html", **get_context())
-
-
-# @bp.route("/grid/")
-# def grid():
-#     return render_template("grid.jinja", **get_context())
+    context = merge(get_context(), {"count": redisw.client.get(COUNT_KEY).decode()})
+    return render_template("base-out.html", **context)
