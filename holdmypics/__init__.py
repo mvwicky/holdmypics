@@ -1,6 +1,9 @@
+import sys
+import logging
 import time
 from logging.config import dictConfig
 
+import structlog
 from flask import Flask, request, send_from_directory
 from flask_redis import FlaskRedis
 from funcy import memoize
@@ -23,35 +26,43 @@ def get_version() -> str:
 
 
 def config_logging():
-    dictConfig(
-        {
-            "version": 1,
-            "disable_existing_loggers": False,
-            "formatters": {
-                "wsgi": {
-                    "format": "[{asctime}] {levelname} {name} {module}: {message}",
-                    "style": "{",
-                },
-                "werk": {"format": "{message}", "style": "{"},
-            },
-            "handlers": {
-                "wsgi": {
-                    "class": "logging.StreamHandler",
-                    "stream": "ext://sys.stderr",
-                    "formatter": "wsgi",
-                },
-                "werk": {
-                    "class": "logging.StreamHandler",
-                    "stream": "ext://sys.stderr",
-                    "formatter": "werk",
-                },
-            },
-            "loggers": {
-                "werkzeug": {"handlers": ["werk"]},
-                __name__: {"level": "INFO", "handlers": ["wsgi"]},
-            },
-        }
+    dictConfig({"version": 1, "disable_existing_loggers": True})
+    logging.basicConfig(format="%(message)s", stream=sys.stderr, level=logging.INFO)
+    structlog.configure(
+        processors=[structlog.processors.KeyValueRenderer()],
+        context_class=structlog.threadlocal.wrap_dict(dict),
+        logger_factory=structlog.stdlib.LoggerFactory(),
     )
+
+    # dictConfig(
+    #     {
+    #         "version": 1,
+    #         "disable_existing_loggers": False,
+    #         "formatters": {
+    #             "wsgi": {
+    #                 "format": "[{asctime}] {levelname} {name} {module}: {message}",
+    #                 "style": "{",
+    #             },
+    #             "werk": {"format": "{message}", "style": "{"},
+    #         },
+    #         "handlers": {
+    #             "wsgi": {
+    #                 "class": "logging.StreamHandler",
+    #                 "stream": "ext://sys.stderr",
+    #                 "formatter": "wsgi",
+    #             },
+    #             "werk": {
+    #                 "class": "logging.StreamHandler",
+    #                 "stream": "ext://sys.stderr",
+    #                 "formatter": "werk",
+    #             },
+    #         },
+    #         "loggers": {
+    #             "werkzeug": {"handlers": ["werk"]},
+    #             __name__: {"level": "INFO", "handlers": ["wsgi"]},
+    #         },
+    #     }
+    # )
 
 
 def create_app(config_class=Config):

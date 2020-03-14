@@ -1,11 +1,9 @@
 import * as path from "path";
 import process from "process";
 
+import autoprefixer from "autoprefixer";
 import webpack from "webpack";
-import {
-  CleanWebpackPlugin,
-  Options as CleanOptions
-} from "clean-webpack-plugin";
+import * as Clean from "clean-webpack-plugin";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 
@@ -28,7 +26,7 @@ function ifProd<T>(obj: T): T | undefined {
   return prodOr(obj, undefined);
 }
 
-const cleanOpts: CleanOptions = {
+const cleanOpts: Clean.Options = {
   verbose: false,
   dry: false,
   cleanOnceBeforeBuildPatterns: [
@@ -70,9 +68,10 @@ const config: webpack.Configuration = {
   devtool: prodOr("source-map", "cheap-module-eval-source-map"),
   mode: prodOr("production", "development"),
   plugins: [
-    new CleanWebpackPlugin(cleanOpts),
+    new Clean.CleanWebpackPlugin(cleanOpts),
     new MiniCssExtractPlugin({
-      filename: `style.[contenthash:${hashlength}].css`
+      filename: `style.[name].[contenthash:${hashlength}].css`,
+      chunkFilename: `[name].[contenthash:${hashlength}].css`
     }),
     new HtmlWebpackPlugin({
       filename: path.join(templatesDir, "base-out.html"),
@@ -131,26 +130,24 @@ const config: webpack.Configuration = {
       },
       {
         test: /\.(s?css)$/,
+        include: [path.resolve(__dirname, "src", "scss")],
         use: compact([
-          {
-            loader: MiniCssExtractPlugin.loader
-          },
+          MiniCssExtractPlugin.loader,
           {
             loader: "css-loader",
             options: {
-              importLoaders: prodOr(2, 1),
-              sourceMap: prod
+              importLoaders: 2,
+              sourceMap: prod,
+              modules: false
             }
           },
-          ifProd({
+          {
             loader: "postcss-loader",
             options: {
               sourceMap: true,
-              plugins: () => {
-                return [require("autoprefixer")];
-              }
+              plugins: [autoprefixer({ flexbox: "no-2009" })]
             }
-          }),
+          },
           {
             loader: "sass-loader",
             options: {

@@ -1,4 +1,5 @@
 import "./scss/main.scss";
+
 import checkSvg from "./icons/check.svg";
 import copySvg from "./icons/copy.svg";
 
@@ -211,7 +212,7 @@ async function afterFeather(
     content: "Copied to Clipboard",
     theme: "light light-border clipboard-tooltip",
     arrow: roundArrow,
-    offset: "0, 12",
+    offset: [0, 12],
     animation: "shift-away",
     onHidden: () => {
       window.requestAnimationFrame(() => {

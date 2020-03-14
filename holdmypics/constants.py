@@ -22,7 +22,7 @@ fonts: Dict[str, Dict[int, ImageFont.ImageFont]] = {
     for (name, file) in font_files.items()
 }
 
-FONT_NAMES: Set[str] = set(list(font_files.keys()))
+FONT_NAMES: Set[str] = set(font_files)
 MAX_SIZE: int = max(font_sizes)
 MIN_SIZE: int = min(font_sizes)
 

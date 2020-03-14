@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Union
 
 import attr
 from flask import Flask
@@ -20,9 +20,9 @@ class FakeRedis(object):
 @attr.s(slots=True, auto_attribs=True)
 class WrappedRedis(object):
     has_redis: bool = False
-    client: Optional[FlaskRedis] = None
+    client: Union[FlaskRedis, FakeRedis] = FakeRedis()
 
-    def init_app(self, app: Flask, redis_client: FlaskRedis):
+    def init_app(self, app: Flask, redis_client: FlaskRedis) -> None:
         self.has_redis = app.config.get("REDIS_URL", None) is not None
         if self.has_redis:
             redis_client.init_app(app)

@@ -1,4 +1,5 @@
 import random
+from collections import namedtuple
 from string import hexdigits
 from typing import Callable, Dict, Tuple, Union
 
@@ -12,7 +13,11 @@ from .args import ImageArgs
 OptValues = Union[str, bool, int, Tuple[int, int]]
 
 
+TextArgs = namedtuple("TextArgs", ["color", "text", "font_name", "debug"])
+
+
 def random_color() -> str:
+    """Generate a random hex string."""
     return "".join([f"{random.randrange(256):02x}" for _ in range(3)])
 
 
@@ -22,15 +27,16 @@ def px_to_pt(px: float) -> float:
 
 
 def pt_to_px(pt: float) -> float:
+    """Convert points to pixels."""
     return pt / 0.75
 
 
 def guess_size(height: int, font_name: str) -> Tuple[ImageFont, int]:
     """Try and figure out the correct font size for a given height and font.
 
-    Arguments:
-        height: The height of the image in pixels
-        font_name: The name of the font we're using.
+    Args:
+        ``height``: The height of the image in pixels.
+        ``font_name``: The name of the font we're using.
 
     Returns:
         A size and an index.
@@ -54,6 +60,7 @@ def guess_size(height: int, font_name: str) -> Tuple[ImageFont, int]:
     for i, sz in enumerate(font_sizes[1:]):
         if last < pt_size < sz:
             return font[sz], i
+    return font[sz], i
 
 
 def get_font(
@@ -70,7 +77,7 @@ def get_font(
     return font, tsize
 
 
-def draw_text(im: Image.Image, color: str, args: ImageArgs) -> Image.Image:
+def draw_text(im: Image.Image, args: TextArgs) -> Image.Image:
     w, h = im.size
     txt = Image.new("RGBA", im.size, (255, 255, 255, 0))
     d = ImageDraw.Draw(txt)
@@ -78,7 +85,7 @@ def draw_text(im: Image.Image, color: str, args: ImageArgs) -> Image.Image:
     tw, th = tsize
     xc = int((w - tw) / 2)
     yc = int((h - th) / 2)
-    d.text((xc, yc), args.text, font=font, fill=color, align="center")
+    d.text((xc, yc), args.text, font=font, fill=args.color, align="center")
     if args.debug:
         d.rectangle(
             [(xc, yc), (int((w + tw) / 2), int((h + th) / 2))], outline="#000", width=3

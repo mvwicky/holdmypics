@@ -4,6 +4,7 @@ from flask import Markup, render_template, url_for
 from funcy import memoize, merge
 
 from .. import redisw
+from .._types import ResponseType
 from ..constants import COUNT_KEY, FONT_NAMES, img_formats
 from ..utils import make_rules
 from . import bp
@@ -69,6 +70,6 @@ def get_context() -> dict:
 
 
 @bp.route("/")
-def index():
+def index() -> ResponseType:
     context = merge(get_context(), {"count": redisw.client.get(COUNT_KEY).decode()})
     return render_template("base-out.html", **context)

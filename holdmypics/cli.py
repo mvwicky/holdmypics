@@ -80,6 +80,7 @@ def register(app: Flask):  # noqa: C901
     @click.option("--run/--no-run", default=True)
     @click.option("--yarn/--no-yarn", default=True)
     def serve(run: bool, yarn: bool):
+        """Run dev server and build client bundles."""
         server = Server(start_run=run, start_yarn=yarn)
         server.start()
         server.loop()

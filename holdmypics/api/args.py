@@ -2,6 +2,7 @@ from typing import Optional
 
 import attr
 from flask import request
+from werkzeug.datastructures import ImmutableMultiDict
 
 
 def clamp_alpha(a: float) -> float:
@@ -15,22 +16,22 @@ class ImageArgs(object):
     font_name: str = "overpass"
     dpi: int = 72
     alpha: float = attr.ib(default=1.0, converter=clamp_alpha)
-    seed: str = None
+    seed: Optional[str] = None
     debug: bool = False
 
     @classmethod
-    def from_request(cls):
-        font_name = request.args.get("font", "overpass")
+    def from_request(cls) -> "ImageArgs":
+        args: ImmutableMultiDict = request.args
         kw = {
-            "text": request.args.get("text", None),
-            "filename": request.args.get("filename", None),
-            "font_name": font_name,
-            "dpi": request.args.get("dpi", 72, type=int),
-            "alpha": request.args.get("alpha", 1.0, type=float),
-            "seed": request.args.get("seed", None),
-            "debug": request.args.get("debug", None) is not None,
+            "text": args.get("text", None),
+            "filename": args.get("filename", None),
+            "font_name": args.get("font", "overpass"),
+            "dpi": args.get("dpi", 72, type=int),
+            "alpha": args.get("alpha", 1.0, type=float),
+            "seed": args.get("seed", None),
+            "debug": args.get("debug", None) is not None,
         }
-        return cls(**kw)
+        return cls(**kw)  # type: ignore
 
 
 @attr.s(slots=True, auto_attribs=True, frozen=True)
@@ -38,6 +39,6 @@ class AnimArgs(object):
     frames: int = 10
 
     @classmethod
-    def from_request(cls):
+    def from_request(cls) -> "AnimArgs":
         kw = {"frames": request.args.get("frames", 10, type=int)}
         return cls(**kw)

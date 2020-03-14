@@ -11,5 +11,8 @@ application-import-names =
     config
     holdmypics
 max-complexity = 10
-enable-extensions = E704
+enable-extensions =
+    E704,
+    W504
 max-line-length = 88
+select = C,D,E,F,I,W,B,B950,PT,TYP001

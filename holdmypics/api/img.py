@@ -1,19 +1,24 @@
 import os
 
 import attr
+import structlog
 from PIL import Image
 
 from .. import redisw
 from .._types import Dimension
 from ..constants import COUNT_KEY
-from .files import files
 from .args import ImageArgs
-from .utils import draw_text, fmt_kw, get_color
+from .files import files
+from .utils import TextArgs, draw_text, fmt_kw, get_color
+
+
+logger = structlog.get_logger()
 
 
 def make_image(
     size: Dimension, bg_color: str, fg_color: str, fmt: str, args: ImageArgs
 ) -> str:
+    """Create an image or find an existing one and produce its path."""
     fmt = "jpeg" if fmt == "jpg" else fmt
     mode = "RGBA"
     bg_color = get_color(bg_color)
@@ -22,14 +27,17 @@ def make_image(
 
     if os.path.isfile(path):
         os.utime(path)
+        logger.info("already existed")
         return path
     else:
+        logger.info("creating new file")
         im = Image.new(mode, size, bg_color)
         if args.alpha < 1:
             alpha_im = Image.new("L", size, int(args.alpha * 255))
             im.putalpha(alpha_im)
         if args.text is not None and fmt != "jpeg":
-            im = draw_text(im, fg_color, args)
+            text_args = TextArgs(fg_color, args.text, args.font_name, args.debug)
+            im = draw_text(im, text_args)
         if fmt == "jpeg":
             im = im.convert("RGB")
         save_kw = {}

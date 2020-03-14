@@ -1,30 +1,45 @@
 import random
+import uuid
+from typing import Callable
 from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 
-from flask import abort, after_this_request, current_app, redirect, request, send_file
+import structlog
+from flask import (
+    Response,
+    abort,
+    after_this_request,
+    current_app,
+    redirect,
+    request,
+    send_file,
+)
 from funcy import merge
 from PIL import features
 
-from .._types import Dimension
+from .._types import Dimension, ResponseType
 from ..constants import FONT_NAMES, img_formats
 from ..utils import make_rules
 from . import bp
 from .anim import make_anim
-from .files import files
 from .args import ImageArgs
+from .files import files
 from .img import make_image
 from .utils import random_color
+
+ViewFunc = Callable
+
+logger = structlog.get_logger()
 
 WEBP_ANIM = features.check_feature("webp_anim")
 ANIM_FMTS = {"gif"}.union({"webp"} if WEBP_ANIM else set())
 RAND_STR = "rand"
 
 
-def image_response(size: Dimension, bg: str, fg: str, fmt: str, args: ImageArgs):
+def image_response(size: Dimension, bg: str, fg: str, fmt: str, args: ImageArgs) -> str:
     return make_image(size, bg, fg, fmt, args)
 
 
-def make_route(prefix: str = ""):
+def make_route(prefix: str = "") -> ViewFunc:
     rule_parts = make_rules()
     rules = []
 
@@ -32,7 +47,7 @@ def make_route(prefix: str = ""):
         rule = "/<dim:size>/" + part + "/"
         rules.append((rule, defaults))
 
-    def func(f):
+    def func(f: ViewFunc) -> ViewFunc:
         for rule, defaults in rules:
             bp.add_url_rule(prefix + rule, None, f, defaults=defaults)
         return f
@@ -40,14 +55,14 @@ def make_route(prefix: str = ""):
     return func
 
 
-def do_cleanup(res):
+def do_cleanup(res: ResponseType) -> ResponseType:
     n = files.clean()
     if n > 0:
         current_app.logger.info("Cleaned %d file%s", n, "" if n == 1 else "s")
     return res
 
 
-def font_redirect(font_name: str):
+def font_redirect(font_name: str) -> ResponseType:
     if font_name.lower() in FONT_NAMES:
         parts = urlsplit(request.url)
         query = merge(parse_qs(parts.query), {"font": [font_name.lower()]})
@@ -59,7 +74,10 @@ def font_redirect(font_name: str):
 
 
 @make_route()
-def image_route(size: Dimension, bg_color: str, fg_color: str, fmt: str):
+def image_route(
+    size: Dimension, bg_color: str, fg_color: str, fmt: str
+) -> ResponseType:
+    log = logger.new(request_id=str(uuid.uuid4()))
     fmt = fmt.lower()
     if fmt not in img_formats:
         abort(400)
@@ -77,6 +95,7 @@ def image_route(size: Dimension, bg_color: str, fg_color: str, fmt: str):
             fg_color = random_color()
 
     path = image_response(size, bg_color, fg_color, fmt, args)
+    log.info("created image", size=size, fmt=fmt)
     if files.need_to_clean:
         after_this_request(do_cleanup)
 
@@ -92,12 +111,12 @@ def image_route(size: Dimension, bg_color: str, fg_color: str, fmt: str):
         if not filename.endswith("." + fmt):
             filename = ".".join([filename, fmt])
         kw.update({"as_attachment": False, "attachment_filename": None})
-    res = send_file(path, **kw)
+    res: Response = send_file(path, **kw)  # type: ignore
     return res
 
 
 @make_route(prefix="anim")
-def anim_route(size: Dimension, bg_color: str, fg_color: str, fmt: str):
+def anim_route(size: Dimension, bg_color: str, fg_color: str, fmt: str) -> Response:
     if fmt not in ANIM_FMTS:
         abort(400)
     anim = make_anim(size, bg_color, fg_color, fmt)
@@ -107,5 +126,5 @@ def anim_route(size: Dimension, bg_color: str, fg_color: str, fmt: str):
 
 
 @bp.route("/text")
-def text_route():
+def text_route() -> str:
     return "TEXT"
