@@ -1,16 +1,19 @@
+import imghdr
+import io
 import itertools as it
+from typing import Optional
 
 import pytest
 from flask.testing import FlaskClient
 from funcy import compact
-
+from PIL import Image
 
 size = "638x328"
 bg_color = "123"
 fg_color = "aaa"
 bg_colors = ["123", None]
 fg_colors = ["aaa", None]
-fmts = ["webp", "png", "jpg"]
+fmts = ["webp", "png", "jpeg", "gif"]
 
 
 def make_route(
@@ -43,10 +46,6 @@ def test_index(client):
     assert res.status_code == 200
 
 
-def test_counter(client):
-    pass
-
-
 # @pytest.mark.parametrize("route", routes)
 # def test_full_params(client: FlaskClient, route):
 # assert not files.max_files
@@ -56,13 +55,24 @@ def test_counter(client):
 # assert files.clean()
 
 
-@pytest.mark.parametrize("width", [100, 300, 1000, 4096])
-@pytest.mark.parametrize("height", [100, 300, 1000, 4096])
+@pytest.mark.parametrize("width", [100, 4096])
+@pytest.mark.parametrize("height", [100, 4096])
 @pytest.mark.parametrize("fg_color", fg_colors)
 @pytest.mark.parametrize("bg_color", bg_colors)
 @pytest.mark.parametrize("fmt", fmts)
-def test_different_params(client: FlaskClient, width, height, fmt, fg_color, bg_color):
+def test_different_params(
+    client: FlaskClient,
+    width: int,
+    height: int,
+    fmt: str,
+    fg_color: Optional[str],
+    bg_color: Optional[str],
+):
     if any([bg_color, fg_color, fmt]):
         path = make_route(width, height, bg_color, fg_color, fmt)
         res = client.get(path, follow_redirects=False)
         assert res.status_code == 200
+        img_type = imghdr.what("filename", h=res.data)
+        assert img_type == fmt
+        im = Image.open(io.BytesIO(res.data))
+        assert im.size == (width, height)

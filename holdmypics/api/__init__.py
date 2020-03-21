@@ -21,7 +21,8 @@ def api_setup(state: BlueprintSetupState):
     cfg: Config = state.app.config
     images_folder = cfg["SAVED_IMAGES_CACHE_DIR"]
     max_files = cfg["SAVED_IMAGES_MAX_NUM"]
-    os.makedirs(images_folder, exist_ok=True)
+    if not os.path.isdir(images_folder):
+        os.makedirs(images_folder)
     bp.images_folder = images_folder
     bp.max_files = max_files
 

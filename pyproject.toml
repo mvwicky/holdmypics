@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "holdmypics"
-version = "0.9.1"
+version = "0.10.0"
 description = ""
 authors = ["Michael Van Wickle <mvanwickle@gmail.com>"]
 
@@ -20,6 +20,7 @@ Pillow = "^7.0.0"
 redis = { version = "^3.0" }
 structlog = "^20.1.0"
 toml = "^0.10.0"
+loguru = "^0.4.1"
 
 [tool.poetry.dev-dependencies]
 colorama = "^0.4.3"

@@ -1,12 +1,11 @@
 import sys
-import logging
 import time
-from logging.config import dictConfig
+from pathlib import Path
 
-import structlog
 from flask import Flask, request, send_from_directory
 from flask_redis import FlaskRedis
 from funcy import memoize
+from loguru import logger
 
 from config import Config
 from .converters import ColorConverter, DimensionConverter
@@ -14,6 +13,9 @@ from .wrapped_redis import WrappedRedis
 
 redisw = WrappedRedis()
 redis_client = FlaskRedis()
+
+HERE: Path = Path(__file__).resolve().parent
+
 
 CACHE_CONTROL_MAX = "max-age=315360000, public, immutable"
 
@@ -26,43 +28,23 @@ def get_version() -> str:
 
 
 def config_logging():
-    dictConfig({"version": 1, "disable_existing_loggers": True})
-    logging.basicConfig(format="%(message)s", stream=sys.stderr, level=logging.INFO)
-    structlog.configure(
-        processors=[structlog.processors.KeyValueRenderer()],
-        context_class=structlog.threadlocal.wrap_dict(dict),
-        logger_factory=structlog.stdlib.LoggerFactory(),
+    logger.remove()
+    fmt = (
+        "[<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>] | <level>{level:<8}</level> | "
+        "<blue>{name}</blue>:<cyan>{line}</cyan> - <bold>{message}</bold>"
     )
-
-    # dictConfig(
-    #     {
-    #         "version": 1,
-    #         "disable_existing_loggers": False,
-    #         "formatters": {
-    #             "wsgi": {
-    #                 "format": "[{asctime}] {levelname} {name} {module}: {message}",
-    #                 "style": "{",
-    #             },
-    #             "werk": {"format": "{message}", "style": "{"},
-    #         },
-    #         "handlers": {
-    #             "wsgi": {
-    #                 "class": "logging.StreamHandler",
-    #                 "stream": "ext://sys.stderr",
-    #                 "formatter": "wsgi",
-    #             },
-    #             "werk": {
-    #                 "class": "logging.StreamHandler",
-    #                 "stream": "ext://sys.stderr",
-    #                 "formatter": "werk",
-    #             },
-    #         },
-    #         "loggers": {
-    #             "werkzeug": {"handlers": ["werk"]},
-    #             __name__: {"level": "INFO", "handlers": ["wsgi"]},
-    #         },
-    #     }
-    # )
+    logger.add(sys.stderr, format=fmt)
+    log_dir = HERE.parent / "log"
+    if log_dir.is_dir():
+        log_file = log_dir / (__name__ + ".log")
+        logger.add(
+            log_file,
+            rotation=10 * 1024,
+            level="DEBUG",
+            filter=__name__,
+            compression="tar.gz",
+            retention=5,
+        )
 
 
 def create_app(config_class=Config):
@@ -131,4 +113,5 @@ def create_app(config_class=Config):
     def _ctx():
         return {"version": get_version()}
 
+    logger.info("Created App {0!r}", app)
     return app

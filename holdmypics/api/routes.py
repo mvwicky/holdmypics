@@ -1,9 +1,8 @@
+import os
 import random
-import uuid
 from typing import Callable
 from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 
-import structlog
 from flask import (
     Response,
     abort,
@@ -14,6 +13,7 @@ from flask import (
     send_file,
 )
 from funcy import merge
+from loguru import logger
 from PIL import features
 
 from .._types import Dimension, ResponseType
@@ -27,8 +27,6 @@ from .img import make_image
 from .utils import random_color
 
 ViewFunc = Callable
-
-logger = structlog.get_logger()
 
 WEBP_ANIM = features.check_feature("webp_anim")
 ANIM_FMTS = {"gif"}.union({"webp"} if WEBP_ANIM else set())
@@ -77,7 +75,6 @@ def font_redirect(font_name: str) -> ResponseType:
 def image_route(
     size: Dimension, bg_color: str, fg_color: str, fmt: str
 ) -> ResponseType:
-    log = logger.new(request_id=str(uuid.uuid4()))
     fmt = fmt.lower()
     if fmt not in img_formats:
         abort(400)
@@ -95,7 +92,7 @@ def image_route(
             fg_color = random_color()
 
     path = image_response(size, bg_color, fg_color, fmt, args)
-    log.info("created image", size=size, fmt=fmt)
+    logger.info("Image size: {0:,}", os.path.getsize(path))
     if files.need_to_clean:
         after_this_request(do_cleanup)
 

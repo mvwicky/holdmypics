@@ -8,14 +8,14 @@ RUN yarn install
 COPY ./webpack.config.ts ./tsconfig.json /app/
 COPY ./src /app/src
 ARG PRODUCTION
-RUN yarn run build${PRODUCTION:-:dev} \
+RUN yarn run build:dev \
   && yarn install --prod
 
 FROM python:3.8-slim
 
 ENV LC_ALL=C.UTF-8 LANG=C.UTF-8 PYTHONUNBUFFERED=1
 
-
+WORKDIR /app/
 RUN set -ex \
   && RUN_DEPS=" \
   libpcre3 \
@@ -25,7 +25,7 @@ RUN set -ex \
   && apt-get update && apt-get install -y --no-install-recommends $RUN_DEPS \
   && rm -rf /var/lib/apt/lists/*
 
-COPY requirements${PRODUCTION:--dev}.txt /requirements.txt
+COPY requirements-dev.txt /requirements.txt
 RUN set -ex \
   && BUILD_DEPS=" \
   build-essential \
@@ -43,10 +43,9 @@ COPY --from=client-builder /app/holdmypics/core/templates/base-out.html /app/hol
 ARG APP_USER=appuser
 RUN groupadd -r ${APP_USER} && useradd --no-log-init -r -g ${APP_USER} ${APP_USER}
 
+RUN mkdir -p /app/.cache/images
 RUN chmod +x /app/docker-entrypoint.sh
 
 USER ${APP_USER}:${APP_USER}
-
-# ENTRYPOINT ["/app/docker-entrypoint.sh"]
 
 CMD ["gunicorn", "wsgi:application", "--config", "file:/app/gunicorn_config.py"]

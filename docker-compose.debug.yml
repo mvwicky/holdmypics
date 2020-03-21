@@ -1,13 +1,16 @@
+---
 version: "3.7"
 services:
   holdmypics:
-    image: holdmypics
+    build:
+      context: .
+      dockerfile: config/dev/Dockerfile
+    image: holdmypics-dev
     env_file: .compose.env
-    build: .
     ports:
-      - "4000:80"
+      - "4000:4000"
     networks:
-      - web
+      - webnet
     depends_on:
       - redis
   redis:
@@ -19,6 +22,6 @@ services:
         constraints: [node.role == manager]
     command: redis-server --appendonly yes
     networks:
-      - web
+      - webnet
 networks:
-  web:
+  webnet:

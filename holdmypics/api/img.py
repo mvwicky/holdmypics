@@ -1,7 +1,7 @@
 import os
 
 import attr
-import structlog
+from loguru import logger
 from PIL import Image
 
 from .. import redisw
@@ -10,9 +10,6 @@ from ..constants import COUNT_KEY
 from .args import ImageArgs
 from .files import files
 from .utils import TextArgs, draw_text, fmt_kw, get_color
-
-
-logger = structlog.get_logger()
 
 
 def make_image(
@@ -27,15 +24,16 @@ def make_image(
 
     if os.path.isfile(path):
         os.utime(path)
-        logger.info("already existed")
+        logger.info("Already existed")
         return path
     else:
-        logger.info("creating new file")
+        logger.info("Creating new file")
         im = Image.new(mode, size, bg_color)
         if args.alpha < 1:
             alpha_im = Image.new("L", size, int(args.alpha * 255))
             im.putalpha(alpha_im)
         if args.text is not None and fmt != "jpeg":
+            logger.info('Writing text "{0}"', args.text)
             text_args = TextArgs(fg_color, args.text, args.font_name, args.debug)
             im = draw_text(im, text_args)
         if fmt == "jpeg":

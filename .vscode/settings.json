@@ -1,7 +1,7 @@
 {
-  "python.pythonPath": "/Users/michael/.pyenv/versions/holdmypics-3.8.2/bin/python",
+  "python.pythonPath": "${env:VIRTUAL_ENV}/bin/python",
   "python.linting.flake8Args": ["--config=${workspaceFolder}/.flake8"],
-  "python.sortImports.path": "${env:HOME}/.pyenv/versions/holdmypics-3.8.1/bin/isort",
+  "python.sortImports.path": "${env:VIRTUAL_ENV}/bin/isort",
   "files.exclude": {
     "**/.git": true,
     "**/.svn": true,
@@ -19,7 +19,7 @@
     ".pytest_cache": true,
     ".cov": true
   },
-  "python.testing.pytestPath": "${env:HOME}/.pyenv/versions/holdmypics-3.8.1/bin/pytest",
+  "python.testing.pytestPath": "${env:VIRTUAL_ENV}/bin/pytest",
   "python.testing.pytestArgs": ["tests"],
   "python.testing.unittestEnabled": false,
   "python.testing.nosetestsEnabled": false,

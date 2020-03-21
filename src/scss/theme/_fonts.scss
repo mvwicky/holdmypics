@@ -3,7 +3,7 @@
 $font-dir: "./theme/fonts/";
 $regular-base: "spectral-v6-latin";
 $mono-base: "fira-mono-v8-latin";
-$file-types: ("eot", "woff", "woff2", "ttf", "svg");
+$file-types: ("woff", "woff2");
 $font-display: fallback;
 
 $regular: $regular-base + "-regular";

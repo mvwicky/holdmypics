@@ -8,13 +8,12 @@ RUN yarn install
 COPY ./webpack.config.ts ./tsconfig.json /app/
 COPY ./src /app/src
 ARG PRODUCTION
-RUN yarn run build${PRODUCTION:-:dev} \
+RUN yarn run build \
   && yarn install --prod
 
 FROM python:3.8-slim
 
 ENV LC_ALL=C.UTF-8 LANG=C.UTF-8 PYTHONUNBUFFERED=1
-
 
 RUN set -ex \
   && RUN_DEPS=" \
@@ -25,7 +24,7 @@ RUN set -ex \
   && apt-get update && apt-get install -y --no-install-recommends $RUN_DEPS \
   && rm -rf /var/lib/apt/lists/*
 
-COPY requirements${PRODUCTION:--dev}.txt /requirements.txt
+COPY requirements.txt /requirements.txt
 RUN set -ex \
   && BUILD_DEPS=" \
   build-essential \
