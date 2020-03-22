@@ -1,5 +1,6 @@
 import sys
 import time
+from logging.config import dictConfig
 from pathlib import Path
 
 from flask import Flask, request, send_from_directory
@@ -28,6 +29,7 @@ def get_version() -> str:
 
 
 def config_logging():
+    dictConfig({"version": 1})
     logger.remove()
     fmt = (
         "[<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>] | <level>{level:<8}</level> | "
@@ -84,10 +86,17 @@ def create_app(config_class=Config):
 
     @app.before_request
     def before_request_cb():
+
         request.start_time = time.monotonic()
 
     @app.after_request
     def after_request_cb(res):
+        logger.info(
+            "{0} - {1} - {2}",
+            request.path,
+            res.status_code,
+            res.headers.get("Content-Length", 0),
+        )
         endpoint = request.endpoint
         if endpoint == "core.index":
             res.headers["Cache-Control"] = "max-age=0, no-store"
@@ -113,5 +122,5 @@ def create_app(config_class=Config):
     def _ctx():
         return {"version": get_version()}
 
-    logger.info("Created App {0!r}", app)
+    logger.debug("Created App {0!r}", app)
     return app
