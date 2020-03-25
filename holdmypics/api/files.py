@@ -10,7 +10,7 @@ from . import bp
 
 ignore_file = ignore(FileNotFoundError, default=None)
 
-fname_tbl = str.maketrans({"#": "", " ": "-", ".": ""})
+fname_tbl = str.maketrans({"#": "", " ": "-", ".": "", "/": "-", "\\": "-"})
 
 
 class GeneratedFiles(object):

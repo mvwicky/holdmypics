@@ -32,7 +32,7 @@ def make_image(
         if args.alpha < 1:
             alpha_im = Image.new("L", size, int(args.alpha * 255))
             im.putalpha(alpha_im)
-        if args.text is not None and fmt != "jpeg":
+        if args.text is not None:
             logger.info('Writing text "{0}"', args.text)
             text_args = TextArgs(fg_color, args.text, args.font_name, args.debug)
             im = draw_text(im, text_args)
