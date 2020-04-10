@@ -1,6 +1,6 @@
 {
   "name": "holdmypics",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "description": "Placeholder image generator",
   "repository": "https://github.com/mvwicky/holdmypics.git",
   "license": "MIT",
@@ -12,7 +12,9 @@
     "build:prod": "cross-env NODE_ENV=production webpack --config webpack.config.ts --progress",
     "watch": "yarn run build:dev --watch"
   },
-  "dependencies": {},
+  "dependencies": {
+    "friendly-words": "^1.1.10"
+  },
   "devDependencies": {
     "@babel/core": "^7.0.0-0",
     "@babel/plugin-proposal-object-rest-spread": "^7.8.3",

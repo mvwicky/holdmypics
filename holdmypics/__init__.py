@@ -35,7 +35,7 @@ def config_logging():
         "[<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>] | <level>{level:<8}</level> | "
         "<blue>{name}</blue>:<cyan>{line}</cyan> - <bold>{message}</bold>"
     )
-    logger.add(sys.stderr, format=fmt)
+    logger.add(sys.stderr, format=fmt, level="INFO")
     log_dir = HERE.parent / "log"
     if log_dir.is_dir():
         log_file = log_dir / (__name__ + ".log")

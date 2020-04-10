@@ -4,7 +4,7 @@ from subprocess import TimeoutExpired
 from typing import Dict
 
 import attr
-import click
+from loguru import logger
 
 WAIT = 5
 
@@ -28,7 +28,7 @@ class Server(object):
             should_shutdown = False
             for name, proc in self.procs.items():
                 if proc.poll() is not None:
-                    click.secho(f"Subprocess {name} died", fg="red")
+                    logger.warning(f"Subprocess {name} died")
                     should_shutdown = True
                     break
             if should_shutdown:
@@ -40,16 +40,16 @@ class Server(object):
         self.shutdown()
 
     def shutdown(self):
-        click.echo("Shutting down.")
+        logger.info("Shutting down.")
         for name, proc in self.procs.items():
-            click.echo(f"Terminating {name}")
+            logger.info(f"Terminating {name}")
             proc.terminate()
             try:
                 proc.wait(WAIT)
             except TimeoutExpired:
-                click.secho(f"Killing {name}", fg="yellow")
+                logger.warning(f"Killing {name}")
                 proc.kill()
                 try:
                     proc.wait(WAIT)
                 except TimeoutExpired:
-                    click.secho(f"Unable to kill {name}", fg="red")
+                    logger.error(f"Unable to kill {name}")

@@ -108,3 +108,7 @@ def get_color(color: str) -> str:
     if color_len in {3, 6} and all(e in hexdigits for e in color):
         return "#" + color
     return color
+
+
+def get_words_file():
+    pass

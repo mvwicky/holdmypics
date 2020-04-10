@@ -5,6 +5,7 @@ from pathlib import Path
 import click
 import toml
 from flask import Flask
+from loguru import logger
 
 from . import __version__
 from .package import Package
@@ -44,20 +45,19 @@ def register(app: Flask):  # noqa: C901
         poetry = proj_data["tool"]["poetry"]
         version = poetry["version"]
 
-        click.secho(f"Current version: ", fg="green", nl=False)
-        click.secho(f"{version}", bold=True)
+        logger.info(f"Current version: {version}")
         version_mod = __version__.__name__
         if __version__.__version__ != version:
-            click.secho(f"{version_mod} out of date.", fg="yellow")
+            logger.info(f"{version_mod} out of date.")
             ver_file = Path(__version__.__file__)
             ver_file.write_text(f'__version__ = "{version}"\n')
         else:
-            click.secho(f"{version_mod} up to date.", fg="green")
+            logger.info(f"{version_mod} up to date.")
 
         if pkg.is_file():
             pkg_data = json.loads(pkg.read_text())
             if pkg_data["version"] != version:
-                click.secho("package.json out of date.", fg="yellow")
+                logger.info("package.json out of date.")
                 pkg_data["version"] = version
                 pkg.write_text(json.dumps(pkg_data))
                 args = [
@@ -72,9 +72,9 @@ def register(app: Flask):  # noqa: C901
                 ]
                 subprocess.run(args)
             else:
-                click.secho("package.json up to date.", fg="green")
+                logger.info("package.json up to date.")
         else:
-            click.secho("No package.json found.", fg="red")
+            logger.warning("No package.json found.")
 
     @app.cli.command()
     @click.option("--run/--no-run", default=True)

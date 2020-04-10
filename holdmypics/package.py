@@ -4,9 +4,9 @@ from pathlib import Path
 from typing import Dict, List, Optional, Sequence
 
 import attr
-import click
 import toml
 from humanize import naturalsize
+from loguru import logger
 
 CWD: Path = Path.cwd()
 FileMeta = Dict[str, str]
@@ -97,16 +97,11 @@ class Package(object):
         req = "\n".join(frozen_pkgs) + "\n"
         return req, len(frozen_pkgs)
 
-    def write_out(self, msg: str, **kwargs):
-        if not isinstance(msg, str):
-            msg = str(msg)
-        click.secho(msg, **kwargs)
-
     def sh(self, args: Sequence[str], **kwargs):
         cmd = args
         if not isinstance(cmd, str) and isinstance(cmd, Sequence):
             cmd = " ".join(cmd)
-        self.write_out("Running command: `{0}`".format(cmd))
+        logger.info(f"Running command {cmd}")
         kwargs.setdefault("cwd", str(self.root_dir))
         return subprocess.run(args, **kwargs)
 
@@ -118,11 +113,11 @@ class Package(object):
         file = self.req_file(dev)
         write = not file.is_file() or req_cts != file.read_text()
         if write:
-            self.write_out(f"Writing new {file.name}")
+            logger.info(f"Writing new {file.name}")
             file.write_text(req_cts)
         else:
-            self.write_out(f"{file.name} unchanged.")
+            logger.info(f"{file.name} unchanged.")
         rel = os.path.relpath(file, self.root_dir)
         sz = naturalsize(os.path.getsize(file))
-        self.write_out(f"Froze {num_pkgs} requirements to {rel} ({sz})")
+        logger.success(f"Froze {num_pkgs} requirements to {rel} ({sz})")
         return write

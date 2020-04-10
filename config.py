@@ -1,10 +1,8 @@
-import logging
 from pathlib import Path
 
 from environs import Env
 
 HERE: Path = Path(__file__).resolve().parent
-logger = logging.getLogger(__name__)
 
 env = Env()
 env.read_env()
@@ -13,6 +11,7 @@ _img_cache = str(HERE / ".cache" / "images")
 
 
 class BaseConfig(object):
+    BASE_PATH = HERE
     DEBUG = env.bool("DEBUG", default=False)
     REDIS_URL = env("REDIS_URL", default=None)
     LOG_DIR = env("LOG_DIR", default=None)
