@@ -156,7 +156,7 @@ const config: webpack.Configuration = {
       },
       {
         test: /\.(s?css)$/,
-        include: [path.resolve(__dirname, "src", "scss")],
+        include: [relToSrc("scss")],
         use: configureStyles(),
       },
       {
@@ -195,7 +195,6 @@ const config: webpack.Configuration = {
               global_defs: {
                 PRODUCTION: true,
               },
-              pure_funcs: ["log"],
             },
             output: {
               comments: false,
@@ -246,7 +245,7 @@ const config: webpack.Configuration = {
   stats: {
     modules: false,
     children: false,
-    excludeAssets: [/\.woff$/, /\.map$/, /\.LICENSE\.txt$/],
+    excludeAssets: [/fonts[\\/]/, /\.map$/, /\.LICENSE\.txt$/],
     publicPath: true,
     cachedAssets: true,
   },

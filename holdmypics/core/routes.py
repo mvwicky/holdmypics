@@ -5,7 +5,8 @@ from funcy import memoize, merge
 
 from .. import redisw
 from .._types import ResponseType
-from ..constants import COUNT_KEY, FONT_NAMES, img_formats
+from ..constants import COUNT_KEY, img_formats
+from ..fonts import fonts
 from ..utils import make_rules
 from . import bp
 
@@ -30,7 +31,7 @@ def get_context() -> dict:
     )
     color_pattern = r"(([a-fA-F0-9]{3})|([a-fA-F0-9]{6}))|rand"
     img_query = urlencode({"text": text, "font": font})
-    font_names = [(n, n.replace("-", " ").title()) for n in sorted(FONT_NAMES)]
+    font_names = [(n, n.replace("-", " ").title()) for n in sorted(fonts.font_names)]
     num_fields = {"width": width, "height": height}
     col_fields = {
         "bg": {"value": bg_color, "label": "Background Color"},

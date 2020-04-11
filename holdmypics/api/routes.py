@@ -13,11 +13,13 @@ from flask import (
     send_file,
 )
 from funcy import merge
+from humanize import naturalsize
 from loguru import logger
 from PIL import features
 
 from .._types import Dimension, ResponseType
-from ..constants import FONT_NAMES, img_formats
+from ..constants import img_formats
+from ..fonts import fonts
 from ..utils import make_rules
 from . import bp
 from .anim import make_anim
@@ -61,7 +63,7 @@ def do_cleanup(res: ResponseType) -> ResponseType:
 
 
 def font_redirect(font_name: str) -> ResponseType:
-    if font_name.lower() in FONT_NAMES:
+    if font_name.lower() in fonts.font_names:
         parts = urlsplit(request.url)
         query = merge(parse_qs(parts.query), {"font": [font_name.lower()]})
         query_list = [(k, v) for k, v in query.items()]
@@ -80,7 +82,7 @@ def image_route(
         abort(400)
     args = ImageArgs.from_request()
     font_name = args.font_name
-    if font_name not in FONT_NAMES:
+    if font_name not in fonts.font_names:
         return font_redirect(font_name)
 
     bg_lower, fg_lower = map(str.lower, [bg_color, fg_color])  # type: str, str
@@ -92,7 +94,7 @@ def image_route(
             fg_color = random_color()
 
     path = image_response(size, bg_color, fg_color, fmt, args)
-    logger.info("Image size: {0:,}", os.path.getsize(path))
+    logger.info("Image size: {0}", naturalsize(os.path.getsize(path)))
     if files.need_to_clean:
         after_this_request(do_cleanup)
 

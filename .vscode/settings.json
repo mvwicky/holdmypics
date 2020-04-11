@@ -1,5 +1,5 @@
 {
-  "python.pythonPath": "/Users/michael/.pyenv/versions/holdmypics-3.8.2/bin/python",
+  "python.pythonPath": "${env:VIRTUAL_ENV}/bin/python",
   "python.linting.flake8Args": ["--config=${workspaceFolder}/.flake8"],
   "python.sortImports.path": "${env:VIRTUAL_ENV}/bin/isort",
   "files.exclude": {

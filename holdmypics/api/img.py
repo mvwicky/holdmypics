@@ -1,4 +1,5 @@
 import os
+from typing import Callable, Dict, Tuple, Union
 
 import attr
 from loguru import logger
@@ -9,7 +10,16 @@ from .._types import Dimension
 from ..constants import COUNT_KEY
 from .args import ImageArgs
 from .files import files
-from .utils import TextArgs, draw_text, fmt_kw, get_color
+from .utils import TextArgs, draw_text, get_color
+
+OptValues = Union[str, bool, int, Tuple[int, int]]
+
+opt_kw: Dict[str, Callable[[ImageArgs], Dict[str, OptValues]]] = {
+    "jpeg": lambda args: {"optimize": True, "dpi": (args.dpi, args.dpi)},
+    "png": lambda args: {"optimize": True, "dpi": (args.dpi, args.dpi)},
+    "webp": lambda _: {"quality": 100, "method": 6},
+    "gif": lambda _: {"optimize": True},
+}
 
 
 def make_image(
@@ -39,7 +49,7 @@ def make_image(
         if fmt == "jpeg":
             im = im.convert("RGB")
         save_kw = {}
-        kw_func = fmt_kw.get(fmt, None)
+        kw_func = opt_kw.get(fmt, None)
         if kw_func is not None:
             save_kw.update(kw_func(args))
         im.save(path, **save_kw)

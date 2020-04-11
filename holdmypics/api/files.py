@@ -73,8 +73,8 @@ class GeneratedFiles(object):
         files = self.collect_for_cleaning()
         num_deleted, num_files = 0, len(files)
         if len(files) > self.max_files:
-            num = num_files - self.max_files
-            to_delete, num_deleted = files[:num], 0
+            n = max(num_files - self.max_files, num_files // 2)
+            to_delete, num_deleted = files[:n], 0
             for f in to_delete:
                 os.unlink(f)
                 num_deleted += 1

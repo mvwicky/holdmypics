@@ -1,34 +1,33 @@
 import random
 from collections import namedtuple
 from string import hexdigits
-from typing import Callable, Dict, Tuple, Union
+from typing import Tuple
 
 from PIL import Image, ImageDraw
 from PIL.ImageFont import ImageFont
 
 from .._types import Dimension
-from ..constants import MAX_SIZE, MIN_SIZE, font_sizes, fonts
-from .args import ImageArgs
-
-OptValues = Union[str, bool, int, Tuple[int, int]]
-
+from ..constants import PX_PER_PT
+from ..fonts import fonts
 
 TextArgs = namedtuple("TextArgs", ["color", "text", "font_name", "debug"])
+
+font_sizes = fonts.font_sizes
 
 
 def random_color() -> str:
     """Generate a random hex string."""
-    return "".join([f"{random.randrange(256):02x}" for _ in range(3)])
+    return "".join([f"{random.randrange(1 << 8):02x}" for _ in range(3)])
 
 
 def px_to_pt(px: float) -> float:
     """Convert pixels to points."""
-    return px * 0.75
+    return px * PX_PER_PT
 
 
 def pt_to_px(pt: float) -> float:
     """Convert points to pixels."""
-    return pt / 0.75
+    return pt / PX_PER_PT
 
 
 def guess_size(height: int, font_name: str) -> Tuple[ImageFont, int]:
@@ -52,10 +51,10 @@ def guess_size(height: int, font_name: str) -> Tuple[ImageFont, int]:
     s_mod = pt_size - (pt_size % 4)
     if s_mod in font:
         return font[s_mod], font_sizes.index(s_mod)
-    if pt_size > MAX_SIZE:
-        return font[MAX_SIZE], len(font_sizes) - 1
-    elif pt_size < MIN_SIZE:
-        return font[MIN_SIZE], 0
+    if pt_size > fonts.max_size:
+        return font[fonts.max_size], len(font_sizes) - 1
+    elif pt_size < fonts.min_size:
+        return font[fonts.min_size], 0
     last = font_sizes[0]
     for i, sz in enumerate(font_sizes[1:]):
         if last < pt_size < sz:
@@ -92,14 +91,6 @@ def draw_text(im: Image.Image, args: TextArgs) -> Image.Image:
         )
 
     return Image.alpha_composite(im, txt)
-
-
-fmt_kw: Dict[str, Callable[[ImageArgs], Dict[str, OptValues]]] = {
-    "jpeg": lambda args: {"optimize": True, "dpi": (args.dpi, args.dpi)},
-    "png": lambda args: {"optimize": True, "dpi": (args.dpi, args.dpi)},
-    "webp": lambda _: {"quality": 100, "method": 6},
-    "gif": lambda _: {"optimize": True},
-}
 
 
 def get_color(color: str) -> str:

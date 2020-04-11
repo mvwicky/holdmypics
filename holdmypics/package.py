@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Sequence
 
 import attr
-import toml
+import tomlkit as toml
 from humanize import naturalsize
 from loguru import logger
 
@@ -83,7 +83,7 @@ class Package(object):
         return self.root_dir / name
 
     def read_lock(self, dev: bool = False):
-        lock_data = toml.loads(self.lock_file.read_text())
+        lock_data = toml.parse(self.lock_file.read_text())
         file_meta = lock_data["metadata"]["files"]
         for elem in lock_data["package"]:
             if dev or elem["category"] != "dev":
