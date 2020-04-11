@@ -34,8 +34,8 @@ const cleanOpts: Clean.Options = {
     "!**/fonts",
     "!**/fonts/**/*",
     "!img",
-    "!img/**/*"
-  ]
+    "!img/**/*",
+  ],
 };
 
 const relToRoot = (...args: string[]) => path.resolve(__dirname, ...args);
@@ -47,13 +47,72 @@ const hashlength = prodOr(28, 10);
 const fontHash = `${hashFn}:hash:hex:${hashlength}`;
 const fontName = `[path][name].[${fontHash}].[ext]`;
 
-const srcDir = path.resolve(__dirname, "src");
-const rootDir = path.resolve(__dirname, "holdmypics");
+const rootDir = relToRoot("holdmypics");
 const outPath = path.join(rootDir, "static", "dist");
 
 const templatesDir = path.join(rootDir, "core", "templates");
 
 const publicPath = "/static/dist/";
+
+const configureBabel = () => {
+  return {
+    loader: "babel-loader",
+    options: {
+      cacheDirectory: prodOr(false, path.resolve(__dirname, ".cache")),
+      cacheCompression: true,
+      exclude: /node_modules/,
+      presets: [
+        [
+          "@babel/preset-env",
+          {
+            corejs: { version: 3, proposals: true },
+            debug: false,
+            useBuiltIns: "usage",
+            targets: { esmodules: true },
+          },
+        ],
+        "@babel/typescript",
+      ],
+      plugins: [
+        ["@babel/plugin-transform-runtime", { useESModules: true }],
+        "@babel/proposal-object-rest-spread",
+      ],
+      parserOpts: {
+        strictMode: true,
+      },
+    },
+  };
+};
+
+const configureStyles = () => {
+  return [
+    MiniCssExtractPlugin.loader,
+    {
+      loader: "css-loader",
+      options: {
+        importLoaders: 2,
+        sourceMap: prod,
+        modules: false,
+      },
+    },
+    {
+      loader: "postcss-loader",
+      options: {
+        sourceMap: true,
+        plugins: [autoprefixer({ flexbox: "no-2009" })],
+      },
+    },
+    {
+      loader: "sass-loader",
+      options: {
+        implementation: require("sass"),
+        sassOptions: {
+          outputStyle: prodOr("compressed", "expanded"),
+        },
+      },
+    },
+  ];
+};
 
 const config: webpack.Configuration = {
   entry: pkg.entry,
@@ -63,7 +122,7 @@ const config: webpack.Configuration = {
     hashFunction: hashFn,
     hashDigestLength: 64,
     publicPath,
-    pathinfo: !prod
+    pathinfo: !prod,
   },
   devtool: prodOr("source-map", "cheap-module-eval-source-map"),
   mode: prodOr("production", "development"),
@@ -71,93 +130,34 @@ const config: webpack.Configuration = {
     new Clean.CleanWebpackPlugin(cleanOpts),
     new MiniCssExtractPlugin({
       filename: `style.[name].[contenthash:${hashlength}].css`,
-      chunkFilename: `[name].[contenthash:${hashlength}].css`
+      chunkFilename: `[name].[contenthash:${hashlength}].css`,
     }),
     new HtmlWebpackPlugin({
       filename: path.join(templatesDir, "base-out.html"),
-      template: path.join(srcDir, "template.html"),
       minify: false,
-      inject: true
+      inject: false,
+      meta: {},
+      cache: false,
     }),
     new webpack.DefinePlugin({
-      PRODUCTION: JSON.stringify(prod)
-    })
+      PRODUCTION: JSON.stringify(prod),
+    }),
   ],
   module: {
     rules: [
       {
         test: /\.(ts)$/,
-        use: [
-          {
-            loader: "babel-loader",
-            options: {
-              cacheDirectory: prodOr(false, path.resolve(__dirname, ".cache")),
-              cacheCompression: true,
-              exclude: /node_modules/,
-              presets: [
-                [
-                  "@babel/preset-env",
-                  {
-                    corejs: { version: 3 },
-                    debug: false,
-                    useBuiltIns: "usage"
-                  }
-                ],
-                "@babel/typescript"
-              ],
-              plugins: [
-                ["@babel/plugin-transform-runtime", { useESModules: true }],
-                "@babel/proposal-object-rest-spread"
-              ],
-              parserOpts: {
-                strictMode: true
-              }
-            }
-          }
-        ],
-        include: path.join(srcDir)
+        use: [configureBabel()],
+        include: relToRoot("src"),
       },
       {
         test: /\.svg$/,
-        use: [
-          {
-            loader: "html-loader",
-            options: {
-              esModule: false
-            }
-          }
-        ]
+        use: [{ loader: "html-loader", options: {} }],
       },
       {
         test: /\.(s?css)$/,
         include: [path.resolve(__dirname, "src", "scss")],
-        use: compact([
-          MiniCssExtractPlugin.loader,
-          {
-            loader: "css-loader",
-            options: {
-              importLoaders: 2,
-              sourceMap: prod,
-              modules: false
-            }
-          },
-          {
-            loader: "postcss-loader",
-            options: {
-              sourceMap: true,
-              plugins: [autoprefixer({ flexbox: "no-2009" })]
-            }
-          },
-          {
-            loader: "sass-loader",
-            options: {
-              implementation: require("sass"),
-              sassOptions: {
-                outputStyle: "expanded"
-              }
-            }
-          }
-        ])
+        use: configureStyles(),
       },
       {
         test: /\.(woff|woff2|eot|ttf|otf|svg)$/,
@@ -168,12 +168,12 @@ const config: webpack.Configuration = {
             options: {
               context: "src/scss/theme",
               name: fontName,
-              esModule: false
-            }
-          }
-        ]
-      }
-    ]
+              esModule: false,
+            },
+          },
+        ],
+      },
+    ],
   },
   optimization: {
     minimizer: compact([
@@ -185,7 +185,7 @@ const config: webpack.Configuration = {
           terserOptions: {
             parse: {
               html5_comments: false,
-              shebang: false
+              shebang: false,
             },
             compress: {
               drop_console: true,
@@ -193,25 +193,25 @@ const config: webpack.Configuration = {
               ecma: 2016,
               passes: 2,
               global_defs: {
-                PRODUCTION: true
+                PRODUCTION: true,
               },
-              pure_funcs: ["log"]
+              pure_funcs: ["log"],
             },
             output: {
               comments: false,
               ecma: 2016,
-              indent_level: 2
-            }
-          }
+              indent_level: 2,
+            },
+          },
         })
       ),
       ifProd(
         new OptimizeCSSPlugin({
           cssProcessor: require("cssnano"),
           cssProcessorOptions: { preset: ["default"], map: true },
-          canPrint: false
+          canPrint: false,
         })
-      )
+      ),
     ]),
     splitChunks: {
       automaticNameDelimiter: "-",
@@ -221,35 +221,35 @@ const config: webpack.Configuration = {
           name: "core-js-es",
           minChunks: 1,
           chunks: "all",
-          priority: 20
+          priority: 20,
         },
         corejs_web: {
           test: /node_modules[\\/]core-js[\\/]modules[\\/]web/,
           name: "core-js-web",
           minChunks: 1,
-          chunks: "all"
+          chunks: "all",
         },
         corejs_internal: {
           test: /node_modules[\\/]core-js[\\/]internals[\\/]/,
           name: "core-js-internal",
           minChunks: 1,
-          chunks: "all"
-        }
-      }
-    }
+          chunks: "all",
+        },
+      },
+    },
   },
   resolve: {
     extensions: [".js"],
-    symlinks: false
+    symlinks: false,
   },
   node: false,
   stats: {
     modules: false,
     children: false,
-    excludeAssets: [/^fonts\//, /\.map$/, /\.LICENSE\.txt$/],
+    excludeAssets: [/\.woff$/, /\.map$/, /\.LICENSE\.txt$/],
     publicPath: true,
-    cachedAssets: true
-  }
+    cachedAssets: true,
+  },
 };
 
 export default config;

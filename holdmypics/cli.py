@@ -1,15 +1,28 @@
 import json
 import subprocess
 from pathlib import Path
+from subprocess import DEVNULL
 
 import click
-import toml
+import semver
+import tomlkit as toml
 from flask import Flask
+from funcy import merge
 from loguru import logger
+from semver import VersionInfo
 
 from . import __version__
 from .package import Package
 from .server import Server
+
+SEMVER_BUMPS = {
+    "major": VersionInfo.bump_major,
+    "minor": VersionInfo.bump_minor,
+    "patch": VersionInfo.bump_patch,
+    "prerelease": VersionInfo.bump_prerelease,
+    "build": VersionInfo.bump_build,
+}
+SEMVER_LEVELS = list(SEMVER_BUMPS)
 
 
 def register(app: Flask):  # noqa: C901
@@ -31,7 +44,20 @@ def register(app: Flask):  # noqa: C901
         package.freeze(dev, not hashes)
 
     @app.cli.command()
-    def sync_versions():
+    @click.option(
+        "--bump/--no-bump",
+        "-b/ ",
+        default=False,
+        help="Increment the version before syncing.",
+    )
+    @click.option(
+        "--level",
+        "-l",
+        type=click.Choice(SEMVER_LEVELS),
+        default="patch",
+        help="The part of the version to bump.",
+    )
+    def sync_versions(bump: bool, level: str):
         """Make sure that versions are synced between various files.
 
         The pyproject.toml version is treated as canonical.
@@ -40,37 +66,35 @@ def register(app: Flask):  # noqa: C901
         proj = package.root_dir / "pyproject.toml"
         pkg = package.root_dir / "package.json"
 
-        proj_data = toml.loads(proj.read_text())
+        proj_data = toml.parse(proj.read_text())
 
         poetry = proj_data["tool"]["poetry"]
-        version = poetry["version"]
+        version = semver.parse_version_info(poetry["version"])
+        if bump:
+            f = SEMVER_BUMPS[level]
+            logger.info(f"Bumping {level}.")
+            version = str(f(version))
+            proj_data["tool"]["poetry"]["version"] = version
+            proj.write_text(toml.dumps(proj_data))
+            logger.success(f"New version: {version}")
+        else:
+            version = str(version)
+            logger.info(f"Current version: {version}")
 
-        logger.info(f"Current version: {version}")
-        version_mod = __version__.__name__
         if __version__.__version__ != version:
-            logger.info(f"{version_mod} out of date.")
+            logger.info(f"{__version__.__name__} out of date.")
             ver_file = Path(__version__.__file__)
             ver_file.write_text(f'__version__ = "{version}"\n')
         else:
-            logger.info(f"{version_mod} up to date.")
+            logger.info(f"{__version__.__name__} up to date.")
 
         if pkg.is_file():
             pkg_data = json.loads(pkg.read_text())
             if pkg_data["version"] != version:
                 logger.info("package.json out of date.")
-                pkg_data["version"] = version
-                pkg.write_text(json.dumps(pkg_data))
-                args = [
-                    "yarn",
-                    "--silent",
-                    "run",
-                    "prettier",
-                    "--loglevel",
-                    "error",
-                    "--write",
-                    str(pkg),
-                ]
-                subprocess.run(args)
+                pkg.write_text(json.dumps(merge(pkg_data, {"version": version})))
+                args = ["yarn", "prettier", "--write", str(pkg)]
+                subprocess.run(args, stdout=DEVNULL, stderr=DEVNULL, check=True)
             else:
                 logger.info("package.json up to date.")
         else:

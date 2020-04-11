@@ -3,16 +3,11 @@ import "./scss/main.scss";
 import checkSvg from "./icons/check.svg";
 import copySvg from "./icons/copy.svg";
 
-import debug from "debug";
-
-const log = PRODUCTION ? (...args: any[]) => {} : debug("holdmypics");
-if (!PRODUCTION) {
-  window.localStorage.setItem("debug", "holdmypics*");
-}
+const log = PRODUCTION ? (...args: any[]) => {} : console.log.bind(console);
 
 const ICON_CONTENTS: Map<string, string> = new Map([
   ["check", checkSvg],
-  ["copy", copySvg]
+  ["copy", copySvg],
 ]);
 
 function getClipboard() {
@@ -122,7 +117,7 @@ function debounce<F extends AnyFunc>(
   return function debouncedFunction(this: ThisType<F>, ...a: Parameters<F>) {
     const context = this;
 
-    const later = function() {
+    const later = function () {
       timeout = undefined;
       if (!immediate) {
         func.apply(context, a);
@@ -164,7 +159,6 @@ async function main() {
   if (truthy(copyIconEl) && truthy(checkIconEl)) {
     afterFeather(btn, copyIconEl, checkIconEl);
   }
-
   log("Everything seems to exist.");
 
   const initialParams = gatherParams(form);
@@ -192,7 +186,7 @@ async function main() {
       endpoint,
       btn,
       image: exampleImage,
-      id: elements[i].id
+      id: elements[i].id,
     };
     const cb = debounce(inputCallback.bind(null, args), 750);
     elements[i].addEventListener("input", cb);
@@ -225,7 +219,7 @@ async function afterFeather(
         checkIcon.classList.remove("d-none");
         copyIcon.classList.add("d-none");
       });
-    }
+    },
   });
   log("Check and copy icons exist.");
   const copy = new Clipboard(copyBtn);
@@ -237,7 +231,7 @@ async function afterFeather(
   });
 }
 
-(function(d: Document, global: Window) {
+(function (d: Document, global: Window) {
   if (d.readyState === "loading") {
     d.addEventListener("DOMContentLoaded", main);
   } else {

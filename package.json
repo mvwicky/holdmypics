@@ -1,6 +1,6 @@
 {
   "name": "holdmypics",
-  "version": "0.11.0",
+  "version": "0.11.4",
   "description": "Placeholder image generator",
   "repository": "https://github.com/mvwicky/holdmypics.git",
   "license": "MIT",
@@ -61,6 +61,7 @@
     "sass-loader": "^8.0.2",
     "sass-mq": "^5.0.1",
     "style-loader": "^1.1.3",
+    "svg-url-loader": "^5.0.0",
     "tailwindcss": "^1.2.0",
     "terser-webpack-plugin": "^2.3.2",
     "tippy.js": "^6.0.0",
@@ -79,6 +80,14 @@
   },
   "prettier": {
     "arrowParens": "always",
-    "tabWidth": 2
+    "tabWidth": 2,
+    "overrides": [
+      {
+        "files": "*.ejs",
+        "options": {
+          "requirePragma": true
+        }
+      }
+    ]
   }
 }

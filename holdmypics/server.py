@@ -34,7 +34,7 @@ class Server(object):
             if should_shutdown:
                 break
             try:
-                time.sleep(0.5)
+                time.sleep(0.1)
             except (KeyboardInterrupt, Exception):
                 break
         self.shutdown()
