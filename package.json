@@ -76,7 +76,7 @@
     "yarn": "1.x"
   },
   "entry": {
-    "main": "./src/main.ts"
+    "main": "./src/ts/main.ts"
   },
   "prettier": {
     "arrowParens": "always",

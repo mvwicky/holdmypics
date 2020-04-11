@@ -148,7 +148,7 @@ const config: webpack.Configuration = {
       {
         test: /\.(ts)$/,
         use: [configureBabel()],
-        include: relToRoot("src"),
+        include: [relToSrc("ts")],
       },
       {
         test: /\.svg$/,
@@ -239,7 +239,7 @@ const config: webpack.Configuration = {
     },
   },
   resolve: {
-    extensions: [".js"],
+    extensions: [".js", ".ts"],
     symlinks: false,
   },
   node: false,

@@ -1,3 +1,12 @@
+type RequestIdleCallbackHandle = any;
+type RequestIdleCallbackOptions = {
+  timeout?: number;
+};
+type RequestIdleCallbackDeadline = {
+  readonly didTimeout: boolean;
+  timeRemaining: () => number;
+};
+
 interface MakeEndpointArgs {
   [k: string]: string;
   width: string;

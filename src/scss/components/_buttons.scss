@@ -3,19 +3,25 @@
   height: 1em;
   align-self: center;
   bottom: 0.1em;
-  cursor: pointer;
+  // cursor: pointer;
   position: relative;
   vertical-align: middle;
   margin-left: 0.1em;
+  stroke: var(--feather-stroke, hsl(0, 0%, 0%));
 }
 
 #copy-button {
   border-radius: 5px;
   margin-left: 0.33em;
-  &:hover {
-    background-color: dodgerblue;
-    .feather-copy {
-      stroke: white;
+  width: 2rem;
+  height: 2rem;
+  &:disabled {
+    --feather-stroke: hsl(0, 0%, 73%);
+  }
+  &:not(:disabled) {
+    &:hover {
+      --feather-stroke: hsl(0, 0%, 100%);
+      background-color: hsl(210, 100%, 56%);
     }
   }
 }

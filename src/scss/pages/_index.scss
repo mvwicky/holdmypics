@@ -34,6 +34,9 @@ $h-spacing: 5rem;
   @include mq($from: "md") {
     margin-bottom: 0;
   }
+  & > a {
+    color: inherit;
+  }
   &:hover {
     text-decoration: underline;
   }

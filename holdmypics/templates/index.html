@@ -13,22 +13,23 @@
     <h2>Images Created: <span id="img-count">{{ count }}</span></h2>
   </div>
 
+  {% set image_url = img_url ~ "?" ~ img_query %}
   <div class="image-container">
     <div class="row justify-content-center">
-      <img id="example-image" src="{{ img_url }}?{{ img_query }}" alt="Example image.">
+      <img id="example-image" src="{{ image_url }}" alt="Example image.">
     </div>
 
     <div class="row align-items-center justify-content-between endpoint-container">
-      <code id="endpoint">{{ img_url }}?{{ img_query }}</code>
+      <code id="endpoint">
+        <a href="{{ image_url }}" target="_blank" rel="noreferrer noopener">{{ image_url }}</a>
+      </code>
       <button
         id="copy-button"
-        data-clipboard-text="{{ img_url }}?{{ img_query }}"
+        data-clipboard-text="{{ image_url }}"
         aria-label="Copied to clipboard!"
+        disabled
       >
-        <i
-          data-icon="copy"
-          title="Copy to clipboard."
-        ></i>
+        <i data-icon="copy" title="Copy to clipboard."></i>
         <i class="d-none" data-icon="check" title="Copied"></i>
       </button>
     </div>
@@ -116,7 +117,6 @@
     </p>
     {% endfor %}
     <div class="size-explanation">
-
       <small>
         Where <code>&lt;size&gt;</code> is either the width and height of a rectangular image (<code>width&times;height</code>) or the length of each side of a square image (<code>side</code>), in pixels.
         <p>
