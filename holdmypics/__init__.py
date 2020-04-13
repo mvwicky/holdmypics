@@ -29,7 +29,6 @@ def get_version() -> str:
 
 
 def config_logging():
-    print("Configuring Logging")
     dictConfig({"version": 1})
     logger.remove()
     fmt = (
@@ -123,5 +122,6 @@ def create_app(config_class=Config):
     def _ctx():
         return {"version": get_version()}
 
+    print("End of init function.")
     logger.debug(f"Created App {app!r}")
     return app
