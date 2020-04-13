@@ -1,19 +1,25 @@
 import imghdr
 import io
-import itertools as it
+import random
 from typing import Optional
+from urllib.parse import urlencode
 
 import pytest
+from flask import Flask
 from flask.testing import FlaskClient
 from funcy import compact
 from PIL import Image
 
-size = "638x328"
-bg_color = "123"
-fg_color = "aaa"
-bg_colors = ["123", None]
-fg_colors = ["aaa", None]
-fmts = ["webp", "png", "jpeg", "gif"]
+
+def random_color() -> str:
+    """Generate a random hex string."""
+    return "".join([f"{random.randrange(1 << 8):02x}" for _ in range(3)])
+
+
+bg_colors = ["Random", None]
+fg_colors = ["Random", None]
+fmts = ["webp", "png", "jpeg"]
+texts = ["An bunch of words here", None]
 
 
 def make_route(
@@ -25,20 +31,15 @@ def make_route(
     return "/api/" + "/".join(compact(parts)) + "/"
 
 
-_routes = it.chain.from_iterable(
-    (
-        [
-            f"{size}/{bg_color}/{fg_color}/{fmt}/",
-            f"{size}/{bg_color}/{fg_color}/",
-            f"{size}/{bg_color}/{fmt}/",
-            f"{size}/{fmt}/",
-            f"{size}/{bg_color}/",
-        ]
-        for fmt in fmts
-    )
-)
-
-routes = ["/api/" + r for r in _routes]
+def make_url(
+    width: int, height: int, fmt: int, bg_color: str, fg_color: str, text: str
+):
+    path = make_route(width, height, bg_color, fg_color, fmt)
+    if text is not None:
+        query = urlencode({"text": text})
+        return "?".join([path, query])
+    else:
+        return path
 
 
 def test_index(client):
@@ -46,20 +47,85 @@ def test_index(client):
     assert res.status_code == 200
 
 
-# @pytest.mark.parametrize("route", routes)
-# def test_full_params(client: FlaskClient, route):
-# assert not files.max_files
-# res = client.get(route, follow_redirects=True)
-# assert res.status_code == 200
-# files.clean()
-# assert files.clean()
+@pytest.fixture(name="width", params=[100, 1000])
+def width_fixture(request):
+    return request.param
 
 
-@pytest.mark.parametrize("width", [100, 4096])
-@pytest.mark.parametrize("height", [100, 4096])
-@pytest.mark.parametrize("fg_color", fg_colors)
-@pytest.mark.parametrize("bg_color", bg_colors)
-@pytest.mark.parametrize("fmt", fmts)
+@pytest.fixture(name="height", params=[100, 1000])
+def height_fixture(request):
+    return request.param
+
+
+@pytest.fixture(name="fg_color", params=fg_colors)
+def fg_color_fixture(request):
+    return random_color() if request.param else request.param
+
+
+@pytest.fixture(name="bg_color", params=bg_colors)
+def bg_color_fixture(request):
+    return random_color() if request.param else request.param
+
+
+@pytest.fixture(name="fmt", params=fmts)
+def fmt_fixture(request):
+    return request.param
+
+
+@pytest.fixture(name="text", params=texts, ids=["Words", "None"])
+def text_fixture(request):
+    return request.param
+
+
+@pytest.fixture(name="dpi", params=[72, None])
+def dpi_fixture(request):
+    return request.param
+
+
+@pytest.fixture(name="alpha", params=[0.77, None])
+def alpha_fixture(request):
+    return request.param
+
+
+@pytest.fixture(name="args")
+def args_fixture(text, dpi, alpha):
+    return {"text": text, "dpi": dpi, "alpha": alpha}
+
+
+@pytest.fixture(name="query")
+def query_fixture(args):
+    if args:
+        return urlencode(args)
+    else:
+        return None
+
+
+def test_from_function(
+    app: Flask,
+    width: int,
+    height: int,
+    fmt: str,
+    fg_color: str,
+    bg_color: str,
+    args: dict,
+):
+    from holdmypics.api.args import ImageArgs
+    from holdmypics.api.img import make_image
+    from holdmypics.api.utils import get_color
+
+    with app.test_request_context():
+        img_args = ImageArgs.from_request(compact(args))
+        size = (width, height)
+        im = make_image(
+            size,
+            get_color(bg_color or "000"),
+            get_color(fg_color or "aaa"),
+            fmt,
+            img_args,
+        )
+        assert im.size == size
+
+
 def test_different_params(
     client: FlaskClient,
     width: int,
@@ -67,12 +133,14 @@ def test_different_params(
     fmt: str,
     fg_color: Optional[str],
     bg_color: Optional[str],
+    query: str,
 ):
-    if any([bg_color, fg_color, fmt]):
-        path = make_route(width, height, bg_color, fg_color, fmt)
-        res = client.get(path, follow_redirects=False)
-        assert res.status_code == 200
-        img_type = imghdr.what("filename", h=res.data)
-        assert img_type == fmt
-        im = Image.open(io.BytesIO(res.data))
-        assert im.size == (width, height)
+    url = make_route(width, height, bg_color, fg_color, fmt)
+    if query is not None:
+        url = "?".join([url, query])
+    res = client.get(url, follow_redirects=False)
+    assert res.status_code == 200
+    img_type = imghdr.what("filename", h=res.data)
+    assert img_type == fmt
+    im = Image.open(io.BytesIO(res.data))
+    assert im.size == (width, height)

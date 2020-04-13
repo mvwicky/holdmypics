@@ -29,6 +29,7 @@ def get_version() -> str:
 
 
 def config_logging():
+    print("Configuring Logging")
     dictConfig({"version": 1})
     logger.remove()
     fmt = (
@@ -54,6 +55,7 @@ def create_app(config_class=Config):
 
     app = Flask(__name__)
     app.config.from_object(config_class)
+    print("App Created")
 
     hsts_seconds = app.config.get("HSTS_SECONDS", 0)
     hsts_preload = app.config.get("HSTS_PRELOAD", False)
@@ -86,7 +88,6 @@ def create_app(config_class=Config):
 
     @app.before_request
     def before_request_cb():
-
         request.start_time = time.monotonic()
 
     @app.after_request
@@ -122,5 +123,5 @@ def create_app(config_class=Config):
     def _ctx():
         return {"version": get_version()}
 
-    logger.debug("Created App {0!r}", app)
+    logger.debug(f"Created App {app!r}")
     return app

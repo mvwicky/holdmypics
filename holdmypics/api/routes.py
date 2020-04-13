@@ -25,7 +25,7 @@ from . import bp
 from .anim import make_anim
 from .args import ImageArgs
 from .files import files
-from .img import make_image
+from .img import save_image
 from .utils import random_color
 
 ViewFunc = Callable
@@ -36,7 +36,7 @@ RAND_STR = "rand"
 
 
 def image_response(size: Dimension, bg: str, fg: str, fmt: str, args: ImageArgs) -> str:
-    return make_image(size, bg, fg, fmt, args)
+    return save_image(size, bg, fg, fmt, args)
 
 
 def make_route(prefix: str = "") -> ViewFunc:
@@ -105,11 +105,6 @@ def image_route(
         "conditional": True,
     }
 
-    filename = args.filename
-    if filename is not None:
-        if not filename.endswith("." + fmt):
-            filename = ".".join([filename, fmt])
-        kw.update({"as_attachment": False, "attachment_filename": None})
     res: Response = send_file(path, **kw)  # type: ignore
     return res
 

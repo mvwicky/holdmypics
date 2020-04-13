@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Mapping, Optional
 
 import attr
 from flask import request
@@ -20,8 +20,11 @@ class ImageArgs(object):
     debug: bool = False
 
     @classmethod
-    def from_request(cls) -> "ImageArgs":
-        args: ImmutableMultiDict = request.args
+    def from_request(cls, args: Optional[Mapping] = None) -> "ImageArgs":
+        if args is not None:
+            args = ImmutableMultiDict(args)
+        else:
+            args: ImmutableMultiDict = request.args
         kw = {
             "text": args.get("text", None),
             "filename": args.get("filename", None),

@@ -1,7 +1,7 @@
 import random
 from collections import namedtuple
 from string import hexdigits
-from typing import Tuple
+from typing import NamedTuple, Tuple
 
 from PIL import Image, ImageDraw
 from PIL.ImageFont import ImageFont
@@ -10,7 +10,14 @@ from .._types import Dimension
 from ..constants import PX_PER_PT
 from ..fonts import fonts
 
+
+class FontParams(NamedTuple):
+    font: ImageFont
+    size: Dimension
+
+
 TextArgs = namedtuple("TextArgs", ["color", "text", "font_name", "debug"])
+
 
 font_sizes = fonts.font_sizes
 
@@ -73,7 +80,7 @@ def get_font(
         idx -= 1
         font = face[font_sizes[idx]]
         tsize = d.textsize(text, font)
-    return font, tsize
+    return FontParams(font, tsize)
 
 
 def draw_text(im: Image.Image, args: TextArgs) -> Image.Image:
@@ -95,8 +102,7 @@ def draw_text(im: Image.Image, args: TextArgs) -> Image.Image:
 
 def get_color(color: str) -> str:
     color = color.lstrip("#")
-    color_len = len(color)
-    if color_len in {3, 6} and all(e in hexdigits for e in color):
+    if len(color) in {3, 6} and all(e in hexdigits for e in color):
         return "#" + color
     return color
 

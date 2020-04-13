@@ -24,10 +24,27 @@ opt_kw: Dict[str, Callable[[ImageArgs], Dict[str, OptValues]]] = {
 
 def make_image(
     size: Dimension, bg_color: str, fg_color: str, fmt: str, args: ImageArgs
+) -> Image.Image:
+    fmt = "jpeg" if fmt == "jpg" else fmt
+    mode = "RGBA"
+    im = Image.new(mode, size, bg_color)
+    if args.alpha < 1:
+        alpha_im = Image.new("L", size, int(args.alpha * 255))
+        im.putalpha(alpha_im)
+    if args.text is not None:
+        logger.info('Writing text "{0}"', args.text)
+        text_args = TextArgs(fg_color, args.text, args.font_name, args.debug)
+        im = draw_text(im, text_args)
+    if fmt == "jpeg":
+        im = im.convert("RGB")
+    return im
+
+
+def save_image(
+    size: Dimension, bg_color: str, fg_color: str, fmt: str, args: ImageArgs
 ) -> str:
     """Create an image or find an existing one and produce its path."""
     fmt = "jpeg" if fmt == "jpg" else fmt
-    mode = "RGBA"
     bg_color = get_color(bg_color)
     fg_color = get_color(fg_color)
     path = files.get_file_name(size, bg_color, fg_color, fmt, *attr.astuple(args))
@@ -38,19 +55,10 @@ def make_image(
         return path
     else:
         logger.info("Creating new file")
-        im = Image.new(mode, size, bg_color)
-        if args.alpha < 1:
-            alpha_im = Image.new("L", size, int(args.alpha * 255))
-            im.putalpha(alpha_im)
-        if args.text is not None:
-            logger.info('Writing text "{0}"', args.text)
-            text_args = TextArgs(fg_color, args.text, args.font_name, args.debug)
-            im = draw_text(im, text_args)
-        if fmt == "jpeg":
-            im = im.convert("RGB")
+        im = make_image(size, bg_color, fg_color, fmt, args)
         save_kw = {}
         kw_func = opt_kw.get(fmt, None)
-        if kw_func is not None:
+        if kw_func is not None:  # pragma: no cover
             save_kw.update(kw_func(args))
         im.save(path, **save_kw)
         redisw.client.incr(COUNT_KEY)

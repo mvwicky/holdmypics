@@ -4,9 +4,7 @@ env = Env()
 env.read_env()
 
 loglevel = "info"
-bind = env("BIND", default=None)
-if bind is None:
-    del bind
+# bind = env("BIND", default=None)
 
 worker_class = "gthread"
 workers = env.int("WEB_CONCURRENCY", default=1)
