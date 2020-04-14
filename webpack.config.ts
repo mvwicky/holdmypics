@@ -152,7 +152,7 @@ const config: webpack.Configuration = {
       },
       {
         test: /\.svg$/,
-        use: [{ loader: "html-loader", options: {} }],
+        use: [{ loader: "html-loader", options: { minimize: false } }],
       },
       {
         test: /\.(s?css)$/,

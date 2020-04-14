@@ -1,3 +1,4 @@
+import os
 import sys
 import time
 from logging.config import dictConfig
@@ -28,40 +29,44 @@ def get_version() -> str:
     return __version__
 
 
-def config_logging():
+def config_logging(config_class):
     dictConfig({"version": 1})
-    logger.remove()
     fmt = (
-        "[<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>] | <level>{level:<8}</level> | "
+        "[<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>] | "
+        "<level>{level:<8}</level> | "
         "<blue>{name}</blue>:<cyan>{line}</cyan> - <bold>{message}</bold>"
     )
-    logger.add(sys.stderr, format=fmt, level="INFO")
-    log_dir = HERE.parent / "log"
-    if log_dir.is_dir():
-        log_file = log_dir / (__name__ + ".log")
-        logger.add(
-            log_file,
-            rotation=10 * 1024,
-            level="DEBUG",
-            filter=__name__,
-            compression="tar.gz",
-            retention=5,
-        )
+    handlers = [{"sink": sys.stderr, "format": fmt, "level": config_class.LOG_LEVEL}]
+    if config_class.LOG_DIR is not None:
+        log_dir = Path(os.path.realpath(config_class.LOG_DIR))
+        if log_dir.is_dir():
+            log_file = log_dir / (__name__ + ".log")
+            handlers.append(
+                {
+                    "sink": log_file,
+                    "rotation": 10 * 1024,
+                    "level": "DEBUG",
+                    "filter": __name__,
+                    "compression": "tar.gz",
+                    "retention": 5,
+                }
+            )
+    logger.configure(handlers=handlers)
 
 
 def create_app(config_class=Config):
-    config_logging()
+    config_logging(config_class)
 
     app = Flask(__name__)
     app.config.from_object(config_class)
-    print("App Created")
 
     hsts_seconds = app.config.get("HSTS_SECONDS", 0)
     hsts_preload = app.config.get("HSTS_PRELOAD", False)
+    include_sub = app.config.get("HSTS_INCLUDE_SUBDOMAINS", False)
     if hsts_seconds:
         parts = [
             f"max-age={hsts_seconds}",
-            "includeSubDomains",
+            "includeSubDomains" if include_sub else False,
             "preload" if hsts_preload else False,
         ]
         HSTS_HEADER = "; ".join(filter(bool, parts))
@@ -73,16 +78,10 @@ def create_app(config_class=Config):
 
     redisw.init_app(app, redis_client)
 
-    from . import core
+    from . import core, api, cli
 
     app.register_blueprint(core.bp)
-
-    from . import api
-
     app.register_blueprint(api.bp, url_prefix="/api")
-
-    from . import cli
-
     cli.register(app)
 
     @app.before_request
@@ -122,6 +121,5 @@ def create_app(config_class=Config):
     def _ctx():
         return {"version": get_version()}
 
-    print("End of init function.")
     logger.debug(f"Created App {app!r}")
     return app

@@ -15,9 +15,11 @@ class Config(object):
     DEBUG = env.bool("DEBUG", default=False)
     REDIS_URL = env("REDIS_URL", default=None)
     LOG_DIR = env("LOG_DIR", default=None)
+    LOG_LEVEL = env("LOG_LEVEL", default="INFO")
     MAX_AGE = env.int("MAX_AGE", default=86400)
 
     HSTS_SECONDS = env.int("HSTS_SECONDS", default=0)
+    HSTS_INCLUDE_SUBDOMAINS = env.bool("HSTS_INCLUDE_SUBDOMAINS", default=False)
     HSTS_PRELOAD = env.bool("HSTS_PRELOAD", default=False)
 
     SEND_FILE_MAX_AGE_DEFAULT = env.int("SEND_FILE_MAX_AGE_DEFAULT", default=86400)

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "holdmypics"
-version = "0.11.4"
+version = "0.12.0"
 description = ""
 authors = ["Michael Van Wickle <mvanwickle@gmail.com>"]
 
