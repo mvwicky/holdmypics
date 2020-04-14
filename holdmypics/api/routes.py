@@ -58,7 +58,7 @@ def make_route(prefix: str = "") -> ViewFunc:
 def do_cleanup(res: ResponseType) -> ResponseType:
     n = files.clean()
     if n > 0:
-        current_app.logger.info("Cleaned %d file%s", n, "" if n == 1 else "s")
+        logger.info("Removed {0} file{1}", n, "" if n == 1 else "s")
     return res
 
 

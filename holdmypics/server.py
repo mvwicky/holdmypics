@@ -24,12 +24,19 @@ class Server(object):
         if self.start_yarn:
             self._start_yarn()
         if self.start_run:
-            self._start_proc("dev_server", ["flask", "run"])
+            dev_args = [
+                "gunicorn",
+                "wsgi:application",
+                "--config",
+                "python:gunicorn_config",
+            ]
+            self._start_proc("dev_server", dev_args)
         n = len(self.procs)
         ts = "" if n == 1 else "es"
         logger.info(f"Started {n} process{ts}")
 
     def _start_proc(self, name: str, args: Sequence[str], **kwargs):
+        logger.info("Starting process `{0}`", " ".join(args))
         self.procs[name] = subprocess.Popen(args, **kwargs)
 
     def _start_yarn(self):
@@ -52,7 +59,7 @@ class Server(object):
                     break
                 time.sleep(0.1)
             if time.perf_counter() - start > WAIT:
-                logger.info("Waited too long.")
+                logger.warning("Waited too long.")
                 break
         logger.info("Done waiting for yarn.")
 

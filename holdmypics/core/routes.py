@@ -13,9 +13,8 @@ from . import bp
 
 @memoize
 def get_context() -> dict:
-    rule_parts = make_rules()
-
-    rules = [e[0].replace("string:", "").replace("any", "") for e in rule_parts]
+    paths = (p for (p, _) in make_rules())
+    rules = [p.replace("string:", "").replace("any", "") for p in paths]
 
     width, height = 638, 328
     bg_color, fg_color = "cef", "555"

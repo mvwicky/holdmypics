@@ -22,4 +22,7 @@ class DimensionConverter(BaseConverter):
 
 
 class ColorConverter(BaseConverter):
-    regex = r"(?:[A-Fa-f0-9]{3}){1,2}"
+    regex = r"(?:(?:(?:[A-Fa-f0-9]{3}){1,2})|(?i:rand))"
+
+    def to_python(self, value: str) -> str:
+        return value

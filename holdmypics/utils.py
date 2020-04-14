@@ -19,8 +19,8 @@ def get_debug() -> bool:
 def make_rules() -> List[Tuple[str, Dict[str, str]]]:
     fmt_rule = f"<any({img_formats_str}):fmt>"
     colors_default = merge(bg_color_default, fg_color_default)
-    bg_color = "<string:bg_color>"
-    fg_color = "<string:fg_color>"
+    bg_color = "<col:bg_color>"
+    fg_color = "<col:fg_color>"
 
     return [
         (fmt_rule, colors_default),

@@ -16,6 +16,11 @@ CONFIG_DIR=config
 DOCKER_TAG=holdmypics-$(MODE)
 BUILD_CPU_SHARES=512
 
+VERSION=$(shell jq -r .version package.json)
+VERSION_TAG=v$(VERSION)
+
+.PHONY: version-tag
+
 dbuilddev: MODE=dev
 dbuilddev: docker-build
 
@@ -30,3 +35,6 @@ docker:
 
 compose:
 	$(DOCKER_COMPOSE) $(COMPOSE_ARGS)
+
+version-tag:
+	@git tag $(VERSION_TAG)
