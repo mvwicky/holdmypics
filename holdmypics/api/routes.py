@@ -104,8 +104,10 @@ def image_route(
         "add_etags": not current_app.debug,
         "conditional": True,
     }
-
     res: Response = send_file(path, **kw)  # type: ignore
+    if RAND_STR in {bg_lower, fg_lower}:
+        res.headers["Cache-Control"] = "max-age=0, no-cache, must-revalidate, private"
+
     return res
 
 
