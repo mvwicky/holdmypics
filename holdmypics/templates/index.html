@@ -16,7 +16,14 @@
   {% set image_url = img_url ~ "?" ~ img_query %}
   <div class="image-container">
     <div class="row justify-content-center">
-      <img id="example-image" src="{{ image_url }}" alt="Example image.">
+      <img
+        id="example-image"
+        src="{{ image_url }}"
+        alt="Example image."
+        loading="lazy"
+        width="{{ img_dim.0 }}"
+        height="{{ img_dim.1 }}"
+      >
     </div>
 
     <div class="row align-items-center justify-content-between endpoint-container">

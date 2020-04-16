@@ -67,6 +67,7 @@ def get_context() -> dict:
         "col_fields": col_fields,
         "sel_fields": sel_fields,
         "title": "Hold My Pics",
+        "img_dim": (width, height),
     }
 
 
