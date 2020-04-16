@@ -8,6 +8,7 @@ from flask import Flask, request, send_from_directory
 from flask_redis import FlaskRedis
 from funcy import memoize
 from loguru import logger
+from whitenoise import WhiteNoise
 
 from config import Config
 from .converters import ColorConverter, DimensionConverter
@@ -54,6 +55,11 @@ def config_logging(config_class):
     logger.configure(handlers=handlers)
 
 
+def wn_add_headers(headers, path, url):
+    logger.info(f"Serving static file: {url}")
+    headers["X-Powered-By"] = "Flask/WhiteNoise"
+
+
 def create_app(config_class=Config):
     config_logging(config_class)
 
@@ -83,6 +89,15 @@ def create_app(config_class=Config):
     app.register_blueprint(core.bp)
     app.register_blueprint(api.bp, url_prefix="/api")
     cli.register(app)
+
+    base_path = app.config.get("BASE_PATH")
+
+    app.wsgi_app = WhiteNoise(
+        app.wsgi_app, autorefresh=True, add_headers_function=wn_add_headers,
+    )
+
+    app.wsgi_app.add_files(str(HERE / "static"), prefix="static/")
+    app.wsgi_app.add_files(str(base_path / "static"), prefix="static/")
 
     @app.before_request
     def before_request_cb():

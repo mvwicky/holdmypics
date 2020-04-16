@@ -7,7 +7,7 @@ RUN yarn install
 
 COPY ./webpack.config.ts ./tsconfig.json /app/
 COPY ./src /app/src
-ARG PRODUCTION
+
 RUN yarn run build \
   && yarn install --prod
 

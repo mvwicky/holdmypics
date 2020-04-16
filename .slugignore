@@ -6,13 +6,15 @@
 .vscode/
 *.sublime-*
 bin/
+config/
 cypress.json
 cypress/
-config/
 docker-*
+docker-compose.*
 Dockerfile
 LICENSE
 Makefile
+poetry.lock
 pyproject.toml
 pytest.ini
 README.md

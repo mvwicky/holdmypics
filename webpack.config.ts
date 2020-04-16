@@ -48,7 +48,7 @@ const fontHash = `${hashFn}:hash:hex:${hashlength}`;
 const fontName = `[path][name].[${fontHash}].[ext]`;
 
 const rootDir = relToRoot("holdmypics");
-const outPath = path.join(rootDir, "static", "dist");
+const outPath = path.join(__dirname, "static", "dist");
 
 const templatesDir = path.join(rootDir, "core", "templates");
 

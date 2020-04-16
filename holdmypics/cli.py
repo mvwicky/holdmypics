@@ -12,6 +12,7 @@ from loguru import logger
 from semver import VersionInfo
 
 from . import __version__
+from .generate import Generator
 from .package import Package
 from .server import Server
 
@@ -26,7 +27,19 @@ SEMVER_LEVELS = list(SEMVER_BUMPS)
 
 
 def register(app: Flask):  # noqa: C901
+    base_path = app.config.get("BASE_PATH")
+    cfg_path = base_path / "config"
+    dev_dir = str(cfg_path / "dev")
+    prod_dir = str(cfg_path / "prod")
+    default_template = str(cfg_path / "Dockerfile.template")
+
     @app.cli.command("freeze")
+    @click.option(
+        "--both/--not-both",
+        "-b/ ",
+        default=False,
+        help="Freeze both types of requirements.",
+    )
     @click.option(
         "--dev/--not-dev",
         "-d/ ",
@@ -38,10 +51,15 @@ def register(app: Flask):  # noqa: C901
         default=True,
         help="Create lock file without file hashes.",
     )
-    def freeze_reqs(dev: bool, hashes: bool):
+    def freeze_reqs(both: bool, dev: bool, hashes: bool):
         """Create a requirements.txt file."""
         package: Package = Package.find_root()
-        package.freeze(dev, not hashes)
+        if both:
+            logger.info("Freezing both requirement types.")
+            package.freeze(False, not hashes)
+            package.freeze(True, not hashes)
+        else:
+            package.freeze(dev, not hashes)
 
     @app.cli.command()
     @click.option(
@@ -108,3 +126,26 @@ def register(app: Flask):  # noqa: C901
         server = Server(app, start_run=run, start_yarn=yarn)
         server.start()
         server.loop()
+
+    @app.cli.command()
+    @click.argument(
+        "template",
+        type=click.Path(exists=True, dir_okay=False),
+        default=default_template,
+    )
+    @click.option("--dev-output", type=click.Path(), default=dev_dir)
+    @click.option("--prod-output", type=click.Path(), default=prod_dir)
+    @click.option("--dry-run/--for-real", "-n/ ", default=False)
+    @click.option("--verbose", "-v", count=True)
+    @click.option("--yes", "-y", is_flag=True, default=False)
+    def generate_dockerfiles(
+        template: str,
+        dev_output: str,
+        prod_output: str,
+        dry_run: bool,
+        verbose: int,
+        yes: bool,
+    ):
+        """Generate development and production Dockerfiles."""
+        gen = Generator(template, dev_output, prod_output)
+        gen.generate(dry_run, verbose, yes)
