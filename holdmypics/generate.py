@@ -1,8 +1,20 @@
+import operator as op
+import string
+from difflib import SequenceMatcher
+from functools import partial
 from pathlib import Path
 
 import attr
 import click
 from jinja2 import Environment, FileSystemLoader, Template
+
+junk = partial(op.contains, string.whitespace)
+
+
+def diff_contents(a: str, b: str) -> SequenceMatcher:
+    a_lines, b_lines = a.splitlines(), b.splitlines()
+    matcher = SequenceMatcher(junk, a_lines, b_lines)
+    return matcher
 
 
 @attr.s(slots=True, auto_attribs=True)
@@ -21,14 +33,8 @@ class Generator(object):
 
     def generate(self, dry_run: bool, verbosity: int, yes: bool):
         contexts = [
-            (
-                True,
-                {
-                    "yarn_build": "yarn build:dev",
-                    "requirements": "requirements-dev.txt",
-                },
-            ),
-            (False, {"yarn_build": "yarn build", "requirements": "requirements.txt"}),
+            (True, {"yarn_build": "build:dev", "requirements": "requirements-dev.txt"}),
+            (False, {"yarn_build": "build", "requirements": "requirements.txt"}),
         ]
         for dev, context in contexts:
             mode = "dev" if dev else "prod"
@@ -37,12 +43,19 @@ class Generator(object):
             if not folder.is_dir():
                 folder.mkdir()
             file: Path = folder / "Dockerfile"
-            if not self.confirm(file, yes or dry_run):
-                raise click.ClickException("Breaking")
-            self.render(file, context, dry_run, verbosity)
 
-    def render(self, file: Path, context: dict, dry_run: bool, verbosity: int):
+            self.render(file, context, dry_run, verbosity, yes)
+
+    def render(
+        self, file: Path, context: dict, dry_run: bool, verbosity: int, yes: bool
+    ):
         cts = self.template.render(context)
+        if file.is_file():
+            matcher = diff_contents(file.read_text(), cts)
+            if matcher.ratio() == 1.0:
+                yes = True
+        if not self.confirm(file, yes or dry_run):
+            raise click.ClickException("Breaking")
         if verbosity >= 1 or dry_run:
             print(cts)
             print("")

@@ -1,4 +1,4 @@
-FROM node:13.6-slim AS client-builder
+FROM node:13.13-slim AS client-builder
 
 RUN mkdir /app/
 WORKDIR /app/
@@ -11,10 +11,11 @@ COPY ./src /app/src
 RUN yarn run build \
   && yarn install --prod
 
-FROM python:3.8-slim
+FROM python:3.8.2-slim
 
 ENV LC_ALL=C.UTF-8 LANG=C.UTF-8 PYTHONUNBUFFERED=1
 
+WORKDIR /app/
 RUN set -ex \
   && RUN_DEPS=" \
   libpcre3 \
@@ -36,16 +37,15 @@ RUN set -ex \
   && rm -rf /var/lib/apt/lists/*
 
 COPY . /app
-COPY --from=client-builder /app/holdmypics/static/dist /app/holdmypics/static/dist
 COPY --from=client-builder /app/holdmypics/core/templates/base-out.html /app/holdmypics/core/templates/base-out.html
+COPY --from=client-builder /app/static/dist /app/static/dist
 
 ARG APP_USER=appuser
 RUN groupadd -r ${APP_USER} && useradd --no-log-init -r -g ${APP_USER} ${APP_USER}
 
+RUN mkdir -p /app/.cache/images
 RUN chmod +x /app/docker-entrypoint.sh
 
 USER ${APP_USER}:${APP_USER}
 
-# ENTRYPOINT ["/app/docker-entrypoint.sh"]
-
-CMD ["gunicorn", "wsgi:application", "--config", "file:/app/gunicorn_config.py"]
+CMD ["gunicorn", "wsgi:application", "--config", "python:gunicorn_config"]

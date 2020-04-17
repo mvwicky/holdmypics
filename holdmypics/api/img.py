@@ -51,7 +51,7 @@ def save_image(
 
     if os.path.isfile(path):
         os.utime(path)
-        logger.info("Already existed")
+        logger.debug("Already existed")
         return path
     else:
         logger.info("Creating new file")

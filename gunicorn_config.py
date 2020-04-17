@@ -4,7 +4,8 @@ env = Env()
 env.read_env()
 
 loglevel = "info"
-# bind = env("BIND", default=None)
+_host, _port = env("HOST", default="0.0.0.0"), env.int("PORT", default=8080)
+bind = [f"{_host}:{_port}"]
 
 worker_class = "gthread"
 workers = env.int("WEB_CONCURRENCY", default=1)

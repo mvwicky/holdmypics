@@ -1,0 +1,10 @@
+---
+setup:
+  addons:
+    - plan: heroku-redis:hobby-dev
+      as: REDIS
+build:
+  docker:
+    web: config/prod/Dockerfile
+run:
+  web: gunicorn wsgi:application --config python:gunicorn_config
