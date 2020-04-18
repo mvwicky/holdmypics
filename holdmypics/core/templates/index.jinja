@@ -1,3 +1,6 @@
+{% extends "base-out.html" %}
+
+{% block content %}
 <main class="content">
   <div class="row justify-content-center text-row">
     <h1>{{ title }}</h1>
@@ -106,7 +109,7 @@
       <label for="imageText">Text</label>
       <input id="imageText" type="text" value="{{ text }}" maxlength="30">
     </div>
-    <div class="form-group">
+    <div class="form-group d-none">
       <label for="seed">Seed</label>
       <input id="seed" type="text">
     </div>
@@ -144,9 +147,9 @@
     </div>
     <div class="footer-group">
       <div>
-        Fira Mono, Fira Sans, Overpass, and Spectral are licensed under the <a href="{{ url_for('static', filename='licenses/ofl.txt') }}">Open Font License</a>.
+        Fira Mono, Fira Sans, Overpass, and Spectral are licensed under the <a href="{{ ofl_license }}">Open Font License</a>.
       </div>
-      <div>Roboto is licensed under the <a href="{{ url_for('static', filename='licenses/apache.txt') }}">Apache License</a>.</div>
+      <div>Roboto is licensed under the <a href="{{ apache_license }}">Apache License</a>.</div>
     </div>
     <div class="footer-group">
       <h6>Created by Michael Van Wickle</h6>
@@ -154,3 +157,4 @@
     </div>
   </footer>
 </div>
+{% endblock content %}

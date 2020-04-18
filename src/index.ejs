@@ -12,7 +12,8 @@
     <link rel="stylesheet" href="<%= htmlWebpackPlugin.files.css[key] %>"> <% } %>
   </head>
   <body>
-    {% include "index.html" %}<%
+    {% block content %}{% endblock content %}
+    <%
     for (key in htmlWebpackPlugin.files.js) { %>
     <script type="module" src="<%= htmlWebpackPlugin.files.js[key] %>"></script> <% } %>
   </body>

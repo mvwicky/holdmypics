@@ -52,7 +52,11 @@ img {
 }
 
 .d-none {
-  display: none;
+  display: none !important;
+}
+
+.invisible {
+  visibility: hidden !important;
 }
 
 .rule {

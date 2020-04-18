@@ -48,6 +48,9 @@ def get_context() -> dict:
         "font": {"value": font, "options": font_names, "label": "Font"},
     }
 
+    ofl_license = url_for("static", filename="licenses/ofl.txt")
+    apache_license = url_for("static", filename="licenses/apache.txt")
+
     return {
         "rules": ["api/<size>/" + r + "/" for r in rules],
         "img_url": img_url,
@@ -68,10 +71,12 @@ def get_context() -> dict:
         "sel_fields": sel_fields,
         "title": "Hold My Pics",
         "img_dim": (width, height),
+        "ofl_license": ofl_license,
+        "apache_license": apache_license,
     }
 
 
 @bp.route("/")
 def index() -> ResponseType:
     context = merge(get_context(), {"count": redisw.client.get(COUNT_KEY).decode()})
-    return render_template("base-out.html", **context)
+    return render_template("index.jinja", **context)
