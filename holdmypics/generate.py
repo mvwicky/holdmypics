@@ -6,6 +6,7 @@ from pathlib import Path
 
 import attr
 import click
+from funcy import merge
 from jinja2 import Environment, FileSystemLoader, Template
 
 junk = partial(op.contains, string.whitespace)
@@ -43,8 +44,8 @@ class Generator(object):
             if not folder.is_dir():
                 folder.mkdir()
             file: Path = folder / "Dockerfile"
-
-            self.render(file, context, dry_run, verbosity, yes)
+            ctx = merge(context, {"dev": dev})
+            self.render(file, ctx, dry_run, verbosity, yes)
 
     def render(
         self, file: Path, context: dict, dry_run: bool, verbosity: int, yes: bool
@@ -52,13 +53,17 @@ class Generator(object):
         cts = self.template.render(context)
         if file.is_file():
             matcher = diff_contents(file.read_text(), cts)
-            if matcher.ratio() == 1.0:
-                yes = True
-        if not self.confirm(file, yes or dry_run):
-            raise click.ClickException("Breaking")
+            ratio = matcher.ratio()
+            if ratio == 1.0:
+                click.secho("Nothing to do, output is the same.", fg="blue")
+                return
+            else:
+                click.secho(f"New file differs by {1.0 - ratio:.2%}", fg="yellow")
         if verbosity >= 1 or dry_run:
             print(cts)
             print("")
+        if not self.confirm(file, yes or dry_run):
+            raise click.ClickException("Breaking")
 
         if not dry_run:
             file.write_text(cts)
@@ -79,4 +84,6 @@ class Generator(object):
     def _make_env(self) -> Environment:
         searchpath = str(self.template_file.parent)
         loader = FileSystemLoader(searchpath)
-        return Environment(loader=loader, autoescape=False)
+        return Environment(
+            loader=loader, autoescape=False, lstrip_blocks=True, trim_blocks=True
+        )

@@ -44,7 +44,10 @@ ARG APP_USER=appuser
 RUN groupadd -r ${APP_USER} && useradd --no-log-init -r -g ${APP_USER} ${APP_USER}
 
 RUN mkdir -p /app/.cache/images
+RUN chown -R ${APP_USER} /app/
 RUN chmod +x /app/docker-entrypoint.sh
+
+EXPOSE 8080
 
 USER ${APP_USER}:${APP_USER}
 

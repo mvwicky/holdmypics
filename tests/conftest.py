@@ -14,12 +14,6 @@ def app():
 
     app = create_app(config_class=TestConfig)
 
-    # @app.before_first_request
-    # def _clean():
-    #     from holdmypics.api.files import files
-
-    #     files.clean()
-
     return app
 
 
