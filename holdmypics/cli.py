@@ -133,11 +133,41 @@ def register(app: Flask):  # noqa: C901
         type=click.Path(exists=True, dir_okay=False),
         default=default_template,
     )
-    @click.option("--dev-output", type=click.Path(), default=dev_dir)
-    @click.option("--prod-output", type=click.Path(), default=prod_dir)
-    @click.option("--dry-run/--for-real", "-n/ ", default=False)
-    @click.option("--verbose", "-v", count=True)
-    @click.option("--yes", "-y", is_flag=True, default=False)
+    @click.option(
+        "--dev-output",
+        "-d",
+        type=click.Path(),
+        default=dev_dir,
+        help="The location of the development Dockerfile",
+    )
+    @click.option(
+        "--prod-output",
+        "-p",
+        type=click.Path(),
+        default=prod_dir,
+        help="The location of the production Dockerfile",
+    )
+    @click.option(
+        "--dry-run/--for-real",
+        "-n/ ",
+        default=False,
+        help="Don't actually write new files to disk.",
+    )
+    @click.option("--verbose", "-v", count=True, help="Controls how much to log.")
+    @click.option(
+        "--yes",
+        "-y",
+        is_flag=True,
+        default=False,
+        help="Don't prompt to confirm when files are overwritten.",
+    )
+    @click.option(
+        "--port",
+        "-e",
+        type=int,
+        default=None,
+        help="The exposed port in the resulting container.",
+    )
     def generate_dockerfiles(
         template: str,
         dev_output: str,
@@ -145,7 +175,11 @@ def register(app: Flask):  # noqa: C901
         dry_run: bool,
         verbose: int,
         yes: bool,
+        port: int,
     ):
-        """Generate development and production Dockerfiles."""
+        """Generate development and production Dockerfiles.
+
+        Dockerfiles will be based on a given [TEMPLATE]
+        """
         gen = Generator(template, dev_output, prod_output)
-        gen.generate(dry_run, verbose, yes)
+        gen.generate(dry_run, verbose, yes, port)

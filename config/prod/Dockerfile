@@ -1,14 +1,12 @@
-FROM node:13.13-slim AS client-builder
+FROM node:13.13-alpine3.10 AS client-builder
 
 RUN mkdir /app/
 WORKDIR /app/
-COPY ./package.json ./yarn.lock /app/
-RUN yarn install
-
-COPY ./webpack.config.ts ./tsconfig.json /app/
+COPY ./package.json ./yarn.lock ./webpack.config.ts ./tsconfig.json /app/
 COPY ./src /app/src
 
-RUN yarn run build \
+RUN yarn install \
+  && yarn run build \
   && yarn install --prod
 
 FROM python:3.8.2-slim
@@ -34,17 +32,18 @@ RUN set -ex \
   && apt-get update && apt-get install -y --no-install-recommends $BUILD_DEPS \
   && pip install --no-cache-dir -r /requirements.txt \
   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $BUILD_DEPS \
-  && rm -rf /var/lib/apt/lists/*
+  && rm -rf /var/lib/apt/lists/* \
+  && rm /requirements.txt
 
 COPY . /app
 COPY --from=client-builder /app/holdmypics/core/templates/base-out.html /app/holdmypics/core/templates/base-out.html
 COPY --from=client-builder /app/static/dist /app/static/dist
 
 ARG APP_USER=appuser
-RUN groupadd -r ${APP_USER} && useradd --no-log-init -r -g ${APP_USER} ${APP_USER}
+RUN groupadd -r ${APP_USER} && useradd --create-home --no-log-init -r -g ${APP_USER} ${APP_USER}
 
 RUN mkdir -p /app/.cache/images
-RUN chown -R ${APP_USER} /app/
+RUN chown -R ${APP_USER}:${APP_USER} /app/
 RUN chmod +x /app/docker-entrypoint.sh
 
 

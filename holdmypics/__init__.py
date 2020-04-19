@@ -1,7 +1,5 @@
-import os
-import sys
+import re
 import time
-from logging.config import dictConfig
 from pathlib import Path
 
 from flask import Flask, request, send_from_directory
@@ -12,6 +10,7 @@ from whitenoise import WhiteNoise
 
 from config import Config
 from .converters import ColorConverter, DimensionConverter
+from .logging import config_logging
 from .wrapped_redis import WrappedRedis
 
 redisw = WrappedRedis()
@@ -22,6 +21,11 @@ HERE: Path = Path(__file__).resolve().parent
 
 CACHE_CONTROL_MAX = "max-age=315360000, public, immutable"
 
+exts = ["woff", "woff2", "js", "css"]
+exts_rev = [e[::-1] + "." for e in exts]
+exts_group = "|".join(exts_rev)
+EXT_RE = re.compile(f"^(?:{exts_group})")
+
 
 @memoize
 def get_version() -> str:
@@ -30,38 +34,21 @@ def get_version() -> str:
     return __version__
 
 
-def config_logging(config_class):
-    dictConfig({"version": 1})
-    fmt = (
-        "[<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>] | "
-        "<level>{level:<8}</level> | "
-        "<blue>{name}</blue>:<cyan>{line}</cyan> - <bold>{message}</bold>"
-    )
-    handlers = [{"sink": sys.stderr, "format": fmt, "level": config_class.LOG_LEVEL}]
-    if config_class.LOG_DIR is not None:
-        log_dir = Path(os.path.realpath(config_class.LOG_DIR))
-        if log_dir.is_dir():
-            log_file = log_dir / (__name__ + ".log")
-            handlers.append(
-                {
-                    "sink": log_file,
-                    "rotation": 10 * 1024,
-                    "level": "DEBUG",
-                    "filter": __name__,
-                    "compression": "tar.gz",
-                    "retention": 5,
-                }
-            )
-    logger.configure(handlers=handlers)
-
-
 def wn_add_headers(headers, path, url):
     logger.info(f"Serving static file: {url}")
     headers["X-Powered-By"] = "Flask/WhiteNoise"
 
 
+def immutable_file_test(path: str, url: str) -> bool:
+    parts = url.rsplit("/", 1)
+    if len(parts) == 1:
+        return False
+    filename: str = parts[1]
+    return filename.count(".") > 1 and bool(EXT_RE.match(filename[::-1]))
+
+
 def create_app(config_class=Config):
-    config_logging(config_class)
+    config_logging(__name__, config_class.LOG_DIR, config_class.LOG_LEVEL)
 
     app = Flask(__name__)
     app.config.from_object(config_class)
@@ -93,7 +80,10 @@ def create_app(config_class=Config):
     base_path = app.config.get("BASE_PATH")
 
     app.wsgi_app = WhiteNoise(
-        app.wsgi_app, autorefresh=True, add_headers_function=wn_add_headers,
+        app.wsgi_app,
+        autorefresh=True,
+        add_headers_function=wn_add_headers,
+        immutable_file_test=immutable_file_test,
     )
 
     app.wsgi_app.add_files(str(HERE / "static"), prefix="static/")
