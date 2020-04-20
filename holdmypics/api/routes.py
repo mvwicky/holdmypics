@@ -80,7 +80,7 @@ def image_route(
     fmt = fmt.lower()
     if fmt not in img_formats:
         abort(400)
-    args = ImageArgs.from_request()
+    args = ImageArgs.from_request().real_args()
     font_name = args.font_name
     if font_name not in fonts.font_names:
         return font_redirect(font_name)
@@ -94,7 +94,7 @@ def image_route(
             fg_color = random_color()
 
     path = image_response(size, bg_color, fg_color, fmt, args)
-    logger.info("Image size: {0}", naturalsize(os.path.getsize(path)))
+    logger.info("Image size: {0}", naturalsize(os.path.getsize(path), format="%.3f"))
     if files.need_to_clean:
         after_this_request(do_cleanup)
 
@@ -105,8 +105,8 @@ def image_route(
         "conditional": True,
     }
     res: Response = send_file(path, **kw)  # type: ignore
-    if RAND_STR in {bg_lower, fg_lower}:
-        res.headers["Cache-Control"] = "max-age=0, no-cache, must-revalidate, private"
+    if args.random_text or RAND_STR in {bg_lower, fg_lower}:
+        res.headers["Cache-Control"] = "max-age=0, no-cache, must-revalidate"
 
     return res
 

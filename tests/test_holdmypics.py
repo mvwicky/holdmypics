@@ -47,16 +47,6 @@ def test_index(client):
     assert res.status_code == 200
 
 
-@pytest.fixture(name="width", params=[100, 1000])
-def width_fixture(request):
-    return request.param
-
-
-@pytest.fixture(name="height", params=[100, 1000])
-def height_fixture(request):
-    return request.param
-
-
 @pytest.fixture(name="fg_color", params=fg_colors)
 def fg_color_fixture(request):
     return random_color() if request.param else request.param
@@ -77,11 +67,6 @@ def text_fixture(request):
     return request.param
 
 
-@pytest.fixture(name="dpi", params=[72, None])
-def dpi_fixture(request):
-    return request.param
-
-
 @pytest.fixture(name="alpha", params=[0.77, None])
 def alpha_fixture(request):
     return request.param
@@ -95,12 +80,12 @@ def args_fixture(text, dpi, alpha):
 @pytest.fixture(name="query")
 def query_fixture(args):
     if args:
-        return urlencode(args)
+        return urlencode(compact(args))
     else:
         return None
 
 
-def test_from_function(
+def test_create_images_using_function(
     app: Flask,
     width: int,
     height: int,
@@ -126,21 +111,34 @@ def test_from_function(
         assert im.size == size
 
 
-def test_different_params(
+def test_create_images_using_client(
     client: FlaskClient,
     width: int,
     height: int,
-    fmt: str,
+    image_format: str,
     fg_color: Optional[str],
     bg_color: Optional[str],
     query: str,
 ):
-    url = make_route(width, height, bg_color, fg_color, fmt)
+    url = make_route(width, height, bg_color, fg_color, image_format)
     if query is not None:
         url = "?".join([url, query])
     res = client.get(url, follow_redirects=False)
     assert res.status_code == 200
     img_type = imghdr.what("filename", h=res.data)
-    assert img_type == fmt
+    assert img_type == image_format
     im = Image.open(io.BytesIO(res.data))
     assert im.size == (width, height)
+
+
+def test_just_run_once(client: FlaskClient):
+    url = make_route(638, 328, "cef", "555", "png")
+    args = {"text": "Some Random Text", "dpi": None, "alpha": None}
+    query = urlencode(compact(args))
+    url = "?".join([url, query])
+    res = client.get(url, follow_redirects=False)
+    assert res.status_code == 200
+    img_type = imghdr.what("filename", h=res.data)
+    assert img_type == "png"
+    im = Image.open(io.BytesIO(res.data))
+    assert im.size == (638, 328)

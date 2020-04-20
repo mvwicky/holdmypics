@@ -7,6 +7,8 @@ from .constants import bg_color_default, fg_color_default, fmt_default, img_form
 
 _T = TypeVar("_T")
 
+_UNSET = object()
+
 
 def config_value(name: str, default: Optional[_T] = None) -> _T:
     return current_app.config.get(name, default)

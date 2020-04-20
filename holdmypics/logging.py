@@ -8,7 +8,7 @@ from flask import request, Response
 from loguru import logger
 
 
-def config_logging(name: str, log_dir: Optional[Path], log_level):
+def config_logging(name: str, file_name: str, log_dir: Optional[Path], log_level: str):
     dictConfig({"version": 1})
     fmt = (
         "[<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>] | "
@@ -19,7 +19,7 @@ def config_logging(name: str, log_dir: Optional[Path], log_level):
     if log_dir is not None:
         log_dir = Path(os.path.realpath(log_dir))
         if log_dir.is_dir():
-            log_file = log_dir / (name + ".log")
+            log_file = log_dir / (file_name + ".log")
             handlers.append(
                 {
                     "sink": log_file,
@@ -39,10 +39,8 @@ def log_request(res: Response):
         level = "WARNING"
     else:
         level = "INFO"
-    logger.log(
-        level,
-        "{0} - {1} - {2}",
-        request.path,
-        res.status_code,
-        res.headers.get("Content-Length", 0),
-    )
+    path = request.path
+    if request.query_string:
+        path = "?".join([path, request.query_string.decode()])
+    content_length = res.headers.get("Content-Length", 0)
+    logger.log(level, f"{path} - {res.status_code} - {content_length}")

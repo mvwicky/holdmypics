@@ -15,6 +15,7 @@ class Config(object):
     DEBUG = env.bool("DEBUG", default=False)
     REDIS_URL = env("REDIS_URL", default=None)
     LOG_DIR = env("LOG_DIR", default=None)
+    LOG_FILE_NAME = env("LOG_FILE_NAME", default=None)
     LOG_LEVEL = env.log_level("LOG_LEVEL", default="INFO")
     MAX_AGE = env.int("MAX_AGE", default=86400)
 

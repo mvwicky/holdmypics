@@ -51,7 +51,10 @@ def immutable_file_test(path: str, url: str) -> bool:
 
 
 def create_app(config_class=Config):
-    config_logging(__name__, config_class.LOG_DIR, config_class.LOG_LEVEL)
+    log_file_name = config_class.LOG_FILE_NAME or __name__
+    config_logging(
+        __name__, log_file_name, config_class.LOG_DIR, config_class.LOG_LEVEL
+    )
 
     app = Flask(__name__)
     app.config.from_object(config_class)
