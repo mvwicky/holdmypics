@@ -37,5 +37,6 @@
     "**/*.woff": true,
     "**/*.woff2": true,
     "**/fonts/*.svg": true
-  }
+  },
+  "css.validate": false
 }

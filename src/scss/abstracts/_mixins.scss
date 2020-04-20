@@ -1,0 +1,7 @@
+@use "sass:math";
+
+@import "../../../node_modules/rfs/scss.scss";
+
+@mixin font-scale($scale) {
+  @include font-size(scale-value($scale));
+}

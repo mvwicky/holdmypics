@@ -5,7 +5,15 @@ $mq-breakpoints: (
   lg: 992px,
 );
 
+@import "../../../node_modules/bourbon/core/bourbon";
 @import "../../../node_modules/sass-mq/mq";
+
+$modular-scale-base: 0.8rem;
+$modular-scale-ratio: $major-third;
+$bourbon: (
+  "modular-scale-base": $modular-scale-base,
+  "modular-scale-ratio": $modular-scale-ratio,
+);
 
 $base-font-fallback: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
   "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
@@ -17,3 +25,6 @@ $mono-fallback: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
   "Courier New", monospace;
 
 $font-family-mono: "Fira Mono", $mono-fallback;
+
+$rfs-base-value: 0.7rem;
+$rfs-factor: 11;

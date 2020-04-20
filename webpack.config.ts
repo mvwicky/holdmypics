@@ -30,12 +30,14 @@ const cleanOpts: Clean.Options = {
   verbose: false,
   dry: false,
   cleanOnceBeforeBuildPatterns: [
-    "**/*",
+    "**/*.css",
+    "**/*.js",
     "!**/fonts",
     "!**/fonts/**/*",
     "!img",
     "!img/**/*",
   ],
+  cleanStaleWebpackAssets: false,
 };
 
 const relToRoot = (...args: string[]) => path.resolve(__dirname, ...args);

@@ -10,7 +10,7 @@ from whitenoise import WhiteNoise
 
 from config import Config
 from .converters import ColorConverter, DimensionConverter
-from .logging import config_logging
+from .logging import config_logging, log_request
 from .wrapped_redis import WrappedRedis
 
 redisw = WrappedRedis()
@@ -44,7 +44,10 @@ def immutable_file_test(path: str, url: str) -> bool:
     if len(parts) == 1:
         return False
     filename: str = parts[1]
-    return filename.count(".") > 1 and bool(EXT_RE.match(filename[::-1]))
+    is_immutable = filename.count(".") > 1 and bool(EXT_RE.match(filename[::-1]))
+    if is_immutable:
+        logger.debug(f"File is immutable: {url}")
+    return is_immutable
 
 
 def create_app(config_class=Config):
@@ -95,12 +98,7 @@ def create_app(config_class=Config):
 
     @app.after_request
     def after_request_cb(res):
-        logger.info(
-            "{0} - {1} - {2}",
-            request.path,
-            res.status_code,
-            res.headers.get("Content-Length", 0),
-        )
+        log_request(res)
         endpoint = request.endpoint
         if endpoint == "core.index":
             res.headers["Cache-Control"] = "max-age=0, no-store"

@@ -1,0 +1,10 @@
+@use "sass:math";
+
+@function scale-value($n) {
+  @if math.is-unitless($n) {
+    /* @debug "#{$n} -> #{modular-scale($n)}"; */
+    @return modular-scale($n);
+  } @else {
+    @error "Scale should be unitless got #{$n}";
+  }
+}

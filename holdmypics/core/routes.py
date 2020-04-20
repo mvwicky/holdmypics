@@ -1,3 +1,4 @@
+import re
 from urllib.parse import urlencode
 
 from flask import Markup, render_template, url_for
@@ -10,11 +11,14 @@ from ..fonts import fonts
 from ..utils import make_rules
 from . import bp
 
+RULE_RE = re.compile(r"(?:col:|any)")
+
 
 @memoize
 def get_context() -> dict:
     paths = (p for (p, _) in make_rules())
-    rules = [p.replace("string:", "").replace("any", "") for p in paths]
+    rules = [RULE_RE.sub("", p) for p in paths]
+    # rules = [p.replace("col:", "").replace("any", "") for p in paths]
 
     width, height = 638, 328
     bg_color, fg_color = "cef", "555"
@@ -78,5 +82,6 @@ def get_context() -> dict:
 
 @bp.route("/")
 def index() -> ResponseType:
+    get_context.memory.clear()
     context = merge(get_context(), {"count": redisw.client.get(COUNT_KEY).decode()})
     return render_template("index.jinja", **context)

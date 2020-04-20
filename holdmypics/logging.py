@@ -4,6 +4,7 @@ from logging.config import dictConfig
 from pathlib import Path
 from typing import Optional
 
+from flask import request, Response
 from loguru import logger
 
 
@@ -30,3 +31,18 @@ def config_logging(name: str, log_dir: Optional[Path], log_level):
                 }
             )
     logger.configure(handlers=handlers)
+
+
+def log_request(res: Response):
+    code = res.status_code
+    if code > 399:
+        level = "WARNING"
+    else:
+        level = "INFO"
+    logger.log(
+        level,
+        "{0} - {1} - {2}",
+        request.path,
+        res.status_code,
+        res.headers.get("Content-Length", 0),
+    )
