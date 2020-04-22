@@ -1,17 +1,21 @@
-from typing import Dict, List, Optional, Tuple, TypeVar
+from typing import Dict, List, Tuple, TypeVar, Union
 
 from flask import current_app
 from funcy import merge
 
 from .constants import bg_color_default, fg_color_default, fmt_default, img_formats_str
+from .exceptions import ImproperlyConfigured
 
 _T = TypeVar("_T")
 
 _UNSET = object()
 
 
-def config_value(name: str, default: Optional[_T] = None) -> _T:
-    return current_app.config.get(name, default)
+def config_value(name: str, default: Union[_T, object] = _UNSET) -> _T:
+    value = current_app.config.get(name, default)
+    if value is _UNSET:
+        raise ImproperlyConfigured(f"Unknown setting {name}")
+    return value
 
 
 def get_debug() -> bool:

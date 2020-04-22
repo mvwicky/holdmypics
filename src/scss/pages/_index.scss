@@ -3,21 +3,17 @@ $h-spacing: 5rem;
 #params-form {
   border: 1px solid #e9ecef;
   padding: 1rem;
-  margin-left: 0.5rem;
-  margin-right: 0.5rem;
+  @include prop-dir(margin, "x", 0.5rem);
   @include mq($from: "md") {
-    margin-left: $h-spacing;
-    margin-right: $h-spacing;
+    @include prop-dir(margin, "x", $h-spacing);
   }
 }
 
 #routes,
 .endpoint-container {
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
+  @include prop-dir(padding, "x", 0.5rem);
   @include mq($from: "md") {
-    padding-left: $h-spacing;
-    padding-right: $h-spacing;
+    @include prop-dir(padding, "x", $h-spacing);
   }
 }
 

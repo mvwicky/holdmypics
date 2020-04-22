@@ -8,7 +8,7 @@ from .. import redisw
 from .._types import ResponseType
 from ..constants import COUNT_KEY, img_formats
 from ..fonts import fonts
-from ..utils import make_rules
+from ..utils import make_rules, config_value
 from . import bp
 
 RULE_RE = re.compile(r"(?:col:|any)")
@@ -22,8 +22,10 @@ def get_context() -> dict:
 
     width, height = 638, 328
     bg_color, fg_color = "cef", "555"
+    bg_color = config_value("INDEX_DEFAULT_BG")
+    fg_color = config_value("INDEX_DEFAULT_FG")
     fmt = "png"
-    text = "Something Funny"
+    text = config_value("INDEX_TEXT")
     font = "overpass"
     img_url = url_for(
         "api.image_route",

@@ -1,10 +1,17 @@
 @use "sass:math";
+@use "sass:list";
 
 @function scale-value($n) {
   @if math.is-unitless($n) {
-    /* @debug "#{$n} -> #{modular-scale($n)}"; */
     @return modular-scale($n);
   } @else {
     @error "Scale should be unitless got #{$n}";
   }
+}
+
+@function validate-direction($dir) {
+  @if not list.index($directions, $dir) {
+    @error "Direction must be in #{$directions}, got #{$dir}";
+  }
+  @return $dir;
 }

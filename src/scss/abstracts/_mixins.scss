@@ -1,7 +1,32 @@
 @use "sass:math";
+@use "sass:list";
+@use "sass:string";
 
 @import "../../../node_modules/rfs/scss.scss";
 
 @mixin font-scale($scale) {
   @include font-size(scale-value($scale));
+}
+
+@mixin prop-dir($property, $direction, $value) {
+  $direction: validate-direction($direction);
+  $property: string.unquote($property);
+  @if $direction == "x" {
+    #{$property}-left: $value;
+    #{$property}-right: $value;
+  } @else if $direction == "y" {
+    #{$property}-top: $value;
+    #{$property}-bottom: $value;
+  } @else if list.index(left right top bottom, $direction) {
+    #{$property}-#{$direction}: $value;
+  } @else if not $direction {
+    #{$property}: $value;
+  } @else {
+    @warn "Expected one of #{$directions}, got #{$direction}";
+  }
+}
+
+@mixin sz($width, $height: $width) {
+  height: $height;
+  width: $width;
 }

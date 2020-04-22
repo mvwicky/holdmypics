@@ -2,7 +2,7 @@ import * as path from "path";
 import process from "process";
 
 import autoprefixer from "autoprefixer";
-import webpack from "webpack";
+import webpack, { CliConfigOptions } from "webpack";
 import * as Clean from "clean-webpack-plugin";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import HtmlWebpackPlugin from "html-webpack-plugin";
@@ -26,17 +26,14 @@ function ifProd<T>(obj: T): T | undefined {
   return prodOr(obj, undefined);
 }
 
+const cleanExts = ["css", "js", "svg", "txt", "map"];
+const doClean = cleanExts.map((ext) => `**/*.${ext}`);
+const dontClean = ["!**/fonts", "!**/fonts/**/*", "!img", "!img/**/*"];
+const cleanPatterns = doClean.concat(dontClean);
 const cleanOpts: Clean.Options = {
   verbose: false,
   dry: false,
-  cleanOnceBeforeBuildPatterns: [
-    "**/*.css",
-    "**/*.js",
-    "!**/fonts",
-    "!**/fonts/**/*",
-    "!img",
-    "!img/**/*",
-  ],
+  cleanOnceBeforeBuildPatterns: cleanPatterns,
   cleanStaleWebpackAssets: false,
 };
 
@@ -44,7 +41,7 @@ const relToRoot = (...args: string[]) => path.resolve(__dirname, ...args);
 const relToNode = (...args: string[]) => relToRoot("node_modules", ...args);
 const relToSrc = (...args: string[]) => relToRoot("src", ...args);
 
-const hashFn = prodOr("sha256", "md5");
+const hashFn = prodOr("sha256", "md4");
 const hashlength = prodOr(28, 10);
 const fontHash = `${hashFn}:hash:hex:${hashlength}`;
 const fontName = `[path][name].[${fontHash}].[ext]`;
@@ -154,7 +151,14 @@ const config: webpack.Configuration = {
       },
       {
         test: /\.svg$/,
-        use: [{ loader: "html-loader", options: { minimize: false } }],
+        use: [
+          {
+            loader: "html-loader",
+            options: {
+              attributes: false,
+            },
+          },
+        ],
       },
       {
         test: /\.(s?css)$/,
@@ -162,7 +166,7 @@ const config: webpack.Configuration = {
         use: configureStyles(),
       },
       {
-        test: /\.(woff|woff2|eot|ttf|otf|svg)$/,
+        test: /\.(woff|woff2)$/,
         include: [relToSrc("scss")],
         use: [
           {
@@ -242,15 +246,25 @@ const config: webpack.Configuration = {
   resolve: {
     extensions: [".js", ".ts"],
     symlinks: false,
+    alias: {
+      Feather: relToNode("feather-icons", "dist", "icons"),
+    },
   },
   node: false,
   stats: {
     modules: false,
     children: false,
-    excludeAssets: [/fonts[\\/]/, /\.map$/, /\.LICENSE\.txt$/],
+    excludeAssets: [
+      /fonts[\\/]spectral-/,
+      /\.map$/,
+      /\.woff$/,
+      /\.LICENSE\.txt$/,
+    ],
     publicPath: true,
     cachedAssets: true,
   },
 };
 
+type Env = string | Record<string, boolean | number | string>;
 export default config;
+// export default function (env: Env, args: CliConfigOptions) {  }

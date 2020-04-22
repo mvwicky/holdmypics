@@ -2,7 +2,7 @@ $font-dir: "./theme/fonts/";
 $regular-base: "spectral-v6-latin";
 $mono-base: "fira-mono-v8-latin";
 $file-types: ("woff", "woff2");
-$font-display: fallback;
+$font-display: block;
 
 $regular: $regular-base + "-regular";
 $light: $regular-base + "-200";

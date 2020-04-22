@@ -10,7 +10,8 @@ body {
 }
 
 a[href] {
-  color: hsl(200, 100%, 30%);
+  // color: #006699;
+  color: var(--primary);
 }
 
 pre,
@@ -35,14 +36,14 @@ samp {
 .row {
   display: flex;
   flex-direction: row;
-  width: 100%;
   justify-content: center;
+  width: 100%;
 }
 
 img {
+  height: auto;
   margin: 0.5rem auto 1.5rem;
   max-width: 100%;
-  height: auto;
 }
 
 .d-none {

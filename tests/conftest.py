@@ -1,8 +1,15 @@
+from typing import TYPE_CHECKING
+
 import pytest
 
+if TYPE_CHECKING:
+    from _pytest.config.argparsing import Parser, OptionGroup
+    from _pytest.python import Metafunc
+    from _pytest.tmpdir import TempPathFactory
 
-def pytest_addoption(parser):
-    group = parser.getgroup("holdmypics")
+
+def pytest_addoption(parser: "Parser"):
+    group = parser.getgroup("holdmypics")  # type: OptionGroup
     group.addoption(
         "--formats",
         nargs="+",
@@ -27,10 +34,10 @@ def pytest_addoption(parser):
     group.addoption(
         "--dpis", nargs="+", default=[72], type=int, help="The dpi values to use.",
     )
-    group.addoption("--no-empty-dpi", action="store_false", dest="empty_dpi")
+    parser.addini("empty-dpi", "Add a `None` value for dpi.", type="bool", default=True)
 
 
-def pytest_generate_tests(metafunc):
+def pytest_generate_tests(metafunc: "Metafunc"):
     config = metafunc.config
     fixtures = metafunc.fixturenames
     if "image_format" in fixtures:
@@ -44,13 +51,13 @@ def pytest_generate_tests(metafunc):
         metafunc.parametrize("width", widths)
     if "dpi" in fixtures:
         dpis = config.getoption("dpis")
-        if config.getoption("empty_dpi") and None not in dpis:
+        if config.getini("empty-dpi") and None not in dpis:
             dpis.append(None)
         metafunc.parametrize("dpi", dpis)
 
 
 @pytest.fixture(scope="session", name="config")
-def config_fixture(tmp_path_factory):
+def config_fixture(tmp_path_factory: "TempPathFactory"):
     from config import Config
 
     image_dir = tmp_path_factory.mktemp("holdmypics-images")

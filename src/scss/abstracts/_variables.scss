@@ -8,6 +8,8 @@ $mq-breakpoints: (
 @import "../../../node_modules/bourbon/core/bourbon";
 @import "../../../node_modules/sass-mq/mq";
 
+$directions: ("x", "y", "left", "right", "top", "bottom", null);
+
 $modular-scale-base: 0.8rem;
 $modular-scale-ratio: $major-third;
 $bourbon: (
@@ -28,3 +30,28 @@ $font-family-mono: "Fira Mono", $mono-fallback;
 
 $rfs-base-value: 0.7rem;
 $rfs-factor: 11;
+
+$font-scale-min: -3;
+$font-scale-max: 3;
+
+$p0: #e4ecff;
+$p5: #b1e1fd;
+$p10: #96d2fb;
+$p20: #60b2f3;
+$p30: #3392e8;
+
+$p40: #1273d7;
+
+$p50: #0057c2;
+$p55: #006699;
+
+$p60: #0045a2;
+$p70: #00317c;
+
+$p80: #001d4f;
+$p90: #000b21;
+
+$colors: (
+  // "primary": #cceeff,
+    "primary": $p40
+);

@@ -1,18 +1,17 @@
 .feather {
-  width: var(--feather-size, 1em);
-  height: var(--feather-size, 1em);
   align-self: center;
   bottom: 0.1em;
-  position: relative;
-  vertical-align: middle;
+  height: var(--feather-size, 1em);
   margin-left: 0.1em;
+  position: relative;
   stroke: var(--feather-stroke, hsl(0, 0%, 0%));
+  vertical-align: middle;
+  width: var(--feather-size, 1em);
 }
 
 #copy-button {
   border-radius: 5px;
-  width: 2rem;
-  height: 2rem;
+  @include sz(2rem);
   &:disabled {
     --feather-stroke: hsl(0, 0%, 73%);
   }

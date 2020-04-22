@@ -1,9 +1,24 @@
+input {
+  border: 1px solid var(--validity-color, rgb(204, 204, 204));
+  border-radius: 3px;
+  box-shadow: var(--validity-shadow, none);
+  &:invalid {
+    --validity-color: rgba(240, 0, 0, 0.8);
+    --validity-shadow: 0 0 5px 1px var(--validity-color);
+  }
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+}
+
 .form-group {
   display: flex;
   flex-direction: column;
+  flex-wrap: wrap;
   justify-content: space-between;
   margin-bottom: 0.5rem;
-  flex-wrap: wrap;
   @include mq($from: "md") {
     flex-direction: row;
   }
@@ -25,23 +40,8 @@
   }
 }
 
-input {
-  border-radius: 3px;
-  border: 1px solid var(--validity-color, rgb(204, 204, 204));
-  box-shadow: var(--validity-shadow, none);
-  &:invalid {
-    --validity-color: rgba(240, 0, 0, 0.8);
-    --validity-shadow: 0 0 5px 1px var(--validity-color);
-  }
-}
-
-.input-group {
-  display: flex;
-  flex-direction: column;
-}
-
 .help-text {
-  grid-column-start: 2;
   color: #000000;
   font-weight: 200;
+  grid-column-start: 2;
 }

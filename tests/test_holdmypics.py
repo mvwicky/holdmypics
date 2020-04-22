@@ -57,11 +57,6 @@ def bg_color_fixture(request):
     return random_color() if request.param else request.param
 
 
-@pytest.fixture(name="fmt", params=fmts)
-def fmt_fixture(request):
-    return request.param
-
-
 @pytest.fixture(name="text", params=texts, ids=["Words", "None"])
 def text_fixture(request):
     return request.param
@@ -79,17 +74,14 @@ def args_fixture(text, dpi, alpha):
 
 @pytest.fixture(name="query")
 def query_fixture(args):
-    if args:
-        return urlencode(compact(args))
-    else:
-        return None
+    return args and urlencode(compact(args))
 
 
 def test_create_images_using_function(
     app: Flask,
     width: int,
     height: int,
-    fmt: str,
+    image_format: str,
     fg_color: str,
     bg_color: str,
     args: dict,
@@ -105,7 +97,7 @@ def test_create_images_using_function(
             size,
             get_color(bg_color or "000"),
             get_color(fg_color or "aaa"),
-            fmt,
+            image_format,
             img_args,
         )
         assert im.size == size

@@ -38,6 +38,7 @@ RUN set -ex \
 COPY . /app
 COPY --from=client-builder /app/holdmypics/core/templates/base-out.html /app/holdmypics/core/templates/base-out.html
 COPY --from=client-builder /app/static/dist /app/static/dist
+COPY --from=client-builder /app/node_modules /app/node_modules
 
 ARG APP_USER=appuser
 RUN groupadd -r ${APP_USER} && useradd --create-home --no-log-init -r -g ${APP_USER} ${APP_USER}

@@ -38,5 +38,10 @@
     "**/*.woff2": true,
     "**/fonts/*.svg": true
   },
-  "css.validate": false
+  "css.validate": false,
+  "[scss]": {
+    "editor.codeActionsOnSave": {
+      "source.fixAll.stylelint": true
+    }
+  }
 }

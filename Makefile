@@ -9,6 +9,8 @@ YARN=yarn
 YARN_RUN=$(YARN) run
 NODE_BIN=node_modules/.bin
 WEBPACK=$(NODE_BIN)/webpack
+NODE_ENV_VALUE?=development
+
 DOCKER=docker
 DOCKER_COMPOSE=docker-compose
 CONTAINER_NAME?=hold
@@ -43,9 +45,9 @@ dbuildprod: docker-build
 docker-build: DOCKER_ARGS=build -f $(DOCKERFILE) -c $(BUILD_CPU_SHARES) --tag=$(DOCKER_TAG) .
 docker-build: docker
 
-dev: MODE=dev
-dev: DOCKER_ARGS=run --publish 8080:8080 --detach --name=$(CONTAINER_NAME) $(DOCKER_TAG)
-dev: docker
+rundev: MODE=dev
+rundev: DOCKER_ARGS=run --publish 8080:8080 --detach --name=$(CONTAINER_NAME) $(DOCKER_TAG)
+rundev: docker
 
 stop: MODE=dev
 stop: DOCKER_ARGS=stop $(CONTAINER_NAME)
@@ -55,6 +57,16 @@ docker:
 
 compose:
 	$(DOCKER_COMPOSE) $(COMPOSE_ARGS)
+
+dev: NODE_ENV_VALUE=development
+dev: webpack
+
+prod: NODE_ENV_VALUE=production
+prod: webpack
+
+webpack: export NODE_ENV=$(NODE_ENV_VALUE)
+webpack:
+	@$(WEBPACK) --config webpack.config.ts --progress
 
 version-tag:
 	@git tag $(VERSION_TAG)

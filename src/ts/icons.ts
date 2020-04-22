@@ -1,11 +1,13 @@
-import checkSvg from "../icons/check.svg";
-import copySvg from "../icons/copy.svg";
+import checkSvg from "Feather/check.svg";
+import copySvg from "Feather/copy.svg";
+import refreshCwSvg from "Feather/refresh-cw.svg";
 
 import { truthy, getAttrs } from "./utils";
 
 const ICON_CONTENTS: Map<string, string> = new Map([
   ["check", checkSvg],
   ["copy", copySvg],
+  ["refresh-cw", refreshCwSvg],
 ]);
 
 function replaceIcon(element: HTMLElement) {

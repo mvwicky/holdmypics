@@ -7,6 +7,10 @@ import { rIC } from "./idle";
 
 const log = PRODUCTION ? (...args: any[]) => {} : console.log.bind(console);
 
+function getVendoredStyles() {
+  // return import(/* webpackChunkName: "vendors" */ "../scss/_vendor.scss");
+}
+
 function getClipboard() {
   return import(/* webpackChunkName: "clipboard" */ "clipboard");
 }
