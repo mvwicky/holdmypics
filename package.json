@@ -12,6 +12,18 @@
     "build:prod": "cross-env NODE_ENV=production webpack --config webpack.config.ts --progress",
     "watch": "yarn run build:dev --watch"
   },
+  "prettier": {
+    "arrowParens": "always",
+    "tabWidth": 2,
+    "overrides": [
+      {
+        "files": "*.ejs",
+        "options": {
+          "requirePragma": true
+        }
+      }
+    ]
+  },
   "dependencies": {
     "friendly-words": "^1.1.10",
     "rfs": "^9.0.3"
@@ -82,22 +94,10 @@
   },
   "engines": {
     "node": "12.16.x",
-    "yarn": "1.x",
-    "npm": "6.14.x"
+    "npm": "6.14.x",
+    "yarn": "1.x"
   },
   "entry": {
     "main": "./src/ts/main.ts"
-  },
-  "prettier": {
-    "arrowParens": "always",
-    "tabWidth": 2,
-    "overrides": [
-      {
-        "files": "*.ejs",
-        "options": {
-          "requirePragma": true
-        }
-      }
-    ]
   }
 }

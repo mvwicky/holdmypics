@@ -18,7 +18,7 @@ module.exports = (on, config) => {
     mode: "development",
     devtool: "eval-source-map",
     resolve: {
-      extensions: [".ts", ".js"]
+      extensions: [".ts", ".js"],
     },
     module: {
       rules: [
@@ -29,13 +29,13 @@ module.exports = (on, config) => {
             {
               loader: "ts-loader",
               options: {
-                transpileOnly: true
-              }
-            }
-          ]
-        }
-      ]
-    }
+                transpileOnly: true,
+              },
+            },
+          ],
+        },
+      ],
+    },
   };
   on("file:preprocessor", webpack({ webpackOptions }));
 };
