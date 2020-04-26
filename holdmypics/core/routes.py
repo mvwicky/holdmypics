@@ -1,14 +1,14 @@
 import re
 from urllib.parse import urlencode
 
+from cytoolz import memoize, merge
 from flask import Markup, render_template, url_for
-from funcy import memoize, merge
 
 from .. import redisw
 from .._types import ResponseType
 from ..constants import COUNT_KEY, img_formats
 from ..fonts import fonts
-from ..utils import make_rules, config_value
+from ..utils import config_value, make_rules
 from . import bp
 
 RULE_RE = re.compile(r"(?:col:|any)")

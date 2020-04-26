@@ -6,8 +6,8 @@ from subprocess import DEVNULL
 import click
 import semver
 import tomlkit as toml
+from cytoolz import merge
 from flask import Flask
-from funcy import merge
 from loguru import logger
 from semver import VersionInfo
 

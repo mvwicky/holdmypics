@@ -34,6 +34,7 @@ def pytest_addoption(parser: "Parser"):
     group.addoption(
         "--dpis", nargs="+", default=[72], type=int, help="The dpi values to use.",
     )
+    group.addoption("--no-empty-dpi", action="store_true", dest="no_empty_dpi")
     parser.addini("empty-dpi", "Add a `None` value for dpi.", type="bool", default=True)
 
 
@@ -51,7 +52,9 @@ def pytest_generate_tests(metafunc: "Metafunc"):
         metafunc.parametrize("width", widths)
     if "dpi" in fixtures:
         dpis = config.getoption("dpis")
-        if config.getini("empty-dpi") and None not in dpis:
+        opt: bool = config.getoption("no_empty_dpi", False)
+        ini: bool = config.getini("empty-dpi")
+        if not opt and ini and None not in dpis:
             dpis.append(None)
         metafunc.parametrize("dpi", dpis)
 

@@ -4,7 +4,6 @@ from pathlib import Path
 
 from flask import Flask, request, send_from_directory
 from flask_redis import FlaskRedis
-from funcy import memoize
 from loguru import logger
 from whitenoise import WhiteNoise
 
@@ -25,13 +24,6 @@ exts = ["woff", "woff2", "js", "css"]
 exts_rev = [e[::-1] + "." for e in exts]
 exts_group = "|".join(exts_rev)
 EXT_RE = re.compile(f"^(?:{exts_group})")
-
-
-@memoize
-def get_version() -> str:
-    from .__version__ import __version__
-
-    return __version__
 
 
 def wn_add_headers(headers, path, url):
@@ -77,7 +69,7 @@ def create_app(config_class=Config):
 
     redisw.init_app(app, redis_client)
 
-    from . import core, api, cli
+    from . import core, api, cli, __version__
 
     app.register_blueprint(core.bp)
     app.register_blueprint(api.bp, url_prefix="/api")
@@ -125,7 +117,7 @@ def create_app(config_class=Config):
 
     @app.context_processor
     def _ctx():
-        return {"version": get_version()}
+        return {"version": __version__.__version__}
 
     logger.debug(f"Created App {app!r}")
     return app

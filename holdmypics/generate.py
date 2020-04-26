@@ -7,7 +7,7 @@ from typing import Optional
 
 import attr
 import click
-from funcy import merge
+from cytoolz import merge
 from jinja2 import Environment, FileSystemLoader, Template
 
 junk = partial(op.contains, string.whitespace)

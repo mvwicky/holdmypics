@@ -5,9 +5,9 @@ from typing import Optional
 from urllib.parse import urlencode
 
 import pytest
-from flask import Flask
+from cytoolz import valfilter
+from flask import Flask, Response
 from flask.testing import FlaskClient
-from funcy import compact
 from PIL import Image
 
 
@@ -28,7 +28,7 @@ def make_route(
     if not any([bg_color, fg_color, fmt]):
         pytest.fail("Can't make a route with just size")
     parts = [f"{width}x{height}", bg_color, fg_color, fmt]
-    return "/api/" + "/".join(compact(parts)) + "/"
+    return "/api/" + "/".join(filter(bool, parts)) + "/"
 
 
 def make_url(
@@ -74,7 +74,7 @@ def args_fixture(text, dpi, alpha):
 
 @pytest.fixture(name="query")
 def query_fixture(args):
-    return args and urlencode(compact(args))
+    return args and urlencode(valfilter(bool, args))
 
 
 def test_create_images_using_function(
@@ -91,7 +91,7 @@ def test_create_images_using_function(
     from holdmypics.api.utils import get_color
 
     with app.test_request_context():
-        img_args = ImageArgs.from_request(compact(args))
+        img_args = ImageArgs.from_request(valfilter(bool, args))
         size = (width, height)
         im = make_image(
             size,
@@ -123,14 +123,25 @@ def test_create_images_using_client(
     assert im.size == (width, height)
 
 
-def test_just_run_once(client: FlaskClient):
+@pytest.mark.parametrize(
+    "random_text", [True, False], ids=["random_text", "no_random_text"]
+)
+def test_just_run_once(client: FlaskClient, random_text: bool):
     url = make_route(638, 328, "cef", "555", "png")
-    args = {"text": "Some Random Text", "dpi": None, "alpha": None}
-    query = urlencode(compact(args))
+    args = {
+        "text": "Some Random Text",
+        "dpi": None,
+        "alpha": None,
+        "random_text": random_text,
+    }
+    query = urlencode(valfilter(bool, args))
     url = "?".join([url, query])
-    res = client.get(url, follow_redirects=False)
+    res: Response = client.get(url, follow_redirects=False)
     assert res.status_code == 200
     img_type = imghdr.what("filename", h=res.data)
     assert img_type == "png"
     im = Image.open(io.BytesIO(res.data))
     assert im.size == (638, 328)
+    if random_text:
+        headers = res.headers
+        assert headers.get("X-Random-Text") is not None

@@ -3,6 +3,7 @@ import random
 from typing import Callable
 from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 
+from cytoolz import merge
 from flask import (
     Response,
     abort,
@@ -12,7 +13,6 @@ from flask import (
     request,
     send_file,
 )
-from funcy import merge
 from humanize import naturalsize
 from loguru import logger
 from PIL import features
@@ -107,6 +107,8 @@ def image_route(
     res: Response = send_file(path, **kw)  # type: ignore
     if args.random_text or RAND_STR in {bg_lower, fg_lower}:
         res.headers["Cache-Control"] = "max-age=0, no-cache, must-revalidate"
+    if args.random_text:
+        res.headers["X-Random-Text"] = args.text
 
     return res
 

@@ -1,6 +1,6 @@
 from typing import Dict, List
 
-from funcy import merge
+from cytoolz import merge
 
 cache_time = int(24 * 60 * 60)
 

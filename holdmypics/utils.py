@@ -1,7 +1,7 @@
 from typing import Dict, List, Tuple, TypeVar, Union
 
+from cytoolz import merge
 from flask import current_app
-from funcy import merge
 
 from .constants import bg_color_default, fg_color_default, fmt_default, img_formats_str
 from .exceptions import ImproperlyConfigured

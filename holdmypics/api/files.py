@@ -1,14 +1,12 @@
 import hashlib
 import os
+import re
 from typing import List, Optional, Set
 
 from flask import current_app
-from funcy import ignore, re_tester
 
 from .._types import Dimension
 from . import bp
-
-ignore_file = ignore(FileNotFoundError, default=None)
 
 fname_tbl = str.maketrans({"#": "", " ": "-", ".": "", "/": "-", "\\": "-"})
 
@@ -18,14 +16,14 @@ class GeneratedFiles(object):
 
     hash_function = hashlib.md5
     extensions = ["png", "webp", "jpg", "jpeg"]
+    fmt_re: re.Pattern = re.compile("\\.({0})$".format("|".join(extensions)))
 
     def __init__(self) -> None:
         self.files: Set[str] = set()
         self._max_files: Optional[int] = None
 
     def find_current(self) -> None:
-        fmts = "\\.({0})$".format("|".join(self.extensions))
-        pred = re_tester(fmts)
+        pred = self.fmt_re.search
         images_folder = self.images_folder
         files = filter(pred, os.listdir(images_folder))
         for file in files:
