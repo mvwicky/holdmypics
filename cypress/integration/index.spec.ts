@@ -6,7 +6,7 @@ describe("Index", function () {
   });
 
   const getImage = () => {
-    const $endpoint = Cypress.$("#endpoint");
+    const $endpoint = Cypress.$("#endpoint-url");
     const src = $endpoint.text();
     cy.request({ url: src }).its("status").should("eq", 200);
   };
@@ -34,5 +34,4 @@ describe("Index", function () {
       getImage();
     });
   });
-  it("Copies the current link.", function () {});
 });

@@ -1,7 +1,8 @@
 import re
+import functools
 from urllib.parse import urlencode
 
-from cytoolz import memoize, merge
+from cytoolz import merge
 from flask import Markup, render_template, url_for
 
 from .. import redisw
@@ -14,7 +15,7 @@ from . import bp
 RULE_RE = re.compile(r"(?:col:|any)")
 
 
-@memoize
+@functools.lru_cache(maxsize=2)
 def get_context() -> dict:
     paths = (p for (p, _) in make_rules())
     rules = [RULE_RE.sub("", p) for p in paths]
@@ -84,6 +85,6 @@ def get_context() -> dict:
 
 @bp.route("/")
 def index() -> ResponseType:
-    get_context.memory.clear()
+    get_context.cache_clear()
     context = merge(get_context(), {"count": redisw.client.get(COUNT_KEY).decode()})
     return render_template("index.jinja", **context)

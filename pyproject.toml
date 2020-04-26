@@ -36,6 +36,11 @@ pre-commit = "^2.3.0"
 
 [tool.poetry.scripts]
 
+[tool.poetry.plugins]
+
+[tool.poetry.plugins."pytest11"]
+holdmyplugin = "plugin.holdmyplugin"
+
 [tool.isort]
 known_first_party = ["config", "holdmypics"]
 no_lines_before = "LOCALFOLDER"
