@@ -1,6 +1,7 @@
 {
   "baseUrl": "https://holdmypics.com",
   "viewportWidth": 1200,
-  "viewportHeight": 660,
-  "projectId": "qktbfv"
+  "viewportHeight": 1080,
+  "projectId": "qktbfv",
+  "videoCompression": 22
 }

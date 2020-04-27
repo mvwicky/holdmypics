@@ -87,6 +87,9 @@ function inputCallback(args: InputCallbackArgs) {
     log(`Good parameters`);
     const url = makeEndpoint(params);
     args.endpoint.textContent = url.pathname + url.search;
+    if (elemIsTag(args.endpoint, "a")) {
+      args.endpoint.href = url.pathname + url.search;
+    }
     args.btn.dataset.clipboardText = url.href;
     if (!["width", "height"].includes(args.id)) {
       args.image.src = url.href;

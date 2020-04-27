@@ -41,6 +41,6 @@ class Config(object):
         "INDEX_DEFAULT_BG", default="cef", validate=[Regexp(color_re)]
     )
     INDEX_DEFAULT_FG = env(
-        "INDEX_DEFAULT_FG", default="eee", validate=[Regexp(color_re)]
+        "INDEX_DEFAULT_FG", default="555", validate=[Regexp(color_re)]
     )
     INDEX_TEXT = env("INDEX_TEXT", default="Something Funny")
