@@ -1,27 +1,30 @@
+@use "sass:map";
+
 $h-spacing: 5rem;
 
 #params-form {
-  border: 1px solid #e9ecef;
-  padding: 1rem;
-  @include prop-dir(margin, "x", 0.5rem);
+  // background-color: map.get($grays, 10);
+  border: 1px solid var(--border);
+  @include p-short(3);
+  @include m-space("x", 2);
   @include mq($from: "md") {
-    @include prop-dir(margin, "x", $h-spacing);
+    @include m-space("x", 7);
   }
 }
 
 #routes,
 .endpoint-container {
-  @include prop-dir(padding, "x", 0.5rem);
+  @include p-space("x", 2);
   @include mq($from: "md") {
-    @include prop-dir(padding, "x", $h-spacing);
+    @include p-space("x", 7);
   }
 }
 
 #routes {
-  padding-bottom: 1rem;
+  @include p-space("bottom", 3);
   h3 {
     margin-block-end: 0;
-    margin-bottom: 0.5rem;
+    @include m-space("bottom", 2);
   }
   p {
     margin-block-start: 0;
@@ -29,11 +32,11 @@ $h-spacing: 5rem;
 }
 
 .image-container {
-  margin-bottom: 1.5rem;
+  @include m-space("bottom", 4);
 }
 
 #endpoint {
-  margin-bottom: 0.5rem;
+  @include m-space("bottom", 2);
   @include mq($from: "md") {
     margin-bottom: 0;
   }
@@ -53,10 +56,8 @@ $h-spacing: 5rem;
 }
 
 .text-row {
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
+  @include p-space("x", 2);
   @include mq($from: "md") {
-    padding-left: 0;
-    padding-right: 0;
+    @include p-space("x", 0);
   }
 }

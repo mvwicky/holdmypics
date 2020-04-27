@@ -1,8 +1,11 @@
+import random
+import secrets
 from typing import Mapping, Optional
 
 import attr
 import marshmallow as ma
 from flask import request
+from loguru import logger
 from werkzeug.datastructures import ImmutableMultiDict
 
 from .words import words
@@ -57,9 +60,13 @@ class ImageArgs(object):
 
     def real_args(self):
         if self.random_text:
-            text = " ".join(
-                [words.random_word("predicates"), words.random_word("objects")]
-            )
+            if self.seed:
+                logger.debug(f"Seeding from query {self.seed}")
+                random.seed(self.seed)
+            else:
+                logger.debug("Seeding using secrets")
+                random.seed(secrets.token_hex())
+            text = " ".join([words.random("predicates"), words.random("objects")])
         else:
             text = self.text
         return attr.evolve(self, text=text)

@@ -10,7 +10,6 @@ body {
 }
 
 a[href] {
-  // color: #006699;
   color: var(--primary);
 }
 
@@ -21,37 +20,11 @@ samp {
   font-family: $font-family-mono;
 }
 
-.content {
-  border: 1px solid #e9ecef;
-  margin-bottom: 1.5rem;
-  padding: 0 1rem 1rem;
-  @include mq($until: "lg") {
-    padding: 0 0.25rem;
-  }
-  h1 {
-    margin-bottom: 1.5rem;
-  }
-}
-
-.row {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  width: 100%;
-}
-
 img {
   height: auto;
-  margin: 0.5rem auto 1.5rem;
   max-width: 100%;
-}
-
-.d-none {
-  display: none !important;
-}
-
-.invisible {
-  visibility: hidden !important;
+  @include m-space("top", 2);
+  @include m-space("bottom", 4);
 }
 
 .rule {

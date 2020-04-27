@@ -1,4 +1,5 @@
 @use "sass:math";
+@use "sass:map";
 @use "sass:list";
 
 @function scale-value($n) {
@@ -9,9 +10,64 @@
   }
 }
 
+@function space-value($i) {
+  $value: map.get($space, $i);
+  @if not $value {
+    @error "Invalid space value #{$i}";
+  } @else {
+    @return $value;
+  }
+}
+
 @function validate-direction($dir) {
   @if not list.index($directions, $dir) {
     @error "Direction must be in #{$directions}, got #{$dir}";
   }
   @return $dir;
+}
+
+@function comp-css-shorthand($values) {
+  $output: null;
+  $n: list.length($values);
+  $a: list.nth($values, 1);
+  $b: if($n < 2, $a, list.nth($values, 2));
+  $c: if($n < 3, $a, list.nth($values, 3));
+  $d: if($n < 2, $a, list.nth($values, if($n < 4, 2, 4)));
+
+  @if $a == 0 {
+    $a: 0;
+  }
+  @if $b == 0 {
+    $b: 0;
+  }
+  @if $c == 0 {
+    $c: 0;
+  }
+  @if $d == 0 {
+    $d: 0;
+  }
+
+  @if $a == $b and $a == $c and $a == $d {
+    $output: $a;
+  } @else if $a == $c and $b == $d {
+    $output: $a $b;
+  } @else if $b == $d {
+    $output: $a $b $c;
+  } @else {
+    $output: $a $b $c $d;
+  }
+
+  @return $output;
+}
+
+@function short-spaces($values) {
+  $output: ();
+  @each $v in $values {
+    @if $v {
+      $output: list.append($output, space-value($v));
+    } @else {
+      $output: list.append($output, $v);
+    }
+  }
+  @return $output;
 }

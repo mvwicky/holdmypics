@@ -1,15 +1,11 @@
 import "../scss/main.scss";
 
-import { truthy, elemIsTag } from "./utils";
+import { truthy, elemIsTag, assertIsTag } from "./utils";
 import { debounce } from "./debounce";
 import { replaceIcons } from "./icons";
 import { rIC } from "./idle";
 
 const log = PRODUCTION ? (...args: any[]) => {} : console.log.bind(console);
-
-function getVendoredStyles() {
-  // return import(/* webpackChunkName: "vendors" */ "../scss/_vendor.scss");
-}
 
 function getClipboard() {
   return import(/* webpackChunkName: "clipboard" */ "clipboard");
@@ -17,6 +13,10 @@ function getClipboard() {
 
 function getTippy() {
   return import(/* webpackChunkName: "tippy" */ "tippy.js");
+}
+
+function getRand() {
+  return import(/* webpackChunkName: "random-text" */ "./random-text");
 }
 
 const ARGS = ["width", "height", "bg", "fg", "fmt", "imageText", "font"];
@@ -28,7 +28,17 @@ function isEndpointArgs(input: {
 }
 
 function makeEndpoint(args: MakeEndpointArgs) {
-  const { width, height, bg, fg, fmt, imageText, font, seed } = args;
+  const {
+    width,
+    height,
+    bg,
+    fg,
+    fmt,
+    imageText,
+    font,
+    seed,
+    randomText,
+  } = args;
   const path = `/api/${width}x${height}/${bg}/${fg}/${fmt}/`;
   const url = new URL(path, window.location.href);
   url.search = "";
@@ -41,18 +51,26 @@ function makeEndpoint(args: MakeEndpointArgs) {
   if (seed) {
     url.searchParams.append("seed", seed);
   }
+  if (randomText) {
+    url.searchParams.append("random_text", "");
+  }
   return url;
 }
 
-function gatherParams(f: HTMLFormElement): { [k: string]: string } | null {
+function gatherParams(f: HTMLFormElement): Record<string, string> | null {
   const params: { [k: string]: string } = {};
   const n = f.elements.length;
   for (let i = 0; i < n; i++) {
     const elem = f.elements[i];
     if (elemIsTag(elem, "input") || elemIsTag(elem, "select")) {
       if (elem.checkValidity()) {
-        const value = elem.value;
-        params[elem.id] = value && value.trim();
+        if (elem.type === "checkbox") {
+          assertIsTag(elem, "input");
+          params[elem.id] = elem.checked ? "on" : "";
+        } else {
+          const value = elem.value;
+          params[elem.id] = value && value.trim();
+        }
       } else {
         return null;
       }
@@ -64,7 +82,7 @@ function gatherParams(f: HTMLFormElement): { [k: string]: string } | null {
 function inputCallback(args: InputCallbackArgs) {
   log(`Input ${args.id} changed.`);
   const params = gatherParams(args.form);
-  log(params);
+  log(JSON.stringify(params, undefined, 2));
   if (truthy(params) && isEndpointArgs(params)) {
     log(`Good parameters`);
     const url = makeEndpoint(params);
@@ -81,7 +99,7 @@ async function main(this: Document) {
   if (!elemIsTag(exampleImage, "img")) {
     return;
   }
-  const endpoint = this.getElementById("endpoint");
+  const endpoint = this.getElementById("endpoint-url");
   if (!truthy(endpoint)) {
     return;
   }
@@ -120,6 +138,8 @@ async function main(this: Document) {
     const cb = debounce(inputCallback.bind(null, args), 750);
     elements[i].addEventListener("input", cb);
   }
+
+  (await getRand()).initRandomText();
 }
 
 function initIcons(btn: HTMLButtonElement) {

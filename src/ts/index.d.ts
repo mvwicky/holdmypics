@@ -17,6 +17,27 @@ interface MakeEndpointArgs {
   imageText: string;
   font: string;
   seed: string;
+  randomText: string;
+}
+
+interface EndpointPathArgs {
+  width: string;
+  height: string;
+  bg: string;
+  fg: string;
+  fmt: string;
+}
+
+interface EndpointQueryArgs {
+  imageText: string;
+  font: string;
+  seed: string;
+  randomText: boolean;
+}
+
+interface EndpointArgs {
+  path: EndpointPathArgs;
+  query: EndpointQueryArgs;
 }
 
 interface AnyFunc {

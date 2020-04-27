@@ -1,3 +1,5 @@
+@use "sass:map";
+
 input {
   border: 1px solid var(--validity-color, rgb(204, 204, 204));
   border-radius: 3px;
@@ -8,9 +10,30 @@ input {
   }
 }
 
+input[type="text"] {
+  &:disabled,
+  &.disabled {
+    background-color: map.get($grays, 30);
+    color: map.get($grays, 10);
+  }
+}
+
 .input-group {
   display: flex;
   flex-direction: column;
+}
+
+.text-input {
+  align-items: center;
+  flex-direction: row;
+  justify-content: space-between;
+  & > input {
+    flex-basis: auto;
+  }
+  & > #random-text {
+    flex-grow: 0;
+    @include m-space("right", 2);
+  }
 }
 
 .form-group {
@@ -18,14 +41,14 @@ input {
   flex-direction: column;
   flex-wrap: wrap;
   justify-content: space-between;
-  margin-bottom: 0.5rem;
+  @include m-space("bottom", 2);
   @include mq($from: "md") {
     flex-direction: row;
   }
 
   label {
     flex-grow: 0;
-    margin-bottom: 0.25rem;
+    @include m-space("bottom", 1);
     @include mq($from: "md") {
       margin-bottom: 0;
     }
@@ -43,5 +66,4 @@ input {
 .help-text {
   color: #000000;
   font-weight: 200;
-  grid-column-start: 2;
 }

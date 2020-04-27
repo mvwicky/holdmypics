@@ -53,67 +53,105 @@
 
   </div>
 
-  <form id="params-form" action="">
-    <div class="form-group">
-      <label for="width">Width</label>
-      <input id="width" type="number" min="1" step="1" value="{{ width }}" required>
-    </div>
-    <div class="form-group">
-      <label for="height">Height</label>
-      <input id="height" type="number" min="1" step="1" value="{{ height }}" required>
-    </div>
-    <div class="form-group">
-      <label for="bg">Background Color</label>
-      <div class="input-group">
-        <input id="bg" type="text" value="{{ bg_color }}" pattern="{{ color_pattern }}">
-        <small class="help-text">Three or six hex digits.</small>
+  <div>
+    <form id="params-form" action="">
+      <div class="form-group">
+        <label for="width">Width</label>
+        <div class="input-group">
+          <input
+            id="width"
+            type="number"
+            min="1"
+            max="{{ width }}"
+            step="1"
+            value="{{ width }}"
+            required
+          >
+          <small class="help-text">&nbsp;</small>
+        </div>
+
       </div>
-    </div>
-    <div class="form-group">
-      <label for="fg">Text Color</label>
-      <div class="input-group">
-        <input id="fg" type="text" value="{{ fg_color }}" pattern="{{ color_pattern }}">
-        <small class="help-text">Three or six hex digits.</small>
+      <div class="form-group">
+        <label for="height">Height</label>
+        <div class="input-group">
+          <input
+            id="height"
+            type="number"
+            min="1"
+            max="{{ height }}"
+            step="1"
+            value="{{ height }}"
+            required
+          >
+          <small class="help-text">&nbsp;</small>
+        </div>
+
       </div>
-    </div>
-    <div class="form-group">
-      <label for="fmt">Format</label>
-      <div class="input-group">
-        <select name="fmt" id="fmt">
-          {% for value in img_formats %}
-          {% if value == fmt %}
-          <option selected value="{{ value }}">{{ value }}</option>
-          {% else %}
-          <option value="{{ value }}">{{ value }}</option>
-          {% endif %}
-          {% endfor %}
-        </select>
-        <small class="help-text">“jpg” and “jpeg” are equivalent.</small>
+      <div class="form-group">
+        <label for="bg">Background Color</label>
+        <div class="input-group">
+          <input id="bg" type="text" value="{{ bg_color }}" pattern="{{ color_pattern }}">
+          <small class="help-text">Three or six hex digits.</small>
+        </div>
       </div>
-    </div>
-    <div class="form-group">
-      <label for="font">Font</label>
-      <div class="input-group">
-        <select name="font" id="font">
-          {% for value, name in font_names %}
-          {% if value == font %}
-          <option selected value="{{ value }}">{{ name }}</option>
-          {% else %}
-          <option value="{{ value }}">{{ name }}</option>
-          {% endif %}
-          {% endfor %}
-        </select>
+      <div class="form-group">
+        <label for="fg">Text Color</label>
+        <div class="input-group">
+          <input id="fg" type="text" value="{{ fg_color }}" pattern="{{ color_pattern }}">
+          <small class="help-text">Three or six hex digits.</small>
+        </div>
       </div>
-    </div>
-    <div class="form-group">
-      <label for="imageText">Text</label>
-      <input id="imageText" type="text" value="{{ text }}" maxlength="30">
-    </div>
-    <div class="form-group d-none">
-      <label for="seed">Seed</label>
-      <input id="seed" type="text">
-    </div>
-  </form>
+      <div class="form-group">
+        <label for="fmt">Format</label>
+        <div class="input-group">
+          <select name="fmt" id="fmt">
+            {% for value in img_formats %}
+            {% if value == fmt %}
+            <option selected value="{{ value }}">{{ value }}</option>
+            {% else %}
+            <option value="{{ value }}">{{ value }}</option>
+            {% endif %}
+            {% endfor %}
+          </select>
+          <small class="help-text">“jpg” and “jpeg” are equivalent.</small>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="font">Font</label>
+        <div class="input-group">
+          <select name="font" id="font">
+            <option value=""></option>
+            {% for value, name in font_names %}
+            {% if value == font %}
+            <option selected value="{{ value }}">{{ name }}</option>
+            {% else %}
+            <option value="{{ value }}">{{ name }}</option>
+            {% endif %}
+            {% endfor %}
+          </select>
+          <small class="help-text">&nbsp;</small>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="imageText">Text</label>
+        <div class="input-group text-input">
+          <input id="imageText" type="text" value="{{ text }}" maxlength="30">
+          <input
+            type="checkbox"
+            name="randomText"
+            id="randomText"
+            aria-label="Randomize text."
+          >
+        </div>
+
+      </div>
+      <div class="form-group d-none">
+        <label for="seed">Seed</label>
+        <input id="seed" type="text">
+      </div>
+    </form>
+  </div>
+
 
   <div id="color-picker">
 

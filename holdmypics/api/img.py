@@ -2,6 +2,7 @@ import os
 from typing import Callable, Dict, Tuple, Union
 
 import attr
+from humanize import naturalsize
 from loguru import logger
 from PIL import Image
 
@@ -32,7 +33,6 @@ def make_image(
         alpha_im = Image.new("L", size, int(args.alpha * 255))
         im.putalpha(alpha_im)
     if args.text is not None:
-        logger.info('Writing text "{0}"', args.text)
         text_args = TextArgs(fg_color, args.text, args.font_name, args.debug)
         im = draw_text(im, text_args)
     if fmt == "jpeg":
@@ -54,12 +54,13 @@ def save_image(
         logger.debug("Already existed")
         return path
     else:
-        logger.info("Creating new file")
         im = make_image(size, bg_color, fg_color, fmt, args)
         save_kw = {}
         kw_func = opt_kw.get(fmt, None)
         if kw_func is not None:  # pragma: no cover
             save_kw.update(kw_func(args))
         im.save(path, **save_kw)
+        sz = naturalsize(os.path.getsize(path), format="%.3f")
+        logger.info(f"Created new file ({sz})")
         redisw.client.incr(COUNT_KEY)
         return path

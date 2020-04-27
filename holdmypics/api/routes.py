@@ -1,4 +1,3 @@
-import os
 import random
 from typing import Callable
 from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
@@ -13,7 +12,6 @@ from flask import (
     request,
     send_file,
 )
-from humanize import naturalsize
 from loguru import logger
 from PIL import features
 
@@ -94,7 +92,6 @@ def image_route(
             fg_color = random_color()
 
     path = image_response(size, bg_color, fg_color, fmt, args)
-    logger.info("Image size: {0}", naturalsize(os.path.getsize(path), format="%.3f"))
     if files.need_to_clean:
         after_this_request(do_cleanup)
 

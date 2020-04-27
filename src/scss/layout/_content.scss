@@ -1,0 +1,18 @@
+.content {
+  border: 1px solid var(--border);
+  @include m-space("bottom", 4);
+  @include p-short(null 3 3);
+  @include mq($until: "lg") {
+    @include p-short(0 1);
+  }
+  h1 {
+    @include m-space("bottom", 4);
+  }
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 100%;
+}

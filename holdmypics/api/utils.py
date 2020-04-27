@@ -3,6 +3,7 @@ from collections import namedtuple
 from string import hexdigits
 from typing import NamedTuple, Tuple
 
+from loguru import logger
 from PIL import Image, ImageDraw
 from PIL.ImageFont import ImageFont
 
@@ -71,7 +72,15 @@ def guess_size(height: int, font_name: str) -> Tuple[ImageFont, int]:
 
 def get_font(
     d: ImageDraw.Draw, sz: Dimension, text: str, font_name: str
-) -> Tuple[ImageFont, Tuple[int, int]]:
+) -> Tuple[ImageFont, Dimension]:
+    """Get the correctly sized font for the given image size and text.
+
+    Args:
+        d: The Pillow ImageDraw instance
+        sz: The height and width of the output image
+        text: The text to be written
+        font_name: The typeface that we're using.
+    """
     face = fonts[font_name]
     width, height = sz
     font, idx = guess_size(height, font_name)
@@ -88,6 +97,7 @@ def draw_text(im: Image.Image, args: TextArgs) -> Image.Image:
     txt = Image.new("RGBA", im.size, (255, 255, 255, 0))
     d = ImageDraw.Draw(txt)
     font, tsize = get_font(d, (int(w * 0.9), h), args.text, args.font_name)
+    logger.info(f'Writing text "{args.text}" (size={tsize})')
     tw, th = tsize
     xc = int((w - tw) / 2)
     yc = int((h - th) / 2)
@@ -105,7 +115,3 @@ def get_color(color: str) -> str:
     if len(color) in {3, 6} and all(e in hexdigits for e in color):
         return "#" + color
     return color
-
-
-def get_words_file():
-    pass

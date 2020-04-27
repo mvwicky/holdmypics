@@ -47,7 +47,7 @@ class Words(object):
     def teams(self) -> list:
         return self.word_data["teams"]
 
-    def random_word(self, cat: str):
+    def random(self, cat: str):
         words = self.word_data[cat]
         return random.choice(words)
 

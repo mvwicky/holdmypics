@@ -57,7 +57,7 @@ const configureBabel = () => {
   return {
     loader: "babel-loader",
     options: {
-      cacheDirectory: prodOr(false, path.resolve(__dirname, ".cache")),
+      cacheDirectory: prodOr(false, path.resolve(__dirname, ".cache", "babel")),
       cacheCompression: true,
       exclude: /node_modules/,
       presets: [
