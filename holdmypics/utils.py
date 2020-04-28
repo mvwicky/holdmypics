@@ -14,7 +14,7 @@ _UNSET = object()
 def config_value(name: str, default: Union[_T, object] = _UNSET) -> _T:
     value = current_app.config.get(name, default)
     if value is _UNSET:
-        raise ImproperlyConfigured(f"Unknown setting {name}")
+        raise ImproperlyConfigured("Unknown setting {0}".format(name))
     return value
 
 
@@ -23,7 +23,7 @@ def get_debug() -> bool:
 
 
 def make_rules() -> List[Tuple[str, Dict[str, str]]]:
-    fmt_rule = f"<any({img_formats_str}):fmt>"
+    fmt_rule = "<any({0}):fmt>".format(img_formats_str)
     colors_default = merge(bg_color_default, fg_color_default)
     bg_color = "<col:bg_color>"
     fg_color = "<col:fg_color>"

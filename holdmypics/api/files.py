@@ -1,7 +1,7 @@
 import hashlib
 import os
 import re
-from typing import List, Optional, Set
+from typing import List, Optional, Pattern, Set
 
 from flask import current_app
 
@@ -16,7 +16,7 @@ class GeneratedFiles(object):
 
     hash_function = hashlib.md5
     extensions = ["png", "webp", "jpg", "jpeg"]
-    fmt_re: re.Pattern = re.compile("\\.({0})$".format("|".join(extensions)))
+    fmt_re: Pattern = re.compile("\\.({0})$".format("|".join(extensions)))
 
     def __init__(self) -> None:
         self.files: Set[str] = set()

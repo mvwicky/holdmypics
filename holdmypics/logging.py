@@ -53,4 +53,4 @@ def log_request(res: Response):
     if request.query_string:
         path = "?".join([path, request.query_string.decode()])
     content_length = res.headers.get("Content-Length", 0)
-    logger.log(level, f"{path} - {res.status_code} - {content_length}")
+    logger.log(level, "{0} - {1} - {2}", path, res.status_code, content_length)

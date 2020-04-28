@@ -90,21 +90,21 @@ def register(app: Flask):  # noqa: C901
         version = semver.parse_version_info(poetry["version"])
         if bump:
             f = SEMVER_BUMPS[level]
-            logger.info(f"Bumping {level}.")
+            logger.info("Bumping {0}.", level)
             version = str(f(version))
             proj_data["tool"]["poetry"]["version"] = version
             proj.write_text(toml.dumps(proj_data))
-            logger.success(f"New version: {version}")
+            logger.success("New version: {0}", version)
         else:
             version = str(version)
-            logger.info(f"Current version: {version}")
+            logger.info("Current version: {0}", version)
 
         if __version__.__version__ != version:
-            logger.info(f"{__version__.__name__} out of date.")
+            logger.info("{0} out of date.", __version__.__name__)
             ver_file = Path(__version__.__file__)
-            ver_file.write_text(f'__version__ = "{version}"\n')
+            ver_file.write_text('__version__ = "{0}"\n'.format(version))
         else:
-            logger.info(f"{__version__.__name__} up to date.")
+            logger.info("{0} up to date.", __version__.__name__)
 
         if pkg.is_file():
             pkg_data = json.loads(pkg.read_text())

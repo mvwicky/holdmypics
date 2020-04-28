@@ -13,7 +13,7 @@ from PIL import Image
 
 def random_color() -> str:
     """Generate a random hex string."""
-    return "".join([f"{random.randrange(1 << 8):02x}" for _ in range(3)])
+    return "".join(["{0:02x}".format(random.randrange(1 << 8)) for _ in range(3)])
 
 
 bg_colors = ["Random", None]
@@ -27,7 +27,7 @@ def make_route(
 ):
     if not any([bg_color, fg_color, fmt]):
         pytest.fail("Can't make a route with just size")
-    parts = [f"{width}x{height}", bg_color, fg_color, fmt]
+    parts = ["{0}x{1}".format(width, height), bg_color, fg_color, fmt]
     return "/api/" + "/".join(filter(bool, parts)) + "/"
 
 

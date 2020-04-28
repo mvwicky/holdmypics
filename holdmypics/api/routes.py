@@ -97,7 +97,7 @@ def image_route(
 
     mime_fmt = "jpeg" if fmt == "jpg" else fmt
     kw = {
-        "mimetype": f"image/{mime_fmt}",
+        "mimetype": "image/{0}".format(mime_fmt),
         "add_etags": not current_app.debug,
         "conditional": True,
     }
@@ -117,7 +117,7 @@ def anim_route(size: Dimension, bg_color: str, fg_color: str, fmt: str) -> Respo
     anim = make_anim(size, bg_color, fg_color, fmt)
     print(len(anim.getvalue()))
 
-    return send_file(anim, mimetype=f"image/{fmt}")
+    return send_file(anim, mimetype="image/{0}".format(fmt))
 
 
 @bp.route("/text")

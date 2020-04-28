@@ -19,7 +19,7 @@ def find_path_named(name: str, start: Path = CWD, file_only: bool = False) -> Pa
         if not file_only or p.is_file():
             return p
     if p.parent == p:
-        raise RuntimeError(f"Traversed to root, unable to find {name}")
+        raise RuntimeError("Traversed to root, unable to find {0}".format(name))
     return find_path_named(name, p.parent, file_only=file_only)
 
 
@@ -29,7 +29,7 @@ def find_pyproject(start: Path = CWD) -> Path:
 
 def fmt_hash(pkg_hash: str, indent: int = 4) -> str:
     spaces = " " * indent
-    return f"{spaces}--hash={pkg_hash}"
+    return "{0}--hash={1}".format(spaces, pkg_hash)
 
 
 @attr.s(slots=True, auto_attribs=True)
@@ -49,7 +49,7 @@ class Dependency(object):
         return cls(name=name, version=version, hashes=hashes, marker=marker)
 
     def to_line(self, indent: int = 4, no_hashes: bool = False) -> str:
-        init_line = f"{self.name}=={self.version}"
+        init_line = "{0.name}=={0.version}".format(self)
         if self.marker:
             init_line = "; ".join([init_line, self.marker])
         if no_hashes:
@@ -101,7 +101,7 @@ class Package(object):
         cmd = args
         if not isinstance(cmd, str) and isinstance(cmd, Sequence):
             cmd = " ".join(cmd)
-        logger.info(f"Running command {cmd}")
+        logger.info("Running command {0}", cmd)
         kwargs.setdefault("cwd", str(self.root_dir))
         return subprocess.run(args, **kwargs)
 
@@ -113,11 +113,11 @@ class Package(object):
         file = self.req_file(dev)
         write = not file.is_file() or req_cts != file.read_text()
         if write:
-            logger.info(f"Writing new {file.name}")
+            logger.info("Writing new {0.name}", file)
             file.write_text(req_cts)
         else:
-            logger.info(f"{file.name} unchanged.")
+            logger.info("{0.name} unchanged.", file)
         rel = os.path.relpath(file, self.root_dir)
         sz = naturalsize(os.path.getsize(file))
-        logger.success(f"Froze {num_pkgs} requirements to {rel} ({sz})")
+        logger.success("Froze {0} requirements to {1} ({2})", num_pkgs, rel, sz)
         return write

@@ -33,7 +33,7 @@ class Generator(object):
     def confirm(self, file: Path, yes: bool):
         if yes or not file.is_file():
             return True
-        return click.confirm(f"Overwrite {file}?", default=True)
+        return click.confirm("Overwrite {0}?".format(file), default=True)
 
     def generate(self, dry_run: bool, verbosity: int, yes: bool, port: Optional[int]):
         contexts = [
@@ -42,7 +42,7 @@ class Generator(object):
         ]
         for dev, context in contexts:
             mode = "dev" if dev else "prod"
-            click.secho(f"Rendering {mode} template.", fg="green", bold=True)
+            click.secho("Rendering {0} template.".format(mode), fg="green", bold=True)
             folder = self.dev_dir if dev else self.prod_dir
             if not folder.is_dir():
                 folder.mkdir()
@@ -63,7 +63,9 @@ class Generator(object):
                 click.secho("Nothing to do, output is the same.", fg="blue")
                 return
             else:
-                click.secho(f"New file differs by {1.0 - ratio:.2%}", fg="yellow")
+                click.secho(
+                    "New file differs by {0:.2%}".format(1.0 - ratio), fg="yellow"
+                )
         if verbosity >= 1 or dry_run:
             print(cts)
             print("")
@@ -72,7 +74,7 @@ class Generator(object):
 
         if not dry_run:
             file.write_text(cts)
-            click.secho(f"Wrote {file}", fg="blue")
+            click.secho("Wrote {0}".format(file), fg="blue")
 
     @property
     def template(self) -> Template:

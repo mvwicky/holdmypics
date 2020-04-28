@@ -61,6 +61,6 @@ def save_image(
             save_kw.update(kw_func(args))
         im.save(path, **save_kw)
         sz = naturalsize(os.path.getsize(path), format="%.3f")
-        logger.info(f"Created new file ({sz})")
+        logger.info("Created new file ({0})", sz)
         redisw.client.incr(COUNT_KEY)
         return path

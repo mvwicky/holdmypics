@@ -33,7 +33,7 @@ class Server(object):
             self._start_proc("dev_server", dev_args)
         n = len(self.procs)
         ts = "" if n == 1 else "es"
-        logger.info(f"Started {n} process{ts}")
+        logger.info("Started {0} process{1}", n, ts)
 
     def _start_proc(self, name: str, args: Sequence[str], **kwargs):
         logger.info("Starting process `{0}`", " ".join(args))
@@ -46,7 +46,7 @@ class Server(object):
         start_mtime = 0
         if base_out.is_file():
             start_mtime = os.path.getmtime(base_out)
-            logger.debug(f"Waiting for changes (mtime={start_mtime}).")
+            logger.debug("Waiting for changes (mtime={0}).", start_mtime)
         self._start_proc("yarn", ["yarn", "watch"])
         self._wait_for_yarn(base_out, start_mtime)
 
@@ -77,21 +77,21 @@ class Server(object):
     def _inner_loop(self):
         for name, proc in self.procs.items():
             if proc.poll() is not None:
-                logger.warning(f"Subprocess {name} died")
+                logger.warning("Subprocess {0} died", name)
                 return True
         return False
 
     def shutdown(self):
         logger.info("Shutting down.")
         for name, proc in self.procs.items():
-            logger.info(f"Terminating {name}")
+            logger.info("Terminating {0}", name)
             proc.terminate()
             try:
                 proc.wait(WAIT)
             except TimeoutExpired:
-                logger.warning(f"Killing {name}")
+                logger.warning("Killing {0}", name)
                 proc.kill()
                 try:
                     proc.wait(WAIT)
                 except TimeoutExpired:
-                    logger.error(f"Unable to kill {name}")
+                    logger.error("Unable to kill {0}", name)

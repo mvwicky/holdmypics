@@ -23,11 +23,11 @@ CACHE_CONTROL_MAX = "max-age=315360000, public, immutable"
 exts = ["woff", "woff2", "js", "css"]
 exts_rev = [e[::-1] + "." for e in exts]
 exts_group = "|".join(exts_rev)
-EXT_RE = re.compile(f"^(?:{exts_group})")
+EXT_RE = re.compile("^(?:{0})".format(exts_group))
 
 
 def wn_add_headers(headers, path, url):
-    logger.info(f"Serving static file: {url}")
+    logger.info("Serving static file: {0}", url)
     headers["X-Powered-By"] = "Flask/WhiteNoise"
 
 
@@ -38,7 +38,7 @@ def immutable_file_test(path: str, url: str) -> bool:
     filename: str = parts[1]
     is_immutable = filename.count(".") > 1 and bool(EXT_RE.match(filename[::-1]))
     if is_immutable:
-        logger.debug(f"File is immutable: {url}")
+        logger.debug("File is immutable: {0}", url)
     return is_immutable
 
 
@@ -56,7 +56,7 @@ def create_app(config_class=Config):
     include_sub = app.config.get("HSTS_INCLUDE_SUBDOMAINS", False)
     if hsts_seconds:
         parts = [
-            f"max-age={hsts_seconds}",
+            "max-age={0}".format(hsts_seconds),
             "includeSubDomains" if include_sub else False,
             "preload" if hsts_preload else False,
         ]
@@ -119,5 +119,5 @@ def create_app(config_class=Config):
     def _ctx():
         return {"version": __version__.__version__}
 
-    logger.debug(f"Created App {app!r}")
+    logger.debug("Created App {0!r}", app)
     return app

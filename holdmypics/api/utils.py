@@ -25,7 +25,7 @@ font_sizes = fonts.font_sizes
 
 def random_color() -> str:
     """Generate a random hex string."""
-    return "".join([f"{random.randrange(1 << 8):02x}" for _ in range(3)])
+    return "".join(["{0:02x}".format(random.randrange(1 << 8)) for _ in range(3)])
 
 
 def px_to_pt(px: float) -> float:
