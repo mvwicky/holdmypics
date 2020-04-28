@@ -94,8 +94,7 @@ def get_font(
 
 def draw_text(im: Image.Image, args: TextArgs) -> Image.Image:
     w, h = im.size
-    txt = Image.new("RGBA", im.size, (255, 255, 255, 0))
-    d = ImageDraw.Draw(txt)
+    d = ImageDraw.Draw(im)
     font, tsize = get_font(d, (int(w * 0.9), h), args.text, args.font_name)
     logger.info(f'Writing text "{args.text}" (size={tsize})')
     tw, th = tsize
@@ -106,8 +105,7 @@ def draw_text(im: Image.Image, args: TextArgs) -> Image.Image:
         d.rectangle(
             [(xc, yc), (int((w + tw) / 2), int((h + th) / 2))], outline="#000", width=3
         )
-
-    return Image.alpha_composite(im, txt)
+    return im
 
 
 def get_color(color: str) -> str:

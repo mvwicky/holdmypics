@@ -1,9 +1,24 @@
 from typing import TYPE_CHECKING
 
 import pytest
+from loguru import logger
 
 if TYPE_CHECKING:
+    from _pytest.config import Config
     from _pytest.tmpdir import TempPathFactory
+
+
+def _log_filt(record):
+    return "test" in record["name"]
+
+
+def pytest_configure(config: "Config"):
+    fmt = (
+        "[<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>] | "
+        "<level>{level:<8}</level> | "
+        "<blue>{name}</blue>:<cyan>{line}</cyan> - <bold>{message}</bold>"
+    )
+    logger.add("log/holdmytests.log", format=fmt, level="DEBUG", filter=_log_filt)
 
 
 @pytest.fixture(scope="session", name="config")

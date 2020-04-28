@@ -62,7 +62,7 @@ def text_fixture(request):
     return request.param
 
 
-@pytest.fixture(name="alpha", params=[0.77, None])
+@pytest.fixture(name="alpha", params=[0.75, None])
 def alpha_fixture(request):
     return request.param
 

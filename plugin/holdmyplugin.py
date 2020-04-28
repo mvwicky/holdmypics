@@ -1,6 +1,9 @@
 from typing import TYPE_CHECKING
 
+from loguru import logger
+
 if TYPE_CHECKING:
+    from _pytest.config import Config
     from _pytest.config.argparsing import Parser, OptionGroup
     from _pytest.python import Metafunc
 
@@ -33,8 +36,8 @@ def pytest_addoption(parser: "Parser"):
         "--dpis", nargs="+", default=[72], type=int, help="The dpi values to use.",
     )
     group.addoption("--no-empty-dpi", action="store_true", dest="no_empty_dpi")
-    group.addoption("--fake-option", action="store_true", dest="fake_option")
     parser.addini("empty-dpi", "Add a `None` value for dpi.", type="bool", default=True)
+    parser.addini("trace-mem", "Trace memory allocations.", type="bool", default=False)
 
 
 def param_list(metafunc: "Metafunc", name: str, pname: str = None):
@@ -43,6 +46,20 @@ def param_list(metafunc: "Metafunc", name: str, pname: str = None):
     if name in metafunc.fixturenames:
         items = metafunc.config.getoption(pname)
         metafunc.parametrize(name, items)
+
+
+def pytest_configure(config: "Config"):
+    fmt = (
+        "[<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>] | "
+        "<level>{level:<8}</level> | "
+        "<blue>{name}</blue>:<cyan>{line}</cyan> - <bold>{message}</bold>"
+    )
+    logger.add(
+        "log/holdmyplugin.log",
+        format=fmt,
+        level="DEBUG",
+        filter={__name__: "DEBUG", "tests": "DEBUG"},
+    )
 
 
 def pytest_generate_tests(metafunc: "Metafunc"):

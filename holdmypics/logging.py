@@ -10,12 +10,14 @@ from loguru import logger
 
 def config_logging(name: str, file_name: str, log_dir: Optional[Path], log_level: str):
     dictConfig({"version": 1})
+    logger.remove(0)
     fmt = (
         "[<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>] | "
         "<level>{level:<8}</level> | "
         "<blue>{name}</blue>:<cyan>{line}</cyan> - <bold>{message}</bold>"
     )
     handlers = [{"sink": sys.stderr, "format": fmt, "level": log_level}]
+    logger.add(sys.stderr, format=fmt, level=log_level)
     if log_dir is not None:
         log_dir = Path(os.path.realpath(log_dir))
         if log_dir.is_dir():
@@ -25,12 +27,20 @@ def config_logging(name: str, file_name: str, log_dir: Optional[Path], log_level
                     "sink": log_file,
                     "rotation": 3 * (1024 ** 2),
                     "level": "DEBUG",
-                    "filter": name,
+                    "filter": {name: "DEBUG"},
                     "compression": "tar.gz",
                     "retention": 5,
                 }
             )
-    logger.configure(handlers=handlers)
+            logger.add(
+                log_file,
+                rotation=3 * (1024 ** 2),
+                level="DEBUG",
+                filter={name: "DEBUG"},
+                compression="tar.gz",
+                retention=5,
+            )
+    # logger.configure(handlers=handlers)
 
 
 def log_request(res: Response):
