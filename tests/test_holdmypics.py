@@ -4,6 +4,7 @@ import random
 from typing import Optional
 from urllib.parse import urlencode
 
+import pytesseract
 import pytest
 from cytoolz import valfilter
 from flask import Flask, Response
@@ -144,4 +145,7 @@ def test_just_run_once(client: FlaskClient, random_text: bool):
     assert im.size == (638, 328)
     if random_text:
         headers = res.headers
-        assert headers.get("X-Random-Text") is not None
+        from_header = headers.get("X-Random-Text")
+        assert from_header is not None
+        from_ocr = pytesseract.image_to_string(im)
+        assert from_ocr == from_header

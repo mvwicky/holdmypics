@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "holdmypics"
-version = "0.15.1"
+version = "0.15.2"
 description = ""
 authors = ["Michael Van Wickle <mvanwickle@gmail.com>"]
 
@@ -34,6 +34,7 @@ pytest-cov = "^2.8.1"
 pytest-html = "^2.0.0"
 pytest-selenium = "^1.17.0"
 toml = "^0.10.0"
+pytesseract = "^0.3.4"
 
 [tool.poetry.scripts]
 

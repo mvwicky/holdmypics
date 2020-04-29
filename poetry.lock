@@ -598,6 +598,17 @@ version = "2.4.7"
 
 [[package]]
 category = "dev"
+description = "Python-tesseract is a python wrapper for Google's Tesseract-OCR"
+name = "pytesseract"
+optional = false
+python-versions = "*"
+version = "0.3.4"
+
+[package.dependencies]
+Pillow = "*"
+
+[[package]]
+category = "dev"
 description = "pytest: simple powerful testing with Python"
 name = "pytest"
 optional = false
@@ -915,7 +926,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "377eab5528608f4f10bf706ebba9b4ab87cfb0987720208833ea75104d4c0104"
+content-hash = "8e636f573adff932736b0ca24dcacdba357b070a090ba1dd20450c1564c505ef"
 python-versions = "^3.6.1"
 
 [metadata.files]
@@ -1264,6 +1275,9 @@ pygments = [
 pyparsing = [
     {file = "pyparsing-2.4.7-py2.py3-none-any.whl", hash = "sha256:ef9d7589ef3c200abe66653d3f1ab1033c3c419ae9b9bdb1240a85b024efc88b"},
     {file = "pyparsing-2.4.7.tar.gz", hash = "sha256:c203ec8783bf771a155b207279b9bccb8dea02d8f0c9e5f8ead507bc3246ecc1"},
+]
+pytesseract = [
+    {file = "pytesseract-0.3.4.tar.gz", hash = "sha256:afd8a5cdf8ab5d35690efbe71cbf5f89419f668ea8dde7649149815d5c5a899a"},
 ]
 pytest = [
     {file = "pytest-5.4.1-py3-none-any.whl", hash = "sha256:0e5b30f5cb04e887b91b1ee519fa3d89049595f428c1db76e73bd7f17b09b172"},

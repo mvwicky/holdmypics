@@ -10,7 +10,10 @@ from loguru import logger
 
 def config_logging(name: str, file_name: str, log_dir: Optional[Path], log_level: str):
     dictConfig({"version": 1})
-    logger.remove(0)
+    try:
+        logger.remove(0)
+    except Exception:
+        pass
     fmt = (
         "[<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>] | "
         "<level>{level:<8}</level> | "

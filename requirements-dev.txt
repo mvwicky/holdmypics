@@ -294,6 +294,8 @@ pygments==2.6.1 \
 pyparsing==2.4.7 \
     --hash=sha256:ef9d7589ef3c200abe66653d3f1ab1033c3c419ae9b9bdb1240a85b024efc88b \
     --hash=sha256:c203ec8783bf771a155b207279b9bccb8dea02d8f0c9e5f8ead507bc3246ecc1
+pytesseract==0.3.4 \
+    --hash=sha256:afd8a5cdf8ab5d35690efbe71cbf5f89419f668ea8dde7649149815d5c5a899a
 pytest==5.4.1 \
     --hash=sha256:0e5b30f5cb04e887b91b1ee519fa3d89049595f428c1db76e73bd7f17b09b172 \
     --hash=sha256:84dde37075b8805f3d1f392cc47e38a0e59518fb46a431cfdaf7cf1ce805f970

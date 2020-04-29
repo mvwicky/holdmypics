@@ -7,6 +7,9 @@ loglevel = "info"
 _host, _port = env("HOST", default="0.0.0.0"), env.int("PORT", default=8080)
 bind = ["{0}:{1}".format(_host, _port)]
 
+keyfile = env("KEYFILE", default=None)
+certfile = env("CERTFILE", default=None)
+
 worker_class = "gthread"
 workers = env.int("WEB_CONCURRENCY", default=1)
 worker_connections = env.int("WORKER_CONNECTIONS", default=100)

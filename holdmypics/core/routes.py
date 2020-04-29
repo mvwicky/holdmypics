@@ -13,6 +13,8 @@ from ..utils import config_value, make_rules
 from . import bp
 
 RULE_RE = re.compile(r"(?:col:|any)")
+ROBOTS = """User-agent: *
+Disallow: /api/"""
 
 
 @functools.lru_cache(maxsize=2)
@@ -88,3 +90,9 @@ def index() -> ResponseType:
     get_context.cache_clear()
     context = merge(get_context(), {"count": redisw.client.get(COUNT_KEY).decode()})
     return render_template("index.jinja", **context)
+
+
+@bp.route("/robots.txt")
+def robots() -> ResponseType:
+    headers = {"Content-Type": "text/plain", "Cache-Control": "public, max-age=86400"}
+    return ROBOTS, 200, headers
