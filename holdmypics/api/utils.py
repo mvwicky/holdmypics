@@ -10,6 +10,7 @@ from PIL.ImageFont import ImageFont
 from .._types import Dimension
 from ..constants import PX_PER_PT
 from ..fonts import fonts
+from ..utils import profile
 
 
 class FontParams(NamedTuple):
@@ -92,6 +93,7 @@ def get_font(
     return FontParams(font, tsize)
 
 
+@profile
 def draw_text(im: Image.Image, args: TextArgs) -> Image.Image:
     w, h = im.size
     d = ImageDraw.Draw(im)

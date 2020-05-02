@@ -1,10 +1,13 @@
 import re
 import time
+from functools import partial
 from pathlib import Path
+from typing import Optional
 
-from flask import Flask, request, send_from_directory
+from flask import Flask, Response, request, send_from_directory
 from flask_redis import FlaskRedis
 from loguru import logger
+from werkzeug.debug import DebuggedApplication
 from whitenoise import WhiteNoise
 
 from config import Config
@@ -42,15 +45,7 @@ def immutable_file_test(path: str, url: str) -> bool:
     return is_immutable
 
 
-def create_app(config_class=Config):
-    log_file_name = config_class.LOG_FILE_NAME or __name__
-    config_logging(
-        __name__, log_file_name, config_class.LOG_DIR, config_class.LOG_LEVEL
-    )
-
-    app = Flask(__name__)
-    app.config.from_object(config_class)
-
+def configure_hsts(app: Flask):
     hsts_seconds = app.config.get("HSTS_SECONDS", 0)
     hsts_preload = app.config.get("HSTS_PRELOAD", False)
     include_sub = app.config.get("HSTS_INCLUDE_SUBDOMAINS", False)
@@ -60,9 +55,38 @@ def create_app(config_class=Config):
             "includeSubDomains" if include_sub else False,
             "preload" if hsts_preload else False,
         ]
-        HSTS_HEADER = "; ".join(filter(bool, parts))
+        return "; ".join(filter(bool, parts))
     else:
-        HSTS_HEADER = None
+        return None
+
+
+def after_request_callback(hsts_header: Optional[str], res: Response):
+    log_request(res)
+    endpoint = request.endpoint
+    if endpoint == "core.index":
+        res.headers["Cache-Control"] = "max-age=0, no-store"
+    elif endpoint == "static":
+        name = request.path.split("/")[-1]
+        parts = name.split(".")
+        if len(parts) == 3:
+            res.headers["Cache-Control"] = CACHE_CONTROL_MAX
+
+    if hsts_header is not None:
+        res.headers["Strict-Transport-Security"] = hsts_header
+    res.headers["X-Powered-By"] = "Flask"
+    elapsed = time.monotonic() - request.start_time
+    res.headers["X-Processing-Time"] = elapsed
+    return res
+
+
+def create_app(config=Config):
+    log_file_name = config.LOG_FILE_NAME or __name__
+    config_logging(__name__, log_file_name, config.LOG_DIR, config.LOG_LEVEL)
+
+    app = Flask(__name__)
+    app.config.from_object(config)
+
+    HSTS_HEADER = configure_hsts(app)
 
     app.url_map.redirect_defaults = False
     app.url_map.converters.update({"dim": DimensionConverter, "col": ColorConverter})
@@ -87,29 +111,14 @@ def create_app(config_class=Config):
     app.wsgi_app.add_files(str(HERE / "static"), prefix="static/")
     app.wsgi_app.add_files(str(base_path / "static"), prefix="static/")
 
+    if config.DEBUG:
+        app.wsgi_app = DebuggedApplication(app.wsgi_app, evalex=True)
+
     @app.before_request
     def before_request_cb():
         request.start_time = time.monotonic()
 
-    @app.after_request
-    def after_request_cb(res):
-        log_request(res)
-        endpoint = request.endpoint
-        if endpoint == "core.index":
-            res.headers["Cache-Control"] = "max-age=0, no-store"
-        elif endpoint == "static":
-            name = request.path.split("/")[-1]
-            parts = name.split(".")
-            if len(parts) == 3:
-                res.headers["Cache-Control"] = CACHE_CONTROL_MAX
-
-        if HSTS_HEADER is not None:
-            res.headers["Strict-Transport-Security"] = HSTS_HEADER
-        res.headers["X-Powered-By"] = "Flask"
-        elapsed = time.monotonic() - request.start_time
-        res.headers["X-Processing-Time"] = elapsed
-
-        return res
+    app.after_request(partial(after_request_callback, HSTS_HEADER))
 
     @app.route("/favicon.ico")
     def _favicon_route():

@@ -26,6 +26,7 @@ def config_fixture(tmp_path_factory: "TempPathFactory"):
     from config import Config
 
     image_dir = tmp_path_factory.mktemp("holdmypics-images")
+    logger.info("Image dir: {0}", image_dir)
 
     class TestConfig(Config):
         DEBUG = False

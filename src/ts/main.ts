@@ -5,7 +5,9 @@ import { debounce } from "./debounce";
 import { replaceIcons } from "./icons";
 import { rIC } from "./idle";
 
-const log = PRODUCTION ? (...args: any[]) => {} : console.log.bind(console);
+const log = PRODUCTION
+  ? console.debug.bind(console)
+  : console.debug.bind(console);
 
 function getClipboard() {
   return import(/* webpackChunkName: "clipboard" */ "clipboard");

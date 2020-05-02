@@ -6,6 +6,7 @@ from urllib.parse import urlencode
 
 import pytesseract
 import pytest
+from loguru import logger
 from cytoolz import valfilter
 from flask import Flask, Response
 from flask.testing import FlaskClient
@@ -148,4 +149,5 @@ def test_just_run_once(client: FlaskClient, random_text: bool):
         from_header = headers.get("X-Random-Text")
         assert from_header is not None
         from_ocr = pytesseract.image_to_string(im)
+        logger.info("Got text from OCR: {0}", from_ocr)
         assert from_ocr == from_header

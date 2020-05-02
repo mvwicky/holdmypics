@@ -13,14 +13,16 @@ def config_logging(name: str, file_name: str, log_dir: Optional[Path], log_level
     try:
         logger.remove(0)
     except Exception:
-        pass
-    fmt = (
-        "[<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>] | "
-        "<level>{level:<8}</level> | "
-        "<blue>{name}</blue>:<cyan>{line}</cyan> - <bold>{message}</bold>"
-    )
+        return
+    fmt_parts = [
+        "<level>{level:<8}</level>",
+        "<blue>{name}</blue>:<cyan>{line}</cyan> - <bold>{message}</bold>",
+    ]
+    if True:  # TODO: Change this to a locality test
+        fmt_parts.insert(0, "[<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>]")
+    fmt = " | ".join(fmt_parts)
     handlers = [{"sink": sys.stderr, "format": fmt, "level": log_level}]
-    logger.add(sys.stderr, format=fmt, level=log_level)
+    logger.add(sys.stderr, format=fmt, level=log_level, filter={"": True})
     if log_dir is not None:
         log_dir = Path(os.path.realpath(log_dir))
         if log_dir.is_dir():
@@ -30,7 +32,7 @@ def config_logging(name: str, file_name: str, log_dir: Optional[Path], log_level
                     "sink": log_file,
                     "rotation": 3 * (1024 ** 2),
                     "level": "DEBUG",
-                    "filter": {name: "DEBUG"},
+                    "filter": {name: "DEBUG", "plugin": "DEBUG", "tests": "DEBUG"},
                     "compression": "tar.gz",
                     "retention": 5,
                 }

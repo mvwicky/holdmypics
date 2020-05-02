@@ -9,6 +9,7 @@ from PIL import Image
 from .. import redisw
 from .._types import Dimension
 from ..constants import COUNT_KEY
+from ..utils import profile
 from .args import ImageArgs
 from .files import files
 from .utils import TextArgs, draw_text, get_color
@@ -23,6 +24,7 @@ opt_kw: Dict[str, Callable[[ImageArgs], Dict[str, OptValues]]] = {
 }
 
 
+@profile
 def make_image(
     size: Dimension, bg_color: str, fg_color: str, fmt: str, args: ImageArgs
 ) -> Image.Image:
@@ -40,6 +42,7 @@ def make_image(
     return im
 
 
+@profile
 def save_image(
     size: Dimension, bg_color: str, fg_color: str, fmt: str, args: ImageArgs
 ) -> str:
@@ -60,6 +63,7 @@ def save_image(
         if kw_func is not None:  # pragma: no cover
             save_kw.update(kw_func(args))
         im.save(path, **save_kw)
+        im.close()
         sz = naturalsize(os.path.getsize(path), format="%.3f")
         logger.info("Created new file ({0})", sz)
         redisw.client.incr(COUNT_KEY)

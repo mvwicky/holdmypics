@@ -6,6 +6,21 @@ from flask import current_app
 from .constants import bg_color_default, fg_color_default, fmt_default, img_formats_str
 from .exceptions import ImproperlyConfigured
 
+try:
+    from memory_profiler import profile
+except ImportError:
+
+    def profile(f=None):
+        if f is None:
+
+            def inner(f):
+                return f
+
+            return inner
+
+        return f
+
+
 _T = TypeVar("_T")
 
 _UNSET = object()
