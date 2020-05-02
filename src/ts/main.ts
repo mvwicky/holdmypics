@@ -18,7 +18,11 @@ function getTippy() {
 }
 
 function getRand() {
-  return import(/* webpackChunkName: "random-text" */ "./random-text");
+  return import(
+    /* webpackChunkName: "random-text" */
+    /* webpackMode: "eager" */
+    "./random-text"
+  );
 }
 
 const ARGS = ["width", "height", "bg", "fg", "fmt", "imageText", "font"];

@@ -68,12 +68,15 @@ const configureBabel = () => {
             debug: false,
             useBuiltIns: "usage",
             targets: { esmodules: true },
+            exclude: ["@babel/plugin-transform-template-literals"],
+            bugfixes: true,
           },
         ],
         "@babel/typescript",
       ],
       plugins: [
-        ["@babel/plugin-transform-runtime", { useESModules: true }],
+        "@babel/proposal-class-properties",
+        "@babel/plugin-transform-classes",
         "@babel/proposal-object-rest-spread",
       ],
       parserOpts: {
@@ -194,18 +197,22 @@ const config: webpack.Configuration = {
               shebang: false,
             },
             compress: {
-              drop_console: true,
+              drop_console: false,
               drop_debugger: true,
-              ecma: 2016,
-              passes: 2,
+              ecma: 2018,
+              passes: 1,
               global_defs: {
                 PRODUCTION: true,
               },
+              keep_fnames: true,
             },
             output: {
               comments: false,
               ecma: 2016,
               indent_level: 2,
+            },
+            mangle: {
+              keep_fnames: true,
             },
           },
         })
