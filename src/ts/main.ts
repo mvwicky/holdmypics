@@ -4,10 +4,7 @@ import { truthy, elemIsTag, assertIsTag } from "./utils";
 import { debounce } from "./debounce";
 import { replaceIcons } from "./icons";
 import { rIC } from "./idle";
-
-const log = PRODUCTION
-  ? console.debug.bind(console)
-  : console.debug.bind(console);
+import { log } from "./log";
 
 function getClipboard() {
   return import(/* webpackChunkName: "clipboard" */ "clipboard");
@@ -156,9 +153,9 @@ function initIcons(btn: HTMLButtonElement) {
   const copyIconEl = btn.querySelector<HTMLElement>(".feather-copy");
   const checkIconEl = btn.querySelector<HTMLElement>(".feather-check");
   if (truthy(copyIconEl) && truthy(checkIconEl)) {
+    log("Everything seems to exist.");
     afterFeather(btn, copyIconEl, checkIconEl);
   }
-  log("Everything seems to exist.");
 }
 
 async function afterFeather(

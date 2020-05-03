@@ -159,6 +159,7 @@ const config: webpack.Configuration = {
             loader: "html-loader",
             options: {
               attributes: false,
+              minimize: false,
             },
           },
         ],

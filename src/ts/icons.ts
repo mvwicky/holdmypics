@@ -3,6 +3,7 @@ import copySvg from "Feather/copy.svg";
 import refreshCwSvg from "Feather/refresh-cw.svg";
 
 import { truthy, getAttrs } from "./utils";
+import { log } from "./log";
 
 const ICON_CONTENTS: Map<string, string> = new Map([
   ["check", checkSvg],
@@ -17,6 +18,7 @@ function replaceIcon(element: HTMLElement) {
   delete attrs["class"];
   const cts = ICON_CONTENTS.get(iconName);
   if (truthy(cts)) {
+    log(`Replacing ${iconName}`);
     const svgDoc = new DOMParser().parseFromString(cts, "image/svg+xml");
     const svgElem = svgDoc.querySelector("svg");
     if (truthy(svgElem)) {
