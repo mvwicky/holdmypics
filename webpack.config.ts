@@ -99,10 +99,6 @@ const configureStyles = () => {
     },
     {
       loader: "postcss-loader",
-      options: {
-        sourceMap: true,
-        plugins: [autoprefixer({ flexbox: "no-2009" })],
-      },
     },
     {
       loader: "sass-loader",

@@ -4,7 +4,7 @@ from logging.config import dictConfig
 from pathlib import Path
 from typing import Optional
 
-from flask import request, Response
+from flask import Response, request
 from loguru import logger
 
 
@@ -18,7 +18,7 @@ def config_logging(name: str, file_name: str, log_dir: Optional[Path], log_level
         "<level>{level:<8}</level>",
         "<blue>{name}</blue>:<cyan>{line}</cyan> - <bold>{message}</bold>",
     ]
-    if True:  # TODO: Change this to a locality test
+    if log_dir is not None:  # TODO: Change this to a locality test
         fmt_parts.insert(0, "[<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>]")
     fmt = " | ".join(fmt_parts)
     handlers = [{"sink": sys.stderr, "format": fmt, "level": log_level}]
@@ -57,5 +57,6 @@ def log_request(res: Response):
     path = request.path
     if request.query_string:
         path = "?".join([path, request.query_string.decode()])
-    content_length = res.headers.get("Content-Length", 0)
-    logger.log(level, "{0} - {1} - {2}", path, res.status_code, content_length)
+    content_length = res.headers.get("Content-Length", 0, type=int)
+    msg = "{0} status={1} content-length={2:,} addr={3}"
+    logger.log(level, msg, path, res.status_code, content_length, request.remote_addr)
