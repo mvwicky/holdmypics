@@ -11,7 +11,9 @@
     "build:dev": "cross-env NODE_ENV=development webpack --config webpack.config.ts --progress",
     "build:prod": "cross-env NODE_ENV=production webpack --config webpack.config.ts --progress",
     "watch": "yarn run build:dev --watch",
-    "test": "ts-node bin/run-tests.ts"
+    "test": "ts-node bin/run-tests.ts",
+    "dev": "cross-env NODE_ENV=development webpack --config webpack.config.ts --progress",
+    "prod": "cross-env NODE_ENV=production webpack --config webpack.config.ts --progress"
   },
   "prettier": {
     "arrowParens": "always",
@@ -37,6 +39,7 @@
     "@babel/preset-env": "^7.8.3",
     "@babel/preset-typescript": "^7.8.3",
     "@cypress/webpack-preprocessor": "^5.1.1",
+    "@fullhuman/postcss-purgecss": "^2.2.0",
     "@popperjs/core": "^2.0.6",
     "@types/autoprefixer": "^9.7.1",
     "@types/clipboard": "^2.0.1",

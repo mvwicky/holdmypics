@@ -4,8 +4,10 @@ from logging.config import dictConfig
 from pathlib import Path
 from typing import Optional
 
-from flask import Response, request
+from flask import Request, Response, request
 from loguru import logger
+
+req: Request = request
 
 
 def config_logging(name: str, file_name: str, log_dir: Optional[Path], log_level: str):
@@ -54,9 +56,11 @@ def log_request(res: Response):
         level = "WARNING"
     else:
         level = "INFO"
-    path = request.path
-    if request.query_string:
-        path = "?".join([path, request.query_string.decode()])
+    path = req.path
+    if req.query_string:
+        path = "?".join([path, req.query_string.decode()])
+    addrs: str = req.headers.get("X-Forwarded-For", req.remote_addr)
+    addr = addrs.split(",")[-1]
     content_length = res.headers.get("Content-Length", 0, type=int)
     msg = "{0} status={1} content-length={2:,} addr={3}"
-    logger.log(level, msg, path, res.status_code, content_length, request.remote_addr)
+    logger.log(level, msg, path, res.status_code, content_length, addr)

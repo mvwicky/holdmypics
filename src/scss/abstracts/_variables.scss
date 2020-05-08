@@ -79,6 +79,3 @@ $space: (
   7: modular-scale(8),
   8: modular-scale(10),
 );
-// @each $idx, $value in $space {
-//   @debug "#{$idx} -> #{$value}";
-// }

@@ -33,17 +33,20 @@
       <code id="endpoint">
         <a id="endpoint-url" href="{{ image_url }}" target="_blank" rel="noreferrer noopener">{{ image_url }}</a>
       </code>
+
+    </div>
+    <div class="row justify-content-center align-items-center">
       <button
         id="copy-button"
         data-clipboard-text="{{ image_url }}"
         aria-label="Copied to clipboard!"
         disabled
+        title="Copy to clipboard."
       >
         <i data-icon="copy" title="Copy to clipboard."></i>
         <i class="d-none" data-icon="check" title="Copied"></i>
       </button>
-    </div>
-    <div class="row justify-content-between">
+      <span class="ml-2">Copy to clipboard</span>
     </div>
   </div>
 
@@ -121,7 +124,7 @@
       <div class="form-group">
         <label for="font">Font</label>
         <div class="input-group">
-          <select name="font" id="font">
+          <select class="query" name="font" id="font">
             <option value=""></option>
             {% for value, name in font_names %}
             {% if value == font %}
@@ -136,16 +139,19 @@
       </div>
       <div class="form-group">
         <label for="imageText">Text</label>
-        <div class="input-group text-input">
-          <input id="imageText" type="text" value="{{ text }}" maxlength="30">
-          <input
-            type="checkbox"
-            name="randomText"
-            id="randomText"
-            aria-label="Randomize text."
-          >
+        <div class="input-group">
+          <div class="text-input" style="flex-basis: 100%;">
+            <input class="query" id="imageText" type="text" value="{{ text }}" maxlength="30">
+            <input
+              class="query"
+              type="checkbox"
+              name="randomText"
+              id="randomText"
+              aria-label="Randomize text."
+            >
+          </div>
+          <small class="help-text ml-auto">Randomize text.</small>
         </div>
-
       </div>
       <div class="form-group d-none">
         <label for="seed">Seed</label>

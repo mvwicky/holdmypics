@@ -25,14 +25,16 @@ input[type="text"] {
 
 .text-input {
   align-items: center;
+  display: flex;
   flex-direction: row;
   justify-content: space-between;
   & > input {
     flex-basis: auto;
   }
-  & > #random-text {
+  #randomText {
     flex-grow: 0;
-    @include m-space("right", 2);
+    @include m-space("right", 0);
+    @include m-space("left", 2);
   }
 }
 
@@ -54,11 +56,12 @@ input[type="text"] {
     }
   }
   & > input,
-  .input-group {
+  & > .input-group {
     flex-basis: 100%;
     flex-grow: 0;
     @include mq($from: "md") {
       flex-basis: 50%;
+      flex-wrap: wrap;
     }
   }
 }

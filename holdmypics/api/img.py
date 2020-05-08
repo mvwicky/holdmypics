@@ -42,7 +42,6 @@ def make_image(
     return im
 
 
-@profile
 def save_image(
     size: Dimension, bg_color: str, fg_color: str, fmt: str, args: ImageArgs
 ) -> str:

@@ -15,4 +15,5 @@
   flex-direction: row;
   justify-content: center;
   width: 100%;
+  @include m-space("bottom", 2);
 }
