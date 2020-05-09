@@ -1,16 +1,19 @@
 import imghdr
 import io
+import os
 import random
 from typing import Optional
 from urllib.parse import urlencode
 
 import pytesseract
 import pytest
-from loguru import logger
 from cytoolz import valfilter
 from flask import Flask, Response
 from flask.testing import FlaskClient
+from loguru import logger
 from PIL import Image
+
+SKIP_INDEX = os.environ.get("TESTS_SKIP_INDEX", None) is not None
 
 
 def random_color() -> str:
@@ -44,6 +47,7 @@ def make_url(
         return path
 
 
+@pytest.mark.skipif(SKIP_INDEX)
 def test_index(client):
     res = client.get("/")
     assert res.status_code == 200

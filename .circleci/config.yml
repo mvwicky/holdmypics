@@ -6,6 +6,7 @@ jobs:
         environment:
           POETRY_VIRTUALENVS_IN_PROJECT: "1"
           POETRY_VIRTUALENVS_CREATE: "1"
+          TESTS_SKIP_INDEX: "1"
       - image: circleci/redis:5.0.8-alpine
     steps:
       - checkout
