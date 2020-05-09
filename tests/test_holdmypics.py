@@ -47,7 +47,7 @@ def make_url(
         return path
 
 
-@pytest.mark.skipif(SKIP_INDEX)
+@pytest.mark.skipif(SKIP_INDEX, reason="Doesn't work.")
 def test_index(client):
     res = client.get("/")
     assert res.status_code == 200
