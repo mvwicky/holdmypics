@@ -1,9 +1,11 @@
 import "../scss/main.scss";
 
-import { truthy, elemIsTag, assertIsTag } from "./utils";
-import { debounce } from "./debounce";
+import { rIC } from "./dom/idle";
+import { assertIsTag } from "./helpers/assert-is-tag";
+import { truthy } from "./helpers/bools";
+import { debounce } from "./helpers/debounce";
+import { elemIsTag } from "./helpers/elem-is-tag";
 import { replaceIcons } from "./icons";
-import { rIC } from "./idle";
 import { log } from "./log";
 
 function getClipboard() {
@@ -22,7 +24,15 @@ function getRand() {
   );
 }
 
-const ARGS = ["width", "height", "bg", "fg", "fmt", "imageText", "font"];
+const ARGS: readonly string[] = [
+  "width",
+  "height",
+  "bg",
+  "fg",
+  "fmt",
+  "imageText",
+  "font",
+];
 
 function isEndpointArgs(input: {
   [k: string]: string;
@@ -72,7 +82,7 @@ function gatherParams(f: HTMLFormElement): Record<string, string> | null {
           params[elem.id] = elem.checked ? "on" : "";
         } else {
           const value = elem.value;
-          params[elem.id] = value && value.trim();
+          params[elem.id] = elem.disabled ? "" : value && value.trim();
         }
       } else {
         return null;

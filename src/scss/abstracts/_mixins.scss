@@ -5,7 +5,6 @@
 @import "../../../node_modules/rfs/scss.scss";
 
 @mixin font-scale($scale) {
-  // @debug "#{$scale} -> #{scale-value($scale)}";
   @include font-size(scale-value($scale));
 }
 

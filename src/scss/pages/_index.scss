@@ -3,7 +3,6 @@
 $h-spacing: 5rem;
 
 #params-form {
-  // background-color: map.get($grays, 10);
   border: 1px solid var(--border);
   @include p-short(3);
   @include m-space("x", 2);
@@ -31,10 +30,6 @@ $h-spacing: 5rem;
   }
 }
 
-.image-container {
-  @include m-space("bottom", 4);
-}
-
 #endpoint {
   @include m-space("bottom", 2);
   @include mq($from: "md") {
@@ -59,5 +54,14 @@ $h-spacing: 5rem;
   @include p-space("x", 2);
   @include mq($from: "md") {
     @include p-space("x", 0);
+  }
+}
+
+#example-image {
+  height: auto;
+  max-height: 100vh;
+  max-width: 100%;
+  @include mq($from: "md") {
+    max-height: 50vh;
   }
 }

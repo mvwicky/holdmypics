@@ -1,3 +1,5 @@
+/* eslint-env node */
+
 const autoprefixer = require("autoprefixer");
 const plugins = [autoprefixer({ flexbox: "no-2009" })];
 if (process.env.NODE_ENV === "production") {

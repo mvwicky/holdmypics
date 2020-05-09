@@ -1,6 +1,7 @@
+/* purgecss start ignore */
 .feather {
   align-self: center;
-  bottom: 0.1em;
+  bottom: 1px;
   height: var(--feather-size, 1em);
   margin-left: 0.1em;
   position: relative;
@@ -8,17 +9,24 @@
   vertical-align: middle;
   width: var(--feather-size, 1em);
 }
+/* purgecss end ignore */
 
 #copy-button {
+  align-items: center;
   border-radius: 5px;
-  @include sz(2rem);
+  cursor: pointer;
+  display: flex;
+  height: 2rem;
+  justify-content: space-around;
   &:disabled {
     --feather-stroke: hsl(0, 0%, 73%);
+    cursor: default;
   }
   &:not(:disabled) {
     &:hover {
       --feather-stroke: hsl(0, 0%, 100%);
       background-color: hsl(210, 100%, 56%);
+      color: var(--feather-stroke);
     }
   }
 }

@@ -1,4 +1,4 @@
-import { elemIsTag } from "./utils";
+import { elemIsTag } from "./helpers/elem-is-tag";
 
 export function initRandomText() {
   const txtInp = document.getElementById("imageText");

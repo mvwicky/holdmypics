@@ -17,46 +17,48 @@
   </div>
 
   {% set image_url = img_url ~ "?" ~ img_query %}
-  <div class="image-container">
-    <div class="row justify-content-center">
-      <img
-        id="example-image"
-        src="{{ image_url }}"
-        alt="Example image."
-        loading="lazy"
-        width="{{ img_dim.0 }}"
-        height="{{ img_dim.1 }}"
-      >
-    </div>
-
-    <div class="row align-items-center justify-content-between endpoint-container">
-      <code id="endpoint">
-        <a id="endpoint-url" href="{{ image_url }}" target="_blank" rel="noreferrer noopener">{{ image_url }}</a>
-      </code>
-
-    </div>
-    <div class="row justify-content-center align-items-center">
-      <button
-        id="copy-button"
-        data-clipboard-text="{{ image_url }}"
-        aria-label="Copied to clipboard!"
-        disabled
-        title="Copy to clipboard."
-      >
-        <i data-icon="copy" title="Copy to clipboard."></i>
-        <i class="d-none" data-icon="check" title="Copied"></i>
-      </button>
-      <span class="ml-2">Copy to clipboard</span>
-    </div>
+  <div class="row justify-content-center mb-5">
+    <img
+      id="example-image"
+      src="{{ image_url }}"
+      alt="Example image."
+      loading="lazy"
+      width="{{ img_dim.0 }}"
+      height="{{ img_dim.1 }}"
+    >
   </div>
 
-  <div class="row d-none">
+  <div class="row align-items-center justify-content-center endpoint-container">
+    <code id="endpoint">
+      <a id="endpoint-url" href="{{ image_url }}" target="_blank" rel="noreferrer noopener">
+        {{ image_url }}
+      </a>
+    </code>
+  </div>
+
+  <div class="row justify-content-center align-items-center mb-6">
+    <button
+      id="copy-button"
+      data-clipboard-text="{{ image_url }}"
+      aria-label="Copied to clipboard!"
+      disabled
+      title="Copy image URL to clipboard."
+    >
+      <i data-icon="copy" title="Copy to clipboard."></i>
+      <i class="d-none" data-icon="check" title="Copied"></i>
+      <small class="ml-2">Copy to clipboard</small>
+    </button>
+  </div>
+  {# <div class="image-container mb-3">
+
+  </div> #}
+
+  {#<div class="row d-none">
     <div class="form-group">
       <label for="expand-form">Expand Form</label>
       <input id="expand-form" type="checkbox">
     </div>
-
-  </div>
+  </div>#}
 
   <div>
     <form id="params-form" action="">
@@ -67,7 +69,6 @@
             id="width"
             type="number"
             min="1"
-            max="{{ width }}"
             step="1"
             value="{{ width }}"
             required
@@ -165,8 +166,8 @@
 
   </div>
 
-  <div id="routes">
-    <h3>Routes:</h3>
+  <section id="routes">
+    <h3>Routes</h3>
     {% for rule in rules %}
     <p>
       <code>{{ rule|e }}</code>
@@ -183,7 +184,7 @@
         </p>
       </small>
     </div>
-  </div>
+  </section>
 </main>
 <div class="row">
   <footer>

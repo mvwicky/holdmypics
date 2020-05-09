@@ -21,17 +21,17 @@ class Config(object):
     LOG_LEVEL = env.log_level("LOG_LEVEL", default="INFO")
     MAX_AGE = env.int("MAX_AGE", default=86400)
 
-    HSTS_SECONDS = env.int("HSTS_SECONDS", default=0)
+    HSTS_SECONDS = env.int("HSTS_SECONDS", default=0, validate=[Range(min=0)])
     HSTS_INCLUDE_SUBDOMAINS = env.bool("HSTS_INCLUDE_SUBDOMAINS", default=False)
     HSTS_PRELOAD = env.bool("HSTS_PRELOAD", default=False)
 
-    SEND_FILE_MAX_AGE_DEFAULT = env.int("SEND_FILE_MAX_AGE_DEFAULT", default=86400)
-    IMAGE_CACHE_SIZE = env.int(
-        "IMAGE_CACHE_SIZE", default=128, validate=[Range(min=0, min_inclusive=True)]
+    SEND_FILE_MAX_AGE_DEFAULT = env.int(
+        "SEND_FILE_MAX_AGE_DEFAULT", default=86400, validate=[Range(min=0)]
     )
 
-    SAVED_IMAGES_MAX_NUM = env.int("SAVED_IMAGES_MAX_NUM", default=50)
-    SAVED_IMAGES_MAX_SIZE = env.int("SAVED_IMAGES_MAX_SIZE", default=1024)
+    SAVED_IMAGES_MAX_NUM = env.int(
+        "SAVED_IMAGES_MAX_NUM", default=50, validate=[Range(min=0)]
+    )
     SAVED_IMAGES_CACHE_DIR = env.path("SAVED_IMAGES_CACHE_DIR", default=_img_cache)
 
     SESSION_COOKIE_SECURE = env.bool("SESSION_COOKIE_SECURE", default=False)
@@ -44,3 +44,9 @@ class Config(object):
         "INDEX_DEFAULT_FG", default="555", validate=[Regexp(color_re)]
     )
     INDEX_TEXT = env("INDEX_TEXT", default="Something Funny")
+    INDEX_IMG_MAX_WIDTH = env.int(
+        "INDEX_IMG_MAX_WIDTH", default=8192, validate=[Range(min=1)]
+    )
+    INDEX_IMG_MAX_HEIGHT = env.int(
+        "INDEX_IMG_MAX_HEIGHT", default=4608, validate=[Range(min=1)]
+    )

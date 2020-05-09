@@ -51,9 +51,9 @@ declare module "*.svg" {
 }
 
 interface InputCallbackArgs {
-  form: HTMLFormElement;
-  endpoint: HTMLElement;
   btn: HTMLElement;
-  image: HTMLImageElement;
+  endpoint: HTMLElement;
+  form: HTMLFormElement;
   id: string;
+  image: HTMLImageElement;
 }
