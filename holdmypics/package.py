@@ -86,7 +86,9 @@ class Package(object):
         lock_data = toml.parse(self.lock_file.read_text())
         file_meta = lock_data["metadata"]["files"]
         for elem in lock_data["package"]:
-            if dev or elem["category"] != "dev":
+            dev_pkg = elem["category"] == "dev"
+            opt_pkg = elem["optional"]
+            if dev or not (dev_pkg or opt_pkg):
                 name = elem["name"]
                 yield Dependency.from_lock(elem, file_meta[name])
 
