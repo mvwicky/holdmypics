@@ -1,8 +1,7 @@
 import * as path from "path";
 import process from "process";
 
-import autoprefixer from "autoprefixer";
-import webpack, { CliConfigOptions } from "webpack";
+import webpack from "webpack";
 import * as Clean from "clean-webpack-plugin";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import HtmlWebpackPlugin from "html-webpack-plugin";

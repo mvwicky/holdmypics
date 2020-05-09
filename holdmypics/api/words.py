@@ -11,6 +11,7 @@ from ..utils import config_value
 none_attr = partial(attr.ib, default=None, init=False)
 
 word_path_parts = ["node_modules", "friendly-words", "generated", "words.json"]
+# https://unpkg.com/friendly-words@1.1.10/generated/words.json
 
 
 @attr.s(auto_attribs=True, slots=True)
