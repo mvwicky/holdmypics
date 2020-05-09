@@ -14,7 +14,7 @@ def pytest_addoption(parser: "Parser"):
         "--formats",
         nargs="+",
         choices=["webp", "png", "jpeg", "gif"],
-        default=["webp", "png", "jpeg"],
+        default=["png", "jpeg"],
         help="The image formats to test.",
         dest="image_formats",
     )
@@ -22,14 +22,14 @@ def pytest_addoption(parser: "Parser"):
         "--widths",
         nargs="+",
         type=int,
-        default=[100, 1000],
+        default=[4096],
         help="The width values to create.",
     )
     group.addoption(
         "--heights",
         nargs="+",
         type=int,
-        default=[100, 1000],
+        default=[2160],
         help="The height values to create.",
     )
     group.addoption(

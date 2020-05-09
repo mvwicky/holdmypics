@@ -16,7 +16,7 @@ jobs:
       - run:
           command: |
             sudo pip install poetry
-            poetry install --no-interaction
+            poetry install --no-interaction -E tests
       - save_cache:
           key: deps9-{{ .Branch }}-{{ checksum "poetry.lock" }}
           paths:

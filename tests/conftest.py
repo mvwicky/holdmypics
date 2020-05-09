@@ -42,7 +42,7 @@ def config_fixture(tmp_path_factory: "TempPathFactory"):
 def app(config):
     from holdmypics import create_app
 
-    app = create_app(config_class=config)
+    app = create_app(config)
 
     return app
 
