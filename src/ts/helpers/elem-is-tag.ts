@@ -1,8 +1,10 @@
 export type TagMap = HTMLElementTagNameMap;
 
-export function elemIsTag<K extends keyof TagMap>(
-  elem: Node | null | undefined,
-  tag: K
+function elemIsTag<K extends keyof TagMap>(
+  tag: K,
+  elem: NodeMaybe
 ): elem is TagMap[K] {
   return elem?.nodeName?.toUpperCase() === tag.toUpperCase();
 }
+
+export { elemIsTag };

@@ -1,0 +1,10 @@
+env:
+  mocha: true
+globals:
+  cy: readonly
+  expect: readonly
+
+extends:
+  - plugin:cypress/recommended
+plugins:
+  - cypress

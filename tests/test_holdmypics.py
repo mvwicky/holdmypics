@@ -155,3 +155,14 @@ def test_just_run_once(client: FlaskClient, random_text: bool):
         from_ocr = pytesseract.image_to_string(im)
         logger.info("Got text from OCR: {0}", from_ocr)
         assert from_ocr == from_header
+
+
+def test_forwarding_headers(client: FlaskClient):
+    path = make_route(638, 328, "cef", "555", "png")
+    args = {"text": "Some Random Text"}
+    query = urlencode(args)
+    url = "?".join([path, query])
+    forwarded = "123.45.4.2,123.45.4.2"
+    res: Response = client.get(url, headers=[("X-Forwarded-For", forwarded)])
+    was_forwarded = res.headers.get("X-Was-Forwarded-For", None)
+    assert was_forwarded == forwarded

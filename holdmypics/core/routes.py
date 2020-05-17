@@ -1,5 +1,5 @@
-import re
 import functools
+import re
 from urllib.parse import urlencode
 
 from cytoolz import merge
@@ -21,13 +21,13 @@ Disallow: /api/"""
 def get_context() -> dict:
     paths = (p for (p, _) in make_rules())
     rules = [RULE_RE.sub("", p) for p in paths]
-    # rules = [p.replace("col:", "").replace("any", "") for p in paths]
 
     width, height = 638, 328
-    bg_color, fg_color = "cef", "555"
-    bg_color = config_value("INDEX_DEFAULT_BG")
-    fg_color = config_value("INDEX_DEFAULT_FG")
-    fmt = "png"
+    max_width = config_value("INDEX_IMG_MAX_WIDTH")
+    max_height = config_value("INDEX_IMG_MAX_HEIGHT")
+    bg_color = config_value("INDEX_DEFAULT_BG", "cef")
+    fg_color = config_value("INDEX_DEFAULT_FG", "555")
+    fmt = config_value("INDEX_DEFAULT_FORMAT", "png")
     text = config_value("INDEX_TEXT")
     font = "overpass"
     img_url = url_for(
@@ -82,13 +82,20 @@ def get_context() -> dict:
         "img_dim": (width, height),
         "ofl_license": ofl_license,
         "apache_license": apache_license,
+        "max_width": max_width,
+        "max_height": max_height,
     }
 
 
 @bp.route("/")
 def index() -> ResponseType:
     get_context.cache_clear()
-    context = merge(get_context(), {"count": redisw.client.get(COUNT_KEY).decode()})
+    count = redisw.client.get(COUNT_KEY).decode()
+    try:
+        count = int(count)
+    except ValueError:
+        count = 0
+    context = merge(get_context(), {"count": f"{count:,}"})
     return render_template("index.jinja", **context)
 
 

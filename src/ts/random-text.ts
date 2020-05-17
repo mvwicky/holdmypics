@@ -3,7 +3,7 @@ import { elemIsTag } from "./helpers/elem-is-tag";
 export function initRandomText() {
   const txtInp = document.getElementById("imageText");
   const randInp = document.getElementById("randomText");
-  if (elemIsTag(txtInp, "input") && elemIsTag(randInp, "input")) {
+  if (elemIsTag("input", txtInp) && elemIsTag("input", randInp)) {
     addListener(txtInp, randInp);
   }
 }

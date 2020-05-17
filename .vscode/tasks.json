@@ -7,6 +7,14 @@
       "label": "echo",
       "type": "shell",
       "command": "echo ${env:PYENV_ROOT}"
+    },
+    {
+      "type": "npm",
+      "script": "build",
+      "group": "build",
+      "problemMatcher": [],
+      "label": "npm: build",
+      "detail": "cross-env NODE_ENV=production webpack --config webpack.config.ts"
     }
   ]
 }

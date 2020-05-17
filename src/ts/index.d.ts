@@ -7,6 +7,9 @@ type RequestIdleCallbackDeadline = {
   timeRemaining: () => number;
 };
 
+type FormInput = HTMLInputElement | HTMLSelectElement;
+type NodeMaybe = Node | null | undefined;
+
 interface MakeEndpointArgs {
   [k: string]: string;
   width: string;

@@ -2,14 +2,7 @@ import * as path from "path";
 
 import cypress from "cypress";
 
-const spec = path.join(
-  path.dirname(__dirname),
-  "cypress",
-  "integration",
-  "index.spec.ts"
-);
+const root = path.dirname(__dirname);
+const spec = path.join(root, "cypress", "integration", "index.spec.ts");
 
-cypress.run({
-  record: false,
-  spec,
-});
+cypress.run({ record: false, spec });

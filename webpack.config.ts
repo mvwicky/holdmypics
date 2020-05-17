@@ -1,10 +1,12 @@
+/* eslint-env node */
+
 import * as path from "path";
 import process from "process";
 
-import webpack from "webpack";
 import * as Clean from "clean-webpack-plugin";
-import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import HtmlWebpackPlugin from "html-webpack-plugin";
+import MiniCssExtractPlugin from "mini-css-extract-plugin";
+import webpack from "webpack";
 
 import OptimizeCSSPlugin = require("optimize-css-assets-webpack-plugin");
 import TerserPlugin = require("terser-webpack-plugin");
@@ -52,44 +54,49 @@ const templatesDir = path.join(rootDir, "core", "templates");
 
 const publicPath = "/static/dist/";
 
-const configureBabel = () => {
-  return {
-    loader: "babel-loader",
-    options: {
-      cacheDirectory: prodOr(false, path.resolve(__dirname, ".cache", "babel")),
-      cacheCompression: true,
-      exclude: /node_modules/,
-      presets: [
-        [
-          "@babel/preset-env",
-          {
-            corejs: { version: 3, proposals: true },
-            debug: false,
-            useBuiltIns: "usage",
-            targets: { esmodules: true },
-            exclude: ["@babel/plugin-transform-template-literals"],
-            bugfixes: true,
-          },
+function configureBabel(): webpack.RuleSetUseItem[] {
+  return [
+    {
+      loader: require.resolve("babel-loader"),
+      options: {
+        cacheDirectory: prodOr(
+          false,
+          path.resolve(__dirname, ".cache", "babel")
+        ),
+        cacheCompression: true,
+        exclude: /node_modules/,
+        presets: [
+          [
+            "@babel/preset-env",
+            {
+              corejs: { version: "3.6", proposals: true },
+              debug: false,
+              useBuiltIns: "usage",
+              targets: { esmodules: true },
+              exclude: ["@babel/plugin-transform-template-literals"],
+              bugfixes: true,
+            },
+          ],
+          "@babel/typescript",
         ],
-        "@babel/typescript",
-      ],
-      plugins: [
-        "@babel/proposal-class-properties",
-        "@babel/plugin-transform-classes",
-        "@babel/proposal-object-rest-spread",
-      ],
-      parserOpts: {
-        strictMode: true,
+        plugins: [
+          "@babel/proposal-class-properties",
+          "@babel/plugin-transform-classes",
+          "@babel/proposal-object-rest-spread",
+        ],
+        parserOpts: {
+          strictMode: true,
+        },
       },
     },
-  };
-};
+  ];
+}
 
-const configureStyles = () => {
+function configureStyles(): webpack.RuleSetUseItem[] {
   return [
     MiniCssExtractPlugin.loader,
     {
-      loader: "css-loader",
+      loader: require.resolve("css-loader"),
       options: {
         importLoaders: 2,
         sourceMap: prod,
@@ -97,10 +104,10 @@ const configureStyles = () => {
       },
     },
     {
-      loader: "postcss-loader",
+      loader: require.resolve("postcss-loader"),
     },
     {
-      loader: "sass-loader",
+      loader: require.resolve("sass-loader"),
       options: {
         implementation: require("sass"),
         sassOptions: {
@@ -109,21 +116,10 @@ const configureStyles = () => {
       },
     },
   ];
-};
+}
 
-const config: webpack.Configuration = {
-  entry: pkg.entry,
-  output: {
-    filename: `[name].[contenthash:${hashlength}].js`,
-    path: outPath,
-    hashFunction: hashFn,
-    hashDigestLength: 64,
-    publicPath,
-    pathinfo: !prod,
-  },
-  devtool: prodOr("source-map", "cheap-module-eval-source-map"),
-  mode: prodOr("production", "development"),
-  plugins: [
+function configurePlugins(): webpack.Plugin[] {
+  return [
     new Clean.CleanWebpackPlugin(cleanOpts),
     new MiniCssExtractPlugin({
       filename: `style.[name].[contenthash:${hashlength}].css`,
@@ -139,19 +135,35 @@ const config: webpack.Configuration = {
     new webpack.DefinePlugin({
       PRODUCTION: JSON.stringify(prod),
     }),
-  ],
+    new webpack.HashedModuleIdsPlugin({ hashDigestLength: 8 }),
+  ];
+}
+
+const config: webpack.Configuration = {
+  entry: pkg.entry,
+  output: {
+    filename: `[name].[contenthash:${hashlength}].js`,
+    path: outPath,
+    hashFunction: hashFn,
+    hashDigestLength: 64,
+    publicPath,
+    pathinfo: !prod,
+  },
+  devtool: prodOr("source-map", "cheap-module-eval-source-map"),
+  mode: prodOr("production", "development"),
+  plugins: configurePlugins(),
   module: {
     rules: [
       {
         test: /\.(ts)$/,
-        use: [configureBabel()],
+        use: configureBabel(),
         include: [relToSrc("ts")],
       },
       {
         test: /\.svg$/,
         use: [
           {
-            loader: "html-loader",
+            loader: require.resolve("html-loader"),
             options: {
               attributes: false,
               minimize: false,
@@ -165,11 +177,11 @@ const config: webpack.Configuration = {
         use: configureStyles(),
       },
       {
-        test: /\.(woff|woff2)$/,
+        test: /\.(woff2?)$/,
         include: [relToSrc("scss")],
         use: [
           {
-            loader: "file-loader",
+            loader: require.resolve("file-loader"),
             options: {
               context: "src/scss/theme",
               name: fontName,
@@ -225,23 +237,11 @@ const config: webpack.Configuration = {
       automaticNameDelimiter: "-",
       cacheGroups: {
         corejs_es: {
-          test: /node_modules[\\/]core-js[\\/]modules[\\/]es/,
-          name: "core-js-es",
+          test: /[\\/]core-js[\\/]/,
+          name: "core-js",
           minChunks: 1,
           chunks: "all",
           priority: 20,
-        },
-        corejs_web: {
-          test: /node_modules[\\/]core-js[\\/]modules[\\/]web/,
-          name: "core-js-web",
-          minChunks: 1,
-          chunks: "all",
-        },
-        corejs_internal: {
-          test: /node_modules[\\/]core-js[\\/]internals[\\/]/,
-          name: "core-js-internal",
-          minChunks: 1,
-          chunks: "all",
         },
       },
     },
@@ -260,12 +260,13 @@ const config: webpack.Configuration = {
     excludeAssets: [
       /fonts[\\/]spectral-/,
       /\.map$/,
-      /\.woff$/,
+      // /\.woff$/,
       /\.LICENSE\.txt$/,
     ],
     publicPath: true,
     cachedAssets: true,
   },
+  recordsPath: relToSrc("webpack-records.json"),
 };
 
 type Env = string | Record<string, boolean | number | string>;

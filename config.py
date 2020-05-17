@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from environs import Env
-from marshmallow.validate import Range, Regexp
+from marshmallow.validate import OneOf, Range, Regexp
 
 HERE: Path = Path(__file__).resolve().parent
 
@@ -44,6 +44,11 @@ class Config(object):
         "INDEX_DEFAULT_FG", default="555", validate=[Regexp(color_re)]
     )
     INDEX_TEXT = env("INDEX_TEXT", default="Something Funny")
+    INDEX_DEFAULT_FORMAT = env(
+        "INDEX_DEFAULT_FORMAT",
+        default="png",
+        validate=[OneOf(["png", "webp", "jpeg", "gif"])],
+    )
     INDEX_IMG_MAX_WIDTH = env.int(
         "INDEX_IMG_MAX_WIDTH", default=8192, validate=[Range(min=1)]
     )

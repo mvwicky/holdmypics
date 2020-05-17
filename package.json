@@ -24,6 +24,15 @@
         "options": {
           "requirePragma": true
         }
+      },
+      {
+        "files": [
+          "**/*.jinja"
+        ],
+        "options": {
+          "requirePragma": true,
+          "printWidth": 120
+        }
       }
     ]
   },
@@ -68,9 +77,9 @@
     "eslint-config-prettier": "^6.0.0",
     "eslint-import-resolver-typescript": "^2.0.0",
     "eslint-import-resolver-webpack": "^0.12.0",
+    "eslint-plugin-cypress": "^2.10.3",
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-prettier": "^3.1.0",
-    "extract-css-chunks-webpack-plugin": "^4.7.4",
     "feather-icons": "^4.24.0",
     "file-loader": "^6.0.0",
     "html-loader": "^1.0.0",
@@ -78,23 +87,20 @@
     "mini-css-extract-plugin": "^0.9.0",
     "optimize-css-assets-webpack-plugin": "^5.0.3",
     "pattern.css": "^1.0.0",
-    "postcss-cli": "^7.1.1",
     "postcss-loader": "^3.0.0",
     "prettier": "^2.0.0",
     "sanitize.css": "^11.0.0",
     "sass": "^1.25.0",
     "sass-loader": "^8.0.2",
     "sass-mq": "^5.0.1",
-    "style-loader": "^1.1.3",
     "stylelint": "^13.3.3",
     "stylelint-config-prettier": "^8.0.1",
     "stylelint-config-recommended-scss": "^4.2.0",
     "stylelint-order": "^4.0.0",
     "stylelint-prettier": "^1.1.2",
     "stylelint-scss": "^3.17.1",
-    "svg-url-loader": "^5.0.0",
     "tippy.js": "^6.0.0",
-    "ts-loader": "^7.0.1",
+    "ts-loader": "^7.0.4",
     "ts-node": "^8.6.2",
     "typescript": "^3.6.3",
     "webpack": "^4.41.5",

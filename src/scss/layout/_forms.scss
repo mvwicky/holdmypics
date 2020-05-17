@@ -1,8 +1,9 @@
 @use "sass:map";
 
-input {
-  border: 1px solid var(--validity-color, rgb(204, 204, 204));
-  border-radius: 3px;
+input,
+select {
+  border: 1px solid var(--validity-color, #{map.get($primaries, 70)});
+  border-radius: 2px;
   box-shadow: var(--validity-shadow, none);
   &:invalid {
     --validity-color: rgba(240, 0, 0, 0.8);
@@ -26,16 +27,14 @@ input[type="text"] {
 .text-input {
   align-items: center;
   display: flex;
+  flex-basis: 100%;
   flex-direction: row;
   justify-content: space-between;
-  & > input {
-    flex-basis: auto;
-  }
-  #randomText {
-    flex-grow: 0;
-    @include m-space("right", 0);
-    @include m-space("left", 2);
-  }
+}
+
+#randomText {
+  flex-grow: 0;
+  margin: 0 auto;
 }
 
 .form-group {

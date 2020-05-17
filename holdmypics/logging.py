@@ -60,7 +60,7 @@ def log_request(res: Response):
     if req.query_string:
         path = "?".join([path, req.query_string.decode()])
     addrs: str = req.headers.get("X-Forwarded-For", req.remote_addr)
-    addr = addrs.split(",")[-1]
+    addr = addrs.split(",")[-1].strip()
     content_length = res.headers.get("Content-Length", 0, type=int)
     msg = "{0} status={1} content-length={2:,} addr={3}"
     logger.log(level, msg, path, res.status_code, content_length, addr)

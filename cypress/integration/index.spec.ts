@@ -3,7 +3,7 @@ const deleteAll = "{selectall}{backspace}";
 describe("Index", function () {
   beforeEach(function () {
     cy.visit("/");
-    cy.get("#endpoint-url").as("endpoint");
+    cy.dataCy("endpoint-url").as("endpoint");
   });
 
   const getImage = () => {
@@ -13,27 +13,30 @@ describe("Index", function () {
   };
 
   it("Has a maximum width.", function () {
-    cy.get("#width").then(function (elem) {
-      expect(elem.attr("max")).to.not.be.undefined;
+    cy.get("[data-cy=width]").should(($elem) => {
+      expect($elem.attr("max")).to.not.be.undefined;
     });
+    // cy.get("[data-cy=width]").then(function (elem) {
+    //   expect(elem.attr("max")).to.not.be.undefined;
+    // });
   });
 
   ["300", "250", "111"].forEach((sz) => {
     it(`Sets width to ${sz}`, function () {
-      cy.get("#width").type(deleteAll).type(sz);
-      cy.get("#endpoint-url").first().should("contain.text", `${sz}x`);
+      cy.get("[data-cy=width]").type(deleteAll).type(sz);
+      cy.get("@endpoint").should("contain.text", `${sz}x`);
       getImage();
     });
     it(`Sets height to ${sz}`, function () {
-      cy.get("#height").type(deleteAll).type(sz);
-      cy.get("#endpoint-url").first().should("contain.text", `x${sz}`);
+      cy.get("[data-cy=height]").type(deleteAll).type(sz);
+      cy.get("@endpoint").should("contain.text", `x${sz}`);
       getImage();
       cy.screenshot();
     });
   });
 
-  it("Enables random text", function () {
-    cy.get("#randomText").click();
+  it.skip("Enables random text", function () {
+    cy.get("[data-cy=randomText]").click();
     cy.get("@endpoint").then(function (elem) {
       cy.request({ url: elem.text() })
         .debug()
@@ -46,13 +49,13 @@ describe("Index", function () {
 
   ["fec", "000", "fff000", "abcdef", "rand"].forEach((col) => {
     it(`Sets the background color to ${col}.`, function () {
-      cy.get("#bg").type(deleteAll).type(col);
-      cy.get("#endpoint").contains(col);
+      cy.get("[data-cy=bg]").type(deleteAll).type(col);
+      cy.get("@endpoint").contains(col);
       getImage();
     });
     it(`Sets the foreground color to ${col}.`, function () {
-      cy.get("#fg").type(deleteAll).type(col);
-      cy.get("#endpoint").contains(col);
+      cy.get("[data-cy=fg]").type(deleteAll).type(col);
+      cy.get("@endpoint").contains(col);
       getImage();
     });
   });

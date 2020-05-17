@@ -1,9 +1,9 @@
 import { elemIsTag } from "../helpers/elem-is-tag";
 
-type FormInput = HTMLInputElement | HTMLSelectElement;
+const checks = [elemIsTag.bind(null, "input"), elemIsTag.bind(null, "select")];
 
 function isInput(e: Element): e is FormInput {
-  return elemIsTag(e, "input") || elemIsTag(e, "select");
+  return checks.some((f) => f(e));
 }
 
 function isCheckbox(inp: HTMLInputElement): boolean {
@@ -30,7 +30,7 @@ export class ImageForm {
     const args: [string, string][] = [];
     queryInputs.forEach((inp) => {
       if (inp.checkValidity() && !inp.disabled) {
-        if (elemIsTag(inp, "select")) {
+        if (elemIsTag("select", inp)) {
           args.push([inp.id, inp.value]);
         } else if (isCheckbox(inp)) {
           args.push([inp.id, inp.checked ? "on" : ""]);

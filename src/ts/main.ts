@@ -70,15 +70,21 @@ function makeEndpoint(args: MakeEndpointArgs) {
   return url;
 }
 
+const checks = [elemIsTag.bind(null, "input"), elemIsTag.bind(null, "select")];
+
+function isInput(e: Element): e is FormInput {
+  return checks.some((f) => f(e));
+}
+
 function gatherParams(f: HTMLFormElement): Record<string, string> | null {
   const params: { [k: string]: string } = {};
   const n = f.elements.length;
   for (let i = 0; i < n; i++) {
     const elem = f.elements[i];
-    if (elemIsTag(elem, "input") || elemIsTag(elem, "select")) {
+    if (isInput(elem)) {
       if (elem.checkValidity()) {
         if (elem.type === "checkbox") {
-          assertIsTag(elem, "input");
+          assertIsTag("input", elem);
           params[elem.id] = elem.checked ? "on" : "";
         } else {
           const value = elem.value;
@@ -100,7 +106,7 @@ function inputCallback(args: InputCallbackArgs) {
     log(`Good parameters`);
     const url = makeEndpoint(params);
     args.endpoint.textContent = url.pathname + url.search;
-    if (elemIsTag(args.endpoint, "a")) {
+    if (elemIsTag("a", args.endpoint)) {
       args.endpoint.href = url.pathname + url.search;
     }
     args.btn.dataset.clipboardText = url.href;
@@ -112,7 +118,7 @@ function inputCallback(args: InputCallbackArgs) {
 
 async function main(this: Document) {
   const exampleImage = this.getElementById("example-image");
-  if (!elemIsTag(exampleImage, "img")) {
+  if (!elemIsTag("img", exampleImage)) {
     return;
   }
   const endpoint = this.getElementById("endpoint-url");
@@ -120,11 +126,11 @@ async function main(this: Document) {
     return;
   }
   const btn = this.getElementById("copy-button");
-  if (!elemIsTag(btn, "button")) {
+  if (!elemIsTag("button", btn)) {
     return;
   }
   const form = this.getElementById("params-form");
-  if (!elemIsTag(form, "form")) {
+  if (!elemIsTag("form", form)) {
     return;
   }
 

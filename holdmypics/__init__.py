@@ -73,6 +73,9 @@ def after_request_callback(hsts_header: Optional[str], res: Response):
 
     if hsts_header is not None:
         res.headers["Strict-Transport-Security"] = hsts_header
+    forwarded = request.headers.get("X-Forwarded-For", None)
+    if forwarded is not None:
+        res.headers["X-Was-Forwarded-For"] = forwarded
     res.headers["X-Powered-By"] = "Flask"
     elapsed = time.monotonic() - request.start_time
     res.headers["X-Processing-Time"] = elapsed

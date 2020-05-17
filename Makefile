@@ -5,6 +5,7 @@ SHELL:=bash
 MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 
+DRY_RUN?=
 YARN=yarn
 YARN_RUN=$(YARN) run
 NODE_BIN=node_modules/.bin
@@ -16,8 +17,8 @@ DOCKER_COMPOSE=docker-compose
 CONTAINER_NAME?=hold
 
 VERSION_FILE=holdmypics/__version__.py
-VERSION_FILE_CTS=$(shell cat $(VERSION_FILE))
-VERSION=$(subst ",,$(lastword $(VERSION_FILE_CTS)))
+VERSION_FILE_CTS=$(file < $(VERSION_FILE))
+VERSION=$(shell echo $(lastword $(VERSION_FILE_CTS)))
 VERSION_TAG=v$(VERSION)
 
 MODE?=dev
@@ -69,4 +70,8 @@ webpack:
 	@$(WEBPACK) --config webpack.config.ts --progress
 
 version-tag:
+ifeq ($(strip $(DRY_RUN)),)
 	@git tag $(VERSION_TAG)
+else
+	@echo $(VERSION_TAG)
+endif

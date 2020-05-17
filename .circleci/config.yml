@@ -25,4 +25,4 @@ jobs:
           paths:
             - ".venv"
       - run: |
-          poetry run pytest
+          poetry run pytest --no-empty-dpi
