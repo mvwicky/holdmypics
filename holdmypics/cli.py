@@ -111,7 +111,7 @@ def register(app: Flask):  # noqa: C901
             if pkg_data["version"] != version:
                 logger.info("package.json out of date.")
                 pkg.write_text(json.dumps(merge(pkg_data, {"version": version})))
-                args = ["yarn", "prettier", "--write", str(pkg)]
+                args = ["yarn", "run", "prettier", "--write", str(pkg)]
                 subprocess.run(args, stdout=DEVNULL, stderr=DEVNULL, check=True)
             else:
                 logger.info("package.json up to date.")
