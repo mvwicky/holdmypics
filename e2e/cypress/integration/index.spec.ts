@@ -16,9 +16,6 @@ describe("Index", function () {
     cy.get("[data-cy=width]").should(($elem) => {
       expect($elem.attr("max")).to.not.be.undefined;
     });
-    // cy.get("[data-cy=width]").then(function (elem) {
-    //   expect(elem.attr("max")).to.not.be.undefined;
-    // });
   });
 
   ["300", "250", "111"].forEach((sz) => {
