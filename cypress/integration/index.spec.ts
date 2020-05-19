@@ -35,16 +35,16 @@ describe("Index", function () {
     });
   });
 
-  it.skip("Enables random text", function () {
+  it("Enables random text", function () {
     cy.get("[data-cy=randomText]").click();
-    cy.get("@endpoint").then(function (elem) {
-      cy.request({ url: elem.text() })
-        .debug()
-        .then(function (res) {
+    cy.get("@endpoint")
+      .should("contain.text", "random_text")
+      .then(($elem) => {
+        cy.request({ url: $elem.text() }).then(function (res) {
           expect(res.status).to.equal(200);
-          expect(res.headers).to.have.property("X-Random-Text");
+          expect(res.headers).to.have.property("x-random-text");
         });
-    });
+      });
   });
 
   ["fec", "000", "fff000", "abcdef", "rand"].forEach((col) => {
