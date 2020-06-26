@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "holdmypics"
-version = "0.15.4"
+version = "0.15.5"
 description = ""
 authors = ["Michael Van Wickle <mvanwickle@gmail.com>"]
 
@@ -9,7 +9,7 @@ python = "^3.6.1"
 attrs = "^19.3.0"
 beautifulsoup4 = { version = "^4.3", extras = ["lxml"] }
 cytoolz = "^0.10.1"
-environs = "^7.0"
+environs = "^8.0"
 flask = "^1.1"
 flask-cors = "^3.0.8"
 flask-redis = "^0.4.0"
