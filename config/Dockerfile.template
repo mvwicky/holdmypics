@@ -1,4 +1,4 @@
-FROM node:13.13-alpine3.10 AS client-builder
+FROM node:14.5-alpine3.10 AS client-builder
 
 RUN mkdir /app/
 WORKDIR /app/
@@ -9,7 +9,7 @@ RUN yarn install \
   && yarn run {{ yarn_build }} \
   && yarn install --prod
 
-FROM python:3.8.2-slim
+FROM python:{{ python_version }}-slim
 
 ENV LC_ALL=C.UTF-8 LANG=C.UTF-8 PYTHONUNBUFFERED=1
 

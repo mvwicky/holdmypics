@@ -1,15 +1,15 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Optional, Sequence
 
 from loguru import logger
 
 if TYPE_CHECKING:
     from _pytest.config import Config
-    from _pytest.config.argparsing import Parser, OptionGroup
+    from _pytest.config.argparsing import OptionGroup, Parser
     from _pytest.python import Metafunc
 
 
 def pytest_addoption(parser: "Parser"):
-    group = parser.getgroup("holdmypics")  # type: OptionGroup
+    group: "OptionGroup" = parser.getgroup("holdmypics")
     group.addoption(
         "--formats",
         nargs="+",
@@ -40,12 +40,14 @@ def pytest_addoption(parser: "Parser"):
     parser.addini("trace-mem", "Trace memory allocations.", type="bool", default=False)
 
 
-def param_list(metafunc: "Metafunc", name: str, pname: str = None):
+def param_list(
+    metafunc: "Metafunc", name: str, pname: str = None, base_name: Optional[str] = None
+):
     if pname is None:
         pname = name + "s"
     if name in metafunc.fixturenames:
         items = metafunc.config.getoption(pname)
-        metafunc.parametrize(name, items)
+        parametrize(metafunc, name, items, base_name)
 
 
 def pytest_configure(config: "Config"):
@@ -62,20 +64,34 @@ def pytest_configure(config: "Config"):
     )
 
 
+def idfn(base: str):
+    def name_fn(value):
+        return f"{base}={value}"
+
+    return name_fn
+
+
+def parametrize(
+    metafunc: "Metafunc",
+    name: str,
+    items: Sequence[Any],
+    base_name: Optional[str] = None,
+):
+    metafunc.parametrize(name, items, ids=idfn(base_name or name))
+
+
 def pytest_generate_tests(metafunc: "Metafunc"):
     config = metafunc.config
     fixtures = metafunc.fixturenames
-    param_list(metafunc, "image_format")
+    param_list(metafunc, "image_format", None, "fmt")
     if "height" in fixtures:
-        heights = config.getoption("heights")
-        metafunc.parametrize("height", heights)
+        parametrize(metafunc, "height", config.getoption("heights"), "h")
     if "width" in fixtures:
-        widths = config.getoption("widths")
-        metafunc.parametrize("width", widths)
+        parametrize(metafunc, "width", config.getoption("widths"), "w")
     if "dpi" in fixtures:
         dpis = config.getoption("dpis")
         opt: bool = config.getoption("no_empty_dpi", False)
         ini: bool = config.getini("empty-dpi")
         if not opt and ini and None not in dpis:
             dpis.append(None)
-        metafunc.parametrize("dpi", dpis)
+        parametrize(metafunc, "dpi", dpis)

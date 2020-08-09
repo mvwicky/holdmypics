@@ -9,7 +9,7 @@ RUN yarn install \
   && yarn run build \
   && yarn install --prod
 
-FROM python:3.8.2-slim
+FROM python:3.8.5-slim
 
 ENV LC_ALL=C.UTF-8 LANG=C.UTF-8 PYTHONUNBUFFERED=1
 

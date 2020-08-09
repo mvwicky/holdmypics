@@ -6,7 +6,7 @@ from subprocess import DEVNULL
 import click
 import semver
 import tomlkit as toml
-from cytoolz import merge
+from cytoolz import get_in, merge
 from flask import Flask
 from loguru import logger
 from semver import VersionInfo
@@ -86,7 +86,7 @@ def register(app: Flask):  # noqa: C901
 
         proj_data = toml.parse(proj.read_text())
 
-        poetry = proj_data["tool"]["poetry"]
+        poetry = get_in(["tool", "poetry"], proj_data)
         version = semver.parse_version_info(poetry["version"])
         if bump:
             f = SEMVER_BUMPS[level]

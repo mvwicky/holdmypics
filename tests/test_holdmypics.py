@@ -23,8 +23,14 @@ def random_color() -> str:
 
 bg_colors = ["Random", None]
 fg_colors = ["Random", None]
-fmts = ["webp", "png", "jpeg"]
 texts = ["An bunch of words here", None]
+
+
+def idfn(base: str):
+    def name_fn(value):
+        return f"{base}={value}"
+
+    return name_fn
 
 
 def make_route(
@@ -53,22 +59,22 @@ def test_index(client):
     assert res.status_code == 200
 
 
-@pytest.fixture(name="fg_color", params=fg_colors)
+@pytest.fixture(name="fg_color", params=fg_colors, ids=idfn("fg"))
 def fg_color_fixture(request):
     return random_color() if request.param else request.param
 
 
-@pytest.fixture(name="bg_color", params=bg_colors)
+@pytest.fixture(name="bg_color", params=bg_colors, ids=idfn("bg"))
 def bg_color_fixture(request):
     return random_color() if request.param else request.param
 
 
-@pytest.fixture(name="text", params=texts, ids=["Words", "None"])
+@pytest.fixture(name="text", params=texts, ids=["text=Words", "text=None"])
 def text_fixture(request):
     return request.param
 
 
-@pytest.fixture(name="alpha", params=[0.75, None])
+@pytest.fixture(name="alpha", params=[0.75, None], ids=idfn("alpha"))
 def alpha_fixture(request):
     return request.param
 
@@ -132,7 +138,7 @@ def test_create_images_using_client(
 @pytest.mark.parametrize(
     "random_text", [True, False], ids=["random_text", "no_random_text"]
 )
-def test_just_run_once(client: FlaskClient, random_text: bool):
+def test_random_text(client: FlaskClient, random_text: bool):
     url = make_route(638, 328, "cef", "555", "png")
     args = {
         "text": "Some Random Text",
@@ -154,7 +160,7 @@ def test_just_run_once(client: FlaskClient, random_text: bool):
         assert from_header is not None
         from_ocr = pytesseract.image_to_string(im)
         logger.info("Got text from OCR: {0}", from_ocr)
-        assert from_ocr == from_header
+        assert from_ocr.casefold() == from_header.casefold()
 
 
 def test_forwarding_headers(client: FlaskClient):

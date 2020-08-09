@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from _pytest.tmpdir import TempPathFactory
 
 
-def _log_filt(record):
+def _log_filt(record: dict) -> bool:
     return "test" in record["name"]
 
 
@@ -31,6 +31,7 @@ def config_fixture(tmp_path_factory: "TempPathFactory"):
     class TestConfig(Config):
         DEBUG = False
         TESTING = True
+        # REDIS_URL = None
         SAVED_IMAGES_MAX_NUM = 250
         LOG_FILE_NAME = "holdmypics-test"
         SAVED_IMAGES_CACHE_DIR = image_dir

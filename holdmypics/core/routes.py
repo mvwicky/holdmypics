@@ -90,10 +90,13 @@ def get_context() -> dict:
 @bp.route("/")
 def index() -> ResponseType:
     get_context.cache_clear()
-    count = redisw.client.get(COUNT_KEY).decode()
-    try:
-        count = int(count)
-    except ValueError:
+    count = redisw.client.get(COUNT_KEY)
+    if count is not None:
+        try:
+            count = int(count.decode())
+        except ValueError:
+            count = 0
+    else:
         count = 0
     context = merge(get_context(), {"count": f"{count:,}"})
     return render_template("index.jinja", **context)

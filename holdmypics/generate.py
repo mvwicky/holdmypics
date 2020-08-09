@@ -1,5 +1,6 @@
 import operator as op
 import string
+import sys
 from difflib import SequenceMatcher
 from functools import partial
 from pathlib import Path
@@ -10,14 +11,18 @@ import click
 from cytoolz import merge
 from jinja2 import Environment, FileSystemLoader, Template
 
+from config import Config
+
 junk = partial(op.contains, string.whitespace)
 
 split = partial(str.splitlines, keepends=True)
 
+PY_VERSION = ".".join(map(str, sys.version_info[0:3]))
+
 
 def diff_contents(a: str, b: str) -> SequenceMatcher:
     a_lines, b_lines = map(split, [a, b])
-    matcher = SequenceMatcher(junk, a_lines, b_lines)
+    matcher = SequenceMatcher(None, a_lines, b_lines, autojunk=True)
     return matcher
 
 
@@ -30,12 +35,14 @@ class Generator(object):
     _env: Optional[Environment] = attr.ib(default=None, init=False, repr=False)
     _template: Optional[Template] = attr.ib(default=None, init=False, repr=False)
 
-    def confirm(self, file: Path, yes: bool):
+    def confirm(self, file: Path, yes: bool) -> bool:
         if yes or not file.is_file():
             return True
-        return click.confirm("Overwrite {0}?".format(file), default=True)
+        rel = Config.rel_to_root(file)
+        return click.confirm("Overwrite {0}?".format(rel), default=True)
 
     def generate(self, dry_run: bool, verbosity: int, yes: bool, port: Optional[int]):
+        common_context = {"python_version": PY_VERSION}
         contexts = [
             (True, {"yarn_build": "build:dev", "requirements": "requirements-dev.txt"}),
             (False, {"yarn_build": "build", "requirements": "requirements.txt"}),
@@ -47,7 +54,7 @@ class Generator(object):
             if not folder.is_dir():
                 folder.mkdir()
             file: Path = folder / "Dockerfile"
-            ctx = merge(context, {"dev": dev})
+            ctx = merge(common_context, context, {"dev": dev})
             if port is not None:
                 ctx.update({"port": port})
             self.render(file, ctx, dry_run, verbosity, yes)
@@ -74,7 +81,7 @@ class Generator(object):
 
         if not dry_run:
             file.write_text(cts)
-            click.secho("Wrote {0}".format(file), fg="blue")
+            click.secho("Wrote {0}".format(Config.rel_to_root(file)), fg="blue")
 
     @property
     def template(self) -> Template:

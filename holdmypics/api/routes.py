@@ -15,8 +15,9 @@ from flask import (
 from loguru import logger
 from PIL import features
 
+from .. import redisw
 from .._types import Dimension, ResponseType
-from ..constants import img_formats
+from ..constants import COUNT_KEY, img_formats
 from ..fonts import fonts
 from ..utils import make_rules
 from . import bp
@@ -69,6 +70,19 @@ def font_redirect(font_name: str) -> ResponseType:
         return redirect(url)
     else:
         abort(400)
+
+
+@bp.route("/count/")
+def count_route():
+    count = redisw.client.get(COUNT_KEY)
+    if count is not None:
+        try:
+            count = int(count.decode())
+        except ValueError:
+            count = 0
+    else:
+        count = 0
+    return {"count": count}
 
 
 @make_route()

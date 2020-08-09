@@ -5,7 +5,6 @@ from pathlib import Path
 from typing import Optional
 
 from flask import Flask, Response, request, send_from_directory
-from flask_redis import FlaskRedis
 from loguru import logger
 from werkzeug.debug import DebuggedApplication
 from whitenoise import WhiteNoise
@@ -16,7 +15,6 @@ from .logging import config_logging, log_request
 from .wrapped_redis import WrappedRedis
 
 redisw = WrappedRedis()
-redis_client = FlaskRedis()
 
 HERE: Path = Path(__file__).resolve().parent
 
@@ -94,7 +92,7 @@ def create_app(config=Config):
     app.url_map.redirect_defaults = False
     app.url_map.converters.update({"dim": DimensionConverter, "col": ColorConverter})
 
-    redisw.init_app(app, redis_client)
+    redisw.init_app(app)
 
     from . import core, api, cli, __version__
 
@@ -131,5 +129,4 @@ def create_app(config=Config):
     def _ctx():
         return {"version": __version__.__version__}
 
-    logger.debug("Created App {0!r}", app)
     return app

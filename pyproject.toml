@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "holdmypics"
-version = "0.15.5"
+version = "0.15.6"
 description = ""
 authors = ["Michael Van Wickle <mvanwickle@gmail.com>"]
 
@@ -19,16 +19,17 @@ humanize = "^2.0.0"
 loguru = "^0.5.0"
 Pillow = "^7.0.0"
 semver = "^2.9.1"
-tomlkit = "^0.6.0"
+tomlkit = "^0.7.0"
 whitenoise = { version = "^5.0.1", extras = ["brotli"] }
-pytest = { version = "^5.0", optional = true }
+
+pytest = { version = "^6.0", optional = true }
 pytest-cov = { version = "^2.8.1", optional = true }
 pytest-html = { version = "^2.0.0", optional = true }
 pytesseract = { version = "^0.3.4", optional = true }
 
 [tool.poetry.dev-dependencies]
 colorama = "^0.4.3"
-isort = "^4.3"
+isort = "^5.0"
 memory_profiler = "^0.57.0"
 pre-commit = "^2.3.0"
 psutil = "^5.6.5"
@@ -40,19 +41,13 @@ tests = ["pytest", "pytest-cov", "pytest-html", "pytesseract"]
 
 [tool.poetry.scripts]
 
-[tool.poetry.plugins]
-
 [tool.poetry.plugins."pytest11"]
 holdmyplugin = "plugin.holdmyplugin"
 
 [tool.isort]
+profile = "black"
 known_first_party = ["config", "holdmypics"]
 no_lines_before = "LOCALFOLDER"
-multi_line_output = 3
-include_trailing_comma = true
-force_grid_wrap = 0
-use_parentheses = true
-line_length = 88
 
 [tool.black]
 line-length = 88

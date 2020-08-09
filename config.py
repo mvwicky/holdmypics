@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 from environs import Env
@@ -55,3 +56,7 @@ class Config(object):
     INDEX_IMG_MAX_HEIGHT = env.int(
         "INDEX_IMG_MAX_HEIGHT", default=4608, validate=[Range(min=1)]
     )
+
+    @classmethod
+    def rel_to_root(cls, p: os.PathLike) -> str:
+        return os.path.relpath(p, cls.BASE_PATH)
