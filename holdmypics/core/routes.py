@@ -3,7 +3,7 @@ import re
 from urllib.parse import urlencode
 
 from cytoolz import merge
-from flask import Markup, render_template, url_for
+from flask import Markup, render_template, url_for, request
 
 from .. import redisw
 from .._types import ResponseType
@@ -99,7 +99,11 @@ def index() -> ResponseType:
     else:
         count = 0
     context = merge(get_context(), {"count": f"{count:,}"})
-    return render_template("index.jinja", **context)
+    accept = request.accept_mimetypes
+    if accept.accept_json:
+        return context
+    else:
+        return render_template("index.jinja", **context)
 
 
 @bp.route("/robots.txt")
