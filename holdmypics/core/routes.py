@@ -100,7 +100,7 @@ def index() -> ResponseType:
         count = 0
     context = merge(get_context(), {"count": f"{count:,}"})
     accept = request.accept_mimetypes
-    if accept.accept_json:
+    if accept.accept_json and not accept.accept_html:
         return context
     else:
         return render_template("index.jinja", **context)
