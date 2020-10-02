@@ -33,4 +33,4 @@ def api_setup(state: BlueprintSetupState):
         files.find_current()
 
 
-from . import routes  # noqa: F401
+from . import routes  # noqa: F401,E402

@@ -1,16 +1,13 @@
 import os
 import subprocess
 from pathlib import Path
-from typing import Dict, List, Optional, Sequence
+from typing import Optional, Sequence
 
 import attr
-import tomlkit as toml
 from humanize import naturalsize
 from loguru import logger
 
 CWD: Path = Path.cwd()
-FileMeta = Dict[str, str]
-FileMetaList = List[FileMeta]
 
 
 def find_path_named(name: str, start: Path = CWD, file_only: bool = False) -> Path:
@@ -25,40 +22,6 @@ def find_path_named(name: str, start: Path = CWD, file_only: bool = False) -> Pa
 
 def find_pyproject(start: Path = CWD) -> Path:
     return find_path_named("pyproject.toml", file_only=True)
-
-
-def fmt_hash(pkg_hash: str, indent: int = 4) -> str:
-    spaces = " " * indent
-    return "{0}--hash={1}".format(spaces, pkg_hash)
-
-
-@attr.s(slots=True, auto_attribs=True)
-class Dependency(object):
-    name: str
-    version: str
-    hashes: List[str] = attr.ib(factory=list, repr=False)
-    marker: str = attr.ib(default="", repr=False)
-
-    @classmethod
-    def from_lock(cls, elem: Dict[str, str], metadata: FileMetaList) -> "Dependency":
-        name, version = elem["name"], elem["version"]
-        marker = elem.get("marker", "")
-        if "extra == " in marker:
-            marker = ""
-        hashes = [e["hash"] for e in metadata]
-        return cls(name=name, version=version, hashes=hashes, marker=marker)
-
-    def to_line(self, indent: int = 4, no_hashes: bool = False) -> str:
-        init_line = "{0.name}=={0.version}".format(self)
-        if self.marker:
-            init_line = "; ".join([init_line, self.marker])
-        if no_hashes:
-            return init_line
-        init_line = " ".join([init_line, "\\"])
-        line = [init_line]
-        line.extend([fmt_hash(h, indent) + " \\" for h in self.hashes[:-1]])
-        line.append(fmt_hash(self.hashes[-1], indent))
-        return "\n".join(line)
 
 
 @attr.s(slots=True, auto_attribs=True, repr=False)
@@ -82,36 +45,29 @@ class Package(object):
         name = "".join(["requirements", "-dev" if dev else "", ".txt"])
         return self.root_dir / name
 
-    def read_lock(self, dev: bool = False):
-        lock_data = toml.parse(self.lock_file.read_text())
-        file_meta = lock_data["metadata"]["files"]
-        for elem in lock_data["package"]:
-            dev_pkg = elem["category"] == "dev"
-            opt_pkg = elem["optional"]
-            if dev or not (dev_pkg or opt_pkg):
-                name = elem["name"]
-                yield Dependency.from_lock(elem, file_meta[name])
-
-    def make_requirements(self, dev: bool = False, no_hashes: bool = False):
-        frozen_pkgs = []
-        for dep in self.read_lock(dev):  # type: Dependency
-            frozen_pkgs.append(dep.to_line(no_hashes=no_hashes))
-        req = "\n".join(frozen_pkgs) + "\n"
-        return req, len(frozen_pkgs)
-
-    def sh(self, args: Sequence[str], **kwargs):
+    def sh(self, args: Sequence[str], **kwargs) -> subprocess.CompletedProcess:
         cmd = args
         if not isinstance(cmd, str) and isinstance(cmd, Sequence):
             cmd = " ".join(cmd)
         logger.info("Running command {0}", cmd)
+        kwargs.setdefault("check", True)
         kwargs.setdefault("cwd", str(self.root_dir))
         return subprocess.run(args, **kwargs)
 
-    def freeze(self, dev: bool = False, no_hashes: bool = False):
-        if not self.lock_file.is_file():
-            self.sh(["poetry", "lock"], check=True)
+    def export(self, dev: bool, no_hashes: bool) -> str:
+        args = ["poetry", "export", "--format", "requirements.txt"]
+        if dev:
+            args.extend(["--dev", "-E", "tests"])
+        if no_hashes:
+            args.append("--without-hashes")
+        cmd = self.sh(args, stdout=subprocess.PIPE, text=True)
+        return cmd.stdout
 
-        req_cts, num_pkgs = self.make_requirements(dev, no_hashes)
+    def freeze(self, dev: bool = False, no_hashes: bool = False) -> bool:
+        if not self.lock_file.is_file():
+            self.sh(["poetry", "lock"])
+
+        req_cts = self.export(dev, no_hashes)
         file = self.req_file(dev)
         write = not file.is_file() or req_cts != file.read_text()
         if write:
@@ -121,5 +77,5 @@ class Package(object):
             logger.info("{0.name} unchanged.", file)
         rel = os.path.relpath(file, self.root_dir)
         sz = naturalsize(os.path.getsize(file))
-        logger.success("Froze {0} requirements to {1} ({2})", num_pkgs, rel, sz)
+        logger.success("Froze requirements to {0} ({1})", rel, sz)
         return write

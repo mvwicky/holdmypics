@@ -158,7 +158,7 @@ def test_random_text(client: FlaskClient, random_text: bool):
         headers = res.headers
         from_header = headers.get("X-Random-Text")
         assert from_header is not None
-        from_ocr = pytesseract.image_to_string(im)
+        from_ocr = pytesseract.image_to_string(im).strip()
         logger.info("Got text from OCR: {0}", from_ocr)
         assert from_ocr.casefold() == from_header.casefold()
 

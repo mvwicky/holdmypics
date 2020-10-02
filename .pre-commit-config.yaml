@@ -13,11 +13,11 @@ repos:
       - id: check-toml
       - id: mixed-line-ending
   - repo: https://github.com/pre-commit/pygrep-hooks
-    rev: v1.5.1
+    rev: v1.6.0
     hooks:
       - id: python-check-blanket-noqa
   - repo: https://github.com/psf/black
-    rev: 19.10b0
+    rev: 20.8b1
     hooks:
       - id: black
   - repo: https://gitlab.com/pycqa/flake8
@@ -32,6 +32,6 @@ repos:
           - flake8-import-order
           - flake8-pytest-style
   - repo: https://github.com/prettier/prettier
-    rev: 2.0.5
+    rev: 2.1.2
     hooks:
       - id: prettier
