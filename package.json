@@ -36,8 +36,7 @@
     ]
   },
   "dependencies": {
-    "friendly-words": "^1.1.10",
-    "rfs": "^9.0.3"
+    "friendly-words": "^1.1.10"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-0",
@@ -86,6 +85,7 @@
     "pattern.css": "^1.0.0",
     "postcss-loader": "^3.0.0",
     "prettier": "^2.0.0",
+    "rfs": "^9.0.3",
     "sanitize.css": "^11.0.0",
     "sass": "^1.25.0",
     "sass-loader": "^9.0.2",
