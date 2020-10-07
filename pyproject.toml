@@ -37,7 +37,8 @@ ptpython = "^3.0.0"
 toml = "^0.10.0"
 
 [tool.poetry.extras]
-tests = ["pytest", "pytest-cov", "pytest-html", "pytesseract"]
+tests = ["pytest", "pytest-cov", "pytest-html"]
+ocr = ["pytesseract"]
 
 [tool.poetry.scripts]
 
