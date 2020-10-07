@@ -5,13 +5,18 @@ import random
 from typing import Optional
 from urllib.parse import urlencode
 
-import pytesseract
 import pytest
 from cytoolz import valfilter
 from flask import Flask, Response
 from flask.testing import FlaskClient
 from loguru import logger
 from PIL import Image
+
+try:
+    import pytesseract
+except ImportError:
+    pytesseract = None
+
 
 SKIP_INDEX = os.environ.get("TESTS_SKIP_INDEX", None) is not None
 
@@ -135,16 +140,14 @@ def test_create_images_using_client(
     assert im.size == (width, height)
 
 
-@pytest.mark.parametrize(
-    "random_text", [True, False], ids=["random_text", "no_random_text"]
-)
-def test_random_text(client: FlaskClient, random_text: bool):
+@pytest.mark.skipif(pytesseract is None, reason="pytesseract not installed")
+def test_random_text(client: FlaskClient):
     url = make_route(638, 328, "cef", "555", "png")
     args = {
         "text": "Some Random Text",
         "dpi": None,
         "alpha": None,
-        "random_text": random_text,
+        "random_text": True,
     }
     query = urlencode(valfilter(bool, args))
     url = "?".join([url, query])
@@ -154,13 +157,12 @@ def test_random_text(client: FlaskClient, random_text: bool):
     assert img_type == "png"
     im = Image.open(io.BytesIO(res.data))
     assert im.size == (638, 328)
-    if random_text:
-        headers = res.headers
-        from_header = headers.get("X-Random-Text")
-        assert from_header is not None
-        from_ocr = pytesseract.image_to_string(im).strip()
-        logger.info("Got text from OCR: {0}", from_ocr)
-        assert from_ocr.casefold() == from_header.casefold()
+    headers = res.headers
+    from_header = headers.get("X-Random-Text")
+    assert from_header is not None
+    from_ocr = pytesseract.image_to_string(im).strip()
+    logger.info("Got text from OCR: {0}", from_ocr)
+    assert from_ocr.casefold() == from_header.casefold()
 
 
 def test_forwarding_headers(client: FlaskClient):

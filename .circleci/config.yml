@@ -11,9 +11,14 @@ jobs:
       - image: circleci/redis:6.0.8-alpine
     steps:
       - checkout
+      - run: chown -R circleci:circleci /usr/local/bin
+      - run: chown -R circleci:circleci /usr/local/lib/python3.8/site-packages
       - restore_cache:
           key: deps9-{{ .Branch }}-{{ checksum "poetry.lock" }}
-      - run: sudo apt-get install tesseract-ocr libtesseract-dev
+      - run:
+          command: |
+            apt-get update
+            apt-get install tesseract-ocr libtesseract-dev
       - run:
           command: |
             pip install --user poetry
