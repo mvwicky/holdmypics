@@ -97,7 +97,7 @@ def image_route(
     if font_name not in fonts.font_names:
         return font_redirect(font_name)
 
-    bg_lower, fg_lower = map(str.lower, [bg_color, fg_color])  # type: str, str
+    bg_lower, fg_lower = map(str.lower, [bg_color, fg_color])
     if RAND_STR in {bg_lower, fg_lower}:
         random.seed(args.seed)
         if bg_lower == RAND_STR:

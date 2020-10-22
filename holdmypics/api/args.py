@@ -46,7 +46,7 @@ class ImageArgs(object):
             args: ImmutableMultiDict = request.args
         kw = {
             "text": args.get("text", None),
-            "font_name": args.get("font", "overpass"),
+            "font_name": args.get("font", "overpass") or "overpass",
             "dpi": args.get("dpi", 72, type=int),
             "alpha": args.get("alpha", 1.0, type=float),
             "seed": args.get("seed", None),
