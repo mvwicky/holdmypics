@@ -7,8 +7,6 @@
 *.sublime-*
 bin/
 config/
-cypress.json
-cypress/
 docker-*
 docker-compose.*
 Dockerfile

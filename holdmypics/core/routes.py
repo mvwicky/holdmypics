@@ -3,7 +3,7 @@ import re
 from urllib.parse import urlencode
 
 from cytoolz import merge
-from flask import Markup, render_template, url_for, request
+from flask import Markup, render_template, request, url_for
 
 from .. import redisw
 from .._types import ResponseType
