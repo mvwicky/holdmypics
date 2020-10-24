@@ -1,5 +1,3 @@
-import operator as op
-import string
 import sys
 from difflib import SequenceMatcher
 from functools import partial
@@ -13,11 +11,9 @@ from jinja2 import Environment, FileSystemLoader, Template
 
 from config import Config
 
-junk = partial(op.contains, string.whitespace)
+PY_VERSION = ".".join(map(str, sys.version_info[0:3]))
 
 split = partial(str.splitlines, keepends=True)
-
-PY_VERSION = ".".join(map(str, sys.version_info[0:3]))
 
 
 def diff_contents(a: str, b: str) -> SequenceMatcher:

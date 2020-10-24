@@ -26,6 +26,7 @@ CONFIG_DIR=config
 DOCKERFILE=$(CONFIG_DIR)/$(MODE)/Dockerfile
 DOCKER_TAG=holdmypics-$(MODE):$(VERSION_TAG)
 BUILD_CPU_SHARES?=512
+COMPILE_OPTS?=--port 8080 -y
 
 TEMPLATE=$(CONFIG_DIR)/Dockerfile.template
 COMPILE_OUT=$(CONFIG_DIR)/dev/Dockerfile $(CONFIG_DIR)/prod/Dockerfile
@@ -35,7 +36,7 @@ COMPILE_OUT=$(CONFIG_DIR)/dev/Dockerfile $(CONFIG_DIR)/prod/Dockerfile
 compile: $(COMPILE_OUT)
 
 $(COMPILE_OUT): $(TEMPLATE)
-	flask generate-dockerfiles
+	flask generate-dockerfiles $(COMPILE_OPTS)
 
 dbuilddev: MODE=dev
 dbuilddev: docker-build
@@ -43,8 +44,8 @@ dbuilddev: docker-build
 dbuildprod: MODE=prod
 dbuildprod: docker-build
 
-docker-build: DOCKER_ARGS=build -f $(DOCKERFILE) -c $(BUILD_CPU_SHARES) --tag=$(DOCKER_TAG) .
-docker-build: docker
+docker-build: DOCKER_ARGS=build -f $(DOCKERFILE) -c $(BUILD_CPU_SHARES) --tag=$(DOCKER_TAG) -o out .
+docker-build: compile docker
 
 rundev: MODE=dev
 rundev: DOCKER_ARGS=run --publish 8080:8080 --detach --name=$(CONTAINER_NAME) $(DOCKER_TAG)
