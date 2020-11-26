@@ -25,7 +25,7 @@ from .anim import make_anim
 from .args import ImageArgs
 from .files import files
 from .img import save_image
-from .utils import random_color
+from .utils import normalize_fmt, random_color
 
 ViewFunc = Callable
 
@@ -109,9 +109,8 @@ def image_route(
     if files.need_to_clean:
         after_this_request(do_cleanup)
 
-    mime_fmt = "jpeg" if fmt == "jpg" else fmt
     kw = {
-        "mimetype": "image/{0}".format(mime_fmt),
+        "mimetype": "image/{0}".format(normalize_fmt(fmt)),
         "add_etags": not current_app.debug,
         "conditional": True,
     }

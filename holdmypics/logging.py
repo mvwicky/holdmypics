@@ -28,7 +28,7 @@ def config_logging(name: str, file_name: str, log_dir: Optional[Path], log_level
     if log_dir is not None:
         log_dir = Path(os.path.realpath(log_dir))
         if log_dir.is_dir():
-            log_file = log_dir / (file_name + ".log")
+            log_file = log_dir / ".".join([file_name, "log"])
             handlers.append(
                 {
                     "sink": log_file,
@@ -39,15 +39,15 @@ def config_logging(name: str, file_name: str, log_dir: Optional[Path], log_level
                     "retention": 5,
                 }
             )
-            logger.add(
-                log_file,
-                rotation=3 * (1024 ** 2),
-                level="DEBUG",
-                filter={name: "DEBUG"},
-                compression="tar.gz",
-                retention=5,
-            )
-    # logger.configure(handlers=handlers)
+            # logger.add(
+            #     log_file,
+            #     rotation=3 * (1024 ** 2),
+            #     level="DEBUG",
+            #     filter={name: "DEBUG"},
+            #     compression="tar.gz",
+            #     retention=5,
+            # )
+    logger.configure(handlers=handlers)
 
 
 def log_request(res: Response):

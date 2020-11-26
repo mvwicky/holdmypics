@@ -30,7 +30,7 @@
 **/*.md
 **/*.sublime-*
 **/azds.yaml
-**/bin
+# **/bin
 **/charts
 **/dist
 **/docker-compose*
@@ -43,5 +43,6 @@
 **/pytest-report
 **/secrets.dev.yaml
 **/values.dev.yaml
+e2e/
 LICENSE
 config

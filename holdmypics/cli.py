@@ -2,6 +2,7 @@ import json
 import subprocess
 from pathlib import Path
 from subprocess import DEVNULL
+from typing import Any, Callable
 
 import click
 import semver
@@ -24,6 +25,11 @@ SEMVER_BUMPS = {
     "build": VersionInfo.bump_build,
 }
 SEMVER_LEVELS = list(SEMVER_BUMPS)
+
+
+def get_bump_fn(level: str) -> Callable[[VersionInfo], Any]:
+    fn_name = "bump_{0}".format(level)
+    return getattr(VersionInfo, fn_name)
 
 
 def register(app: Flask):  # noqa: C901

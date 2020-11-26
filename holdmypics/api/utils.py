@@ -1,8 +1,8 @@
 import random
-from collections import namedtuple
 from string import hexdigits
 from typing import NamedTuple, Tuple
 
+from cytoolz import memoize
 from loguru import logger
 from PIL import Image, ImageDraw
 from PIL.ImageFont import ImageFont
@@ -18,10 +18,22 @@ class FontParams(NamedTuple):
     size: Dimension
 
 
-TextArgs = namedtuple("TextArgs", ["color", "text", "font_name", "debug"])
+class TextArgs(NamedTuple):
+    color: str
+    text: str
+    font_name: str
+    debug: bool
 
 
 font_sizes = fonts.font_sizes
+
+RAND_COLOR = "rand".casefold()
+MAX_TEXT_HEIGHT = 0.9
+
+
+@memoize
+def normalize_fmt(fmt: str) -> str:
+    return "jpeg" if fmt == "jpg" else fmt
 
 
 def random_color() -> str:
@@ -51,7 +63,7 @@ def guess_size(height: int, font_name: str) -> Tuple[ImageFont, int]:
     """
     font = fonts[font_name]
     # Don't want text to take up 100% of the height.
-    height_prime = height * 0.75
+    height_prime = height * MAX_TEXT_HEIGHT
     # The image height in points.
     pt_size = int(px_to_pt(int(height_prime)))
     if pt_size in font:
@@ -71,13 +83,11 @@ def guess_size(height: int, font_name: str) -> Tuple[ImageFont, int]:
     return font[sz], i
 
 
-def get_font(
-    d: ImageDraw.Draw, sz: Dimension, text: str, font_name: str
-) -> Tuple[ImageFont, Dimension]:
+def get_font(d: ImageDraw.Draw, sz: Dimension, text: str, font_name: str) -> FontParams:
     """Get the correctly sized font for the given image size and text.
 
     Args:
-        d: The Pillow ImageDraw instance
+        d: An ImageDraw instance
         sz: The height and width of the output image
         text: The text to be written
         font_name: The typeface that we're using.
@@ -110,8 +120,9 @@ def draw_text(im: Image.Image, args: TextArgs) -> Image.Image:
     return im
 
 
+@memoize
 def get_color(color: str) -> str:
-    color = color.lstrip("#")
+    color = color.lstrip("#").casefold()
     if len(color) in {3, 6} and all(e in hexdigits for e in color):
-        return "#" + color
+        return "".join(["#", color])
     return color

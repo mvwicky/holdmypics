@@ -12,9 +12,11 @@ from ..constants import COUNT_KEY
 from ..utils import profile
 from .args import ImageArgs
 from .files import files
-from .utils import TextArgs, draw_text, get_color
+from .utils import TextArgs, draw_text, get_color, normalize_fmt
 
 OptValues = Union[str, bool, int, Tuple[int, int]]
+
+MODE = "RGBA"
 
 opt_kw: Dict[str, Callable[[ImageArgs], Dict[str, OptValues]]] = {
     "jpeg": lambda args: {"optimize": True, "dpi": (args.dpi, args.dpi)},
@@ -28,9 +30,8 @@ opt_kw: Dict[str, Callable[[ImageArgs], Dict[str, OptValues]]] = {
 def make_image(
     size: Dimension, bg_color: str, fg_color: str, fmt: str, args: ImageArgs
 ) -> Image.Image:
-    fmt = "jpeg" if fmt == "jpg" else fmt
-    mode = "RGBA"
-    im = Image.new(mode, size, bg_color)
+    fmt = normalize_fmt(fmt)
+    im = Image.new(MODE, size, bg_color)
     if args.alpha < 1:
         alpha_im = Image.new("L", size, int(args.alpha * 255))
         im.putalpha(alpha_im)
@@ -46,9 +47,8 @@ def save_image(
     size: Dimension, bg_color: str, fg_color: str, fmt: str, args: ImageArgs
 ) -> str:
     """Create an image or find an existing one and produce its path."""
-    fmt = "jpeg" if fmt == "jpg" else fmt
-    bg_color = get_color(bg_color)
-    fg_color = get_color(fg_color)
+    fmt = normalize_fmt(fmt)
+    bg_color, fg_color = get_color(bg_color), get_color(fg_color)
     path = files.get_file_name(size, bg_color, fg_color, fmt, *attr.astuple(args))
 
     if os.path.isfile(path):
@@ -64,6 +64,6 @@ def save_image(
         im.save(path, **save_kw)
         im.close()
         sz = naturalsize(os.path.getsize(path), format="%.3f")
-        logger.info("Created new file ({0})", sz)
+        logger.info('Created "{0}" ({1})', path, sz)
         redisw.client.incr(COUNT_KEY)
         return path

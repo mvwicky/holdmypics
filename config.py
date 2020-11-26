@@ -57,6 +57,8 @@ class Config(object):
         "INDEX_IMG_MAX_HEIGHT", default=4608, validate=[Range(min=1)]
     )
 
+    HASH_IMG_FILE_NAMES = env.bool("HASH_IMG_FILE_NAMES", default=not DEBUG)
+
     @classmethod
     def rel_to_root(cls, p: os.PathLike) -> str:
         return os.path.relpath(p, cls.BASE_PATH)
