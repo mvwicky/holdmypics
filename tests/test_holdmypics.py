@@ -121,7 +121,7 @@ def test_favicon(client: FlaskClient):
     url = "/favicon.ico"
     res: Response = client.get(url)
     assert res.status_code == 200
-    assert res.content_type == "image/x-icon"
+    assert res.content_type in ["image/x-icon", "image/vnd.microsoft.icon"]
 
 
 @given(
