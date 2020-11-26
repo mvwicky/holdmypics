@@ -15,7 +15,7 @@ class GeneratedFiles(object):
     __slots__ = ("files", "_max_files")
 
     hash_function = hashlib.md5
-    extensions = ["png", "webp", "jpg", "jpeg"]
+    extensions = ["png", "webp", "jpg", "jpeg", "gif"]
     fmt_re: Pattern = re.compile("\\.({0})$".format("|".join(extensions)))
 
     def __init__(self) -> None:
@@ -50,7 +50,7 @@ class GeneratedFiles(object):
         return hasher.hexdigest()
 
     def get_file_name(self, size: Dimension, bg: str, fg: str, fmt: str, *args) -> str:
-        if current_app.config.get("DEBUG", False):
+        if not current_app.config.get("HASH_IMG_FILE_NAMES", True):
             parts = ["x".join(map(str, size)), bg, fg] + list(args)
             base_name = "-".join(map(str, parts)).translate(fname_tbl)
             name = ".".join([base_name, fmt])

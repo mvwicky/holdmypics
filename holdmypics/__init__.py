@@ -2,7 +2,7 @@ import re
 import time
 from functools import partial
 from pathlib import Path
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from flask import Flask, Response, request, send_from_directory
 from loguru import logger
@@ -13,6 +13,9 @@ from config import Config
 from .converters import ColorConverter, DimensionConverter
 from .logging import config_logging, log_request
 from .wrapped_redis import WrappedRedis
+
+if TYPE_CHECKING:
+    from wsgiref.headers import Headers
 
 redisw = WrappedRedis()
 
@@ -27,7 +30,7 @@ exts_group = "|".join(exts_rev)
 EXT_RE = re.compile("^(?:{0})".format(exts_group))
 
 
-def wn_add_headers(headers, path, url):
+def wn_add_headers(headers: "Headers", path: str, url: str):
     logger.info("Serving static file: {0}", url)
     headers["X-Powered-By"] = "Flask/WhiteNoise"
 
@@ -58,7 +61,7 @@ def configure_hsts(app: Flask):
         return None
 
 
-def after_request_callback(hsts_header: Optional[str], res: Response):
+def after_request_callback(hsts_header: Optional[str], res: Response) -> Response:
     log_request(res)
     endpoint = request.endpoint
     if endpoint == "core.index":
@@ -94,7 +97,7 @@ def create_app(config=Config):
 
     redisw.init_app(app)
 
-    from . import core, api, cli, __version__
+    from . import __version__, api, cli, core
 
     app.register_blueprint(core.bp)
     app.register_blueprint(api.bp, url_prefix="/api")
@@ -115,18 +118,18 @@ def create_app(config=Config):
     if config.DEBUG:
         app.wsgi_app = DebuggedApplication(app.wsgi_app, evalex=True)
 
-    @app.before_request
-    def before_request_cb():
+    def _before_request_cb():
         request.start_time = time.monotonic()
 
-    app.after_request(partial(after_request_callback, HSTS_HEADER))
-
-    @app.route("/favicon.ico")
-    def _favicon_route():
+    def _favicon():
         return send_from_directory(app.root_path, "fav.ico")
 
-    @app.context_processor
     def _ctx():
         return {"version": __version__.__version__}
+
+    app.before_request(_before_request_cb)
+    app.after_request(partial(after_request_callback, HSTS_HEADER))
+    app.add_url_rule("/favicon.ico", "favicon", _favicon)
+    app.context_processor(_ctx)
 
     return app

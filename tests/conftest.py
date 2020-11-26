@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING
 
 import pytest
+from hypothesis import settings
 from loguru import logger
 
 if TYPE_CHECKING:
@@ -19,6 +20,9 @@ def pytest_configure(config: "Config"):
         "<blue>{name}</blue>:<cyan>{line}</cyan> - <bold>{message}</bold>"
     )
     logger.add("log/holdmytests.log", format=fmt, level="DEBUG", filter=_log_filt)
+    settings.register_profile("ci", max_examples=100, deadline=None)
+    settings.register_profile("dev", max_examples=25, deadline=None)
+    settings.load_profile("dev")
 
 
 @pytest.fixture(scope="session", name="config")
@@ -31,10 +35,9 @@ def config_fixture(tmp_path_factory: "TempPathFactory"):
     class TestConfig(Config):
         DEBUG = False
         TESTING = True
-        # REDIS_URL = None
         SAVED_IMAGES_MAX_NUM = 250
         LOG_FILE_NAME = "holdmypics-test"
-        SAVED_IMAGES_CACHE_DIR = image_dir
+        # SAVED_IMAGES_CACHE_DIR = image_dir
 
     return TestConfig
 

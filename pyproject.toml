@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "holdmypics"
-version = "0.16.0"
+version = "0.16.1"
 description = ""
 authors = ["Michael Van Wickle <mvanwickle@gmail.com>"]
 
@@ -9,15 +9,15 @@ python = "^3.6.1"
 attrs = "^20.0"
 beautifulsoup4 = { version = "^4.3", extras = ["lxml"] }
 cytoolz = "^0.11"
-environs = "^8.0"
+environs = "^9.0"
 flask = "^1.1"
 flask-cors = "^3.0.8"
 flask-redis = "^0.4.0"
 funcy = "^1.12"
 gunicorn = { version = "^20.0" }
-humanize = "^2.0.0"
+humanize = "^3.0"
 loguru = "^0.5.0"
-Pillow = "^7.0.0"
+Pillow = "^8.0"
 semver = "^2.9.1"
 tomlkit = "^0.7.0"
 whitenoise = { version = "^5.0.1", extras = ["brotli"] }
@@ -25,19 +25,20 @@ whitenoise = { version = "^5.0.1", extras = ["brotli"] }
 pytest = { version = "^6.0", optional = true }
 pytest-cov = { version = "^2.8.1", optional = true }
 pytest-html = { version = "^2.0.0", optional = true }
+hypothesis = { version = "^5", optional = true }
 pytesseract = { version = "^0.3.4", optional = true }
 
 [tool.poetry.dev-dependencies]
 colorama = "^0.4.3"
 isort = "^5.0"
-memory_profiler = "^0.57.0"
+memory_profiler = "^0.58.0"
 pre-commit = "^2.3.0"
 psutil = "^5.6.5"
 ptpython = "^3.0.0"
 toml = "^0.10.0"
 
 [tool.poetry.extras]
-tests = ["pytest", "pytest-cov", "pytest-html"]
+tests = ["pytest", "pytest-cov", "pytest-html", "hypothesis"]
 ocr = ["pytesseract"]
 
 [tool.poetry.scripts]
@@ -67,7 +68,7 @@ exclude_lines = [
     "def __repr__",
     "if TYPE_CHECKING",
     "raise NotImplementedError",
-    "if __name__ == .__main__.:"
+    "if __name__ == .__main__.:",
 ]
 
 [tool.coverage.html]

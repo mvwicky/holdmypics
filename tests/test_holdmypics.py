@@ -7,18 +7,28 @@ from urllib.parse import urlencode
 
 import pytest
 from cytoolz import valfilter
-from flask import Flask, Response
+from flask import Response
 from flask.testing import FlaskClient
+from hypothesis import assume, given
+from hypothesis import strategies as st
 from loguru import logger
 from PIL import Image
+
+from holdmypics import create_app
+from holdmypics.api.args import ImageArgs
+from holdmypics.api.img import make_image
+from holdmypics.api.utils import get_color
+from holdmypics.converters import COLOR_REGEX
 
 try:
     import pytesseract
 except ImportError:
     pytesseract = None
 
-
+RAND_COL = "rand".casefold()
+# COLOR_REGEX = ColorConverter.regex
 SKIP_INDEX = os.environ.get("TESTS_SKIP_INDEX", None) is not None
+IMG_FORMATS = ["png", "webp", "jpeg", "gif"]
 
 
 def random_color() -> str:
@@ -28,7 +38,7 @@ def random_color() -> str:
 
 bg_colors = ["Random", None]
 fg_colors = ["Random", None]
-texts = ["An bunch of words here", None]
+texts = ["A bunch of words here", None]
 
 
 def idfn(base: str):
@@ -40,11 +50,11 @@ def idfn(base: str):
 
 def make_route(
     width: int, height: int, bg_color: str = None, fg_color: str = None, fmt: str = None
-):
+) -> str:
     if not any([bg_color, fg_color, fmt]):
         pytest.fail("Can't make a route with just size")
     parts = ["{0}x{1}".format(width, height), bg_color, fg_color, fmt]
-    return "/api/" + "/".join(filter(bool, parts)) + "/"
+    return "".join(["/api/", "/".join(filter(bool, parts)), "/"])
 
 
 def make_url(
@@ -58,44 +68,73 @@ def make_url(
         return path
 
 
-@pytest.mark.skipif(SKIP_INDEX, reason="Doesn't work.")
+@pytest.mark.skipif(SKIP_INDEX, reason="Not testing client-side stuff.")
 def test_index(client):
     res = client.get("/")
     assert res.status_code == 200
 
 
-@pytest.fixture(name="fg_color", params=fg_colors, ids=idfn("fg"))
-def fg_color_fixture(request):
-    return random_color() if request.param else request.param
+# @pytest.fixture(name="fg_color", params=fg_colors, ids=idfn("fg"))
+# def fg_color_fixture(request):
+#     return random_color() if request.param else request.param
 
 
-@pytest.fixture(name="bg_color", params=bg_colors, ids=idfn("bg"))
-def bg_color_fixture(request):
-    return random_color() if request.param else request.param
+# @pytest.fixture(name="bg_color", params=bg_colors, ids=idfn("bg"))
+# def bg_color_fixture(request):
+#     return random_color() if request.param else request.param
 
 
-@pytest.fixture(name="text", params=texts, ids=["text=Words", "text=None"])
-def text_fixture(request):
-    return request.param
+# @pytest.fixture(name="text", params=texts, ids=["text=Words", "text=None"])
+# def text_fixture(request):
+#     return request.param
 
 
-@pytest.fixture(name="alpha", params=[0.75, None], ids=idfn("alpha"))
-def alpha_fixture(request):
-    return request.param
+# @pytest.fixture(name="alpha", params=[0.75, None], ids=idfn("alpha"))
+# def alpha_fixture(request):
+#     return request.param
 
 
-@pytest.fixture(name="args")
-def args_fixture(text, dpi, alpha):
-    return {"text": text, "dpi": dpi, "alpha": alpha}
+# @pytest.fixture(name="args")
+# def args_fixture(text, dpi, alpha):
+#     return {"text": text, "dpi": dpi, "alpha": alpha}
 
 
-@pytest.fixture(name="query")
-def query_fixture(args):
-    return args and urlencode(valfilter(bool, args))
+# @pytest.fixture(name="query")
+# def query_fixture(args):
+#     return args and urlencode(valfilter(bool, args))
 
 
+dim_strategy = st.integers(min_value=1, max_value=8192)
+color_strategy = st.one_of(st.none(), st.from_regex(COLOR_REGEX, fullmatch=True))
+alpha_strategy = st.one_of(
+    st.none(),
+    st.floats(min_value=0.0, max_value=1.0, allow_nan=False, allow_infinity=False),
+)
+text_strategy = st.one_of(st.none(), st.text(max_size=255))
+dpi_strategy = st.one_of(st.none(), st.integers(min_value=72, max_value=488))
+args_strategy = st.fixed_dictionaries(
+    {"text": text_strategy, "alpha": alpha_strategy, "dpi": dpi_strategy}
+)
+
+
+def test_favicon(client: FlaskClient):
+    url = "/favicon.ico"
+    res: Response = client.get(url)
+    assert res.status_code == 200
+    assert res.content_type == "image/x-icon"
+
+
+@given(
+    width=dim_strategy,
+    height=dim_strategy,
+    image_format=st.sampled_from(IMG_FORMATS),
+    fg_color=color_strategy,
+    bg_color=color_strategy,
+    args=args_strategy,
+)
 def test_create_images_using_function(
-    app: Flask,
+    # app: Flask,
+    config,
     width: int,
     height: int,
     image_format: str,
@@ -103,9 +142,12 @@ def test_create_images_using_function(
     bg_color: str,
     args: dict,
 ):
-    from holdmypics.api.args import ImageArgs
-    from holdmypics.api.img import make_image
-    from holdmypics.api.utils import get_color
+    app = create_app(config)
+
+    if fg_color:
+        assume(RAND_COL not in fg_color.casefold())
+    if bg_color:
+        assume(RAND_COL not in bg_color.casefold())
 
     with app.test_request_context():
         img_args = ImageArgs.from_request(valfilter(bool, args))
@@ -120,24 +162,36 @@ def test_create_images_using_function(
         assert im.size == size
 
 
+@given(
+    width=dim_strategy,
+    height=dim_strategy,
+    image_format=st.sampled_from(IMG_FORMATS),
+    fg_color=color_strategy,
+    bg_color=color_strategy,
+    args=args_strategy,
+)
 def test_create_images_using_client(
-    client: FlaskClient,
+    # client: FlaskClient,
+    config,
     width: int,
     height: int,
     image_format: str,
     fg_color: Optional[str],
     bg_color: Optional[str],
-    query: str,
+    args: dict,
 ):
-    url = make_route(width, height, bg_color, fg_color, image_format)
-    if query is not None:
-        url = "?".join([url, query])
-    res = client.get(url, follow_redirects=False)
-    assert res.status_code == 200
-    img_type = imghdr.what("filename", h=res.data)
-    assert img_type == image_format
-    im = Image.open(io.BytesIO(res.data))
-    assert im.size == (width, height)
+    app = create_app(config)
+    with app.test_client() as client:
+        query = args and urlencode(valfilter(bool, args))
+        url = make_route(width, height, bg_color, fg_color, image_format)
+        if query:
+            url = "?".join([url, query])
+        res = client.get(url, follow_redirects=False)
+        assert res.status_code == 200
+        img_type = imghdr.what("filename", h=res.data)
+        assert img_type == image_format
+        im = Image.open(io.BytesIO(res.data))
+        assert im.size == (width, height)
 
 
 @pytest.mark.skipif(pytesseract is None, reason="pytesseract not installed")

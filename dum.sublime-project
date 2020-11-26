@@ -1,21 +1,23 @@
 {
-    "folders": [
-        {
-            "path": ".",
-            "folder_exclude_patterns": [
-                "node_modules",
-                "*.egg-info",
-                ".cache",
-                "__pycache__",
-                "pytest-report",
-                ".pytest_cache",
-                ".cov",
-                ".vscode",
-                "dummy_flask/api/images"
-            ]
-        }
-    ],
-    "settings": {
-        "python_interpreter": "/users/michael/.pyenv/versions/resell-dev-3.7.5/bin/python"
+  "folders": [
+    {
+      "path": ".",
+      "folder_exclude_patterns": [
+        "node_modules",
+        "*.egg-info",
+        ".cache",
+        "__pycache__",
+        "pytest-report",
+        ".pytest_cache",
+        ".cov",
+        ".vscode",
+        "dummy_flask/api/images",
+        "dist",
+        ".hypothesis"
+      ]
     }
+  ],
+  "settings": {
+    "python_interpreter": "/users/michael/.pyenv/versions/holdmypics-3.8.6/bin/python"
+  }
 }

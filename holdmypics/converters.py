@@ -2,6 +2,9 @@ from werkzeug.routing import BaseConverter, ValidationError
 
 from ._types import Dimension
 
+COLOR_REGEX = r"(?:(?:[A-Fa-f0-9]{3}){1,2})"
+RAND_REGEX = r"(?i:rand)"
+
 
 class DimensionConverter(BaseConverter):
     regex = r"(?:\d+(?:x\d+)?)"
@@ -22,7 +25,7 @@ class DimensionConverter(BaseConverter):
 
 
 class ColorConverter(BaseConverter):
-    regex = r"(?:(?:(?:[A-Fa-f0-9]{3}){1,2})|(?i:rand))"
+    regex = f"(?:{COLOR_REGEX}|{RAND_REGEX})"
 
     def to_python(self, value: str) -> str:
         return value
