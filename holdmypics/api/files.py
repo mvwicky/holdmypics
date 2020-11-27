@@ -52,7 +52,7 @@ class GeneratedFiles(object):
         return hasher.hexdigest()
 
     def params_hash(self, *params) -> str:
-        return self.hash_strings(map(repr, params))
+        return self.hash_strings(*map(repr, params))
 
     def get_file_name(
         self, size: Dimension, bg: str, fg: str, fmt: str, args: ImageArgs
