@@ -39,12 +39,13 @@ def register(app: Flask):  # noqa: C901
     prod_dir = str(cfg_path / "prod")
     default_template = str(cfg_path / "Dockerfile.template")
 
-    @app.cli.command("freeze")
+    @app.cli.command()
     @click.option(
         "--both/--not-both",
         "-b/ ",
-        default=False,
-        help="Freeze both types of requirements.",
+        default=True,
+        help="Freeze main and dev requirements.",
+        show_default=True,
     )
     @click.option(
         "--dev/--not-dev",
@@ -57,7 +58,7 @@ def register(app: Flask):  # noqa: C901
         default=True,
         help="Create lock file without file hashes.",
     )
-    def freeze_reqs(both: bool, dev: bool, hashes: bool):
+    def freeze(both: bool, dev: bool, hashes: bool):
         """Create a requirements.txt file."""
         package: Package = Package.find_root()
         if both:

@@ -1,12 +1,19 @@
 from typing import TYPE_CHECKING
 
 import pytest
+from environs import Env
 from hypothesis import settings
 from loguru import logger
+from marshmallow.validate import OneOf
 
 if TYPE_CHECKING:
     from _pytest.config import Config
     from _pytest.tmpdir import TempPathFactory
+
+PROFILES = {
+    "ci": {"max_examples": 50, "deadline": None},
+    "dev": {"max_examples": 25, "deadline": None},
+}
 
 
 def _log_filt(record: dict) -> bool:
@@ -14,15 +21,18 @@ def _log_filt(record: dict) -> bool:
 
 
 def pytest_configure(config: "Config"):
+    env = Env()
+    env.read_env()
     fmt = (
         "[<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>] | "
         "<level>{level:<8}</level> | "
         "<blue>{name}</blue>:<cyan>{line}</cyan> - <bold>{message}</bold>"
     )
     logger.add("log/holdmytests.log", format=fmt, level="DEBUG", filter=_log_filt)
-    settings.register_profile("ci", max_examples=100, deadline=None)
-    settings.register_profile("dev", max_examples=25, deadline=None)
-    settings.load_profile("dev")
+    for name, kwargs in PROFILES.items():
+        settings.register_profile(name, **kwargs)
+    profile = env("HYPOTHESIS_PROFILE", default="ci", validate=OneOf(list(PROFILES)))
+    settings.load_profile(profile)
 
 
 @pytest.fixture(scope="session", name="config")

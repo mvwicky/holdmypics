@@ -1,7 +1,6 @@
 import os
 from typing import Callable, Dict, Tuple, Union
 
-import attr
 from humanize import naturalsize
 from loguru import logger
 from PIL import Image
@@ -9,10 +8,11 @@ from PIL import Image
 from .. import redisw
 from .._types import Dimension
 from ..constants import COUNT_KEY
+from ..converters import RAND_COLOR
 from ..utils import profile
 from .args import ImageArgs
 from .files import files
-from .utils import TextArgs, draw_text, get_color, normalize_fmt
+from .utils import TextArgs, draw_text, get_color, normalize_fmt, random_color
 
 OptValues = Union[str, bool, int, Tuple[int, int]]
 
@@ -48,8 +48,14 @@ def save_image(
 ) -> str:
     """Create an image or find an existing one and produce its path."""
     fmt = normalize_fmt(fmt)
+    bg_color, fg_color = map(str.casefold, (bg_color, fg_color))
+    if bg_color == RAND_COLOR:
+        bg_color = random_color()
+    if fg_color == RAND_COLOR:
+        fg_color = random_color()
+
     bg_color, fg_color = get_color(bg_color), get_color(fg_color)
-    path = files.get_file_name(size, bg_color, fg_color, fmt, *attr.astuple(args))
+    path = files.get_file_name(size, bg_color, fg_color, fmt, args)
 
     if os.path.isfile(path):
         os.utime(path)

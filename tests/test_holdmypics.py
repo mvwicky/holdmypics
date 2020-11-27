@@ -1,7 +1,6 @@
 import imghdr
 import io
 import os
-import random
 from typing import Optional
 from urllib.parse import urlencode
 
@@ -9,15 +8,13 @@ import pytest
 from cytoolz import valfilter
 from flask import Response
 from flask.testing import FlaskClient
-from hypothesis import assume, given
-from hypothesis import strategies as st
+from hypothesis import given, strategies as st
 from loguru import logger
 from PIL import Image
 
 from holdmypics import create_app
 from holdmypics.api.args import ImageArgs
-from holdmypics.api.img import make_image
-from holdmypics.api.utils import get_color
+from holdmypics.api.img import save_image
 from holdmypics.converters import COLOR_REGEX
 
 try:
@@ -25,27 +22,8 @@ try:
 except ImportError:
     pytesseract = None
 
-RAND_COL = "rand".casefold()
-# COLOR_REGEX = ColorConverter.regex
 SKIP_INDEX = os.environ.get("TESTS_SKIP_INDEX", None) is not None
 IMG_FORMATS = ["png", "webp", "jpeg", "gif"]
-
-
-def random_color() -> str:
-    """Generate a random hex string."""
-    return "".join(["{0:02x}".format(random.randrange(1 << 8)) for _ in range(3)])
-
-
-bg_colors = ["Random", None]
-fg_colors = ["Random", None]
-texts = ["A bunch of words here", None]
-
-
-def idfn(base: str):
-    def name_fn(value):
-        return f"{base}={value}"
-
-    return name_fn
 
 
 def make_route(
@@ -74,38 +52,9 @@ def test_index(client):
     assert res.status_code == 200
 
 
-# @pytest.fixture(name="fg_color", params=fg_colors, ids=idfn("fg"))
-# def fg_color_fixture(request):
-#     return random_color() if request.param else request.param
-
-
-# @pytest.fixture(name="bg_color", params=bg_colors, ids=idfn("bg"))
-# def bg_color_fixture(request):
-#     return random_color() if request.param else request.param
-
-
-# @pytest.fixture(name="text", params=texts, ids=["text=Words", "text=None"])
-# def text_fixture(request):
-#     return request.param
-
-
-# @pytest.fixture(name="alpha", params=[0.75, None], ids=idfn("alpha"))
-# def alpha_fixture(request):
-#     return request.param
-
-
-# @pytest.fixture(name="args")
-# def args_fixture(text, dpi, alpha):
-#     return {"text": text, "dpi": dpi, "alpha": alpha}
-
-
-# @pytest.fixture(name="query")
-# def query_fixture(args):
-#     return args and urlencode(valfilter(bool, args))
-
-
 dim_strategy = st.integers(min_value=1, max_value=8192)
-color_strategy = st.one_of(st.none(), st.from_regex(COLOR_REGEX, fullmatch=True))
+color_strategy = st.from_regex(COLOR_REGEX, fullmatch=True)
+opt_color_strategy = st.one_of(st.none(), color_strategy)
 alpha_strategy = st.one_of(
     st.none(),
     st.floats(min_value=0.0, max_value=1.0, allow_nan=False, allow_infinity=False),
@@ -133,7 +82,6 @@ def test_favicon(client: FlaskClient):
     args=args_strategy,
 )
 def test_create_images_using_function(
-    # app: Flask,
     config,
     width: int,
     height: int,
@@ -143,22 +91,13 @@ def test_create_images_using_function(
     args: dict,
 ):
     app = create_app(config)
-
-    if fg_color:
-        assume(RAND_COL not in fg_color.casefold())
-    if bg_color:
-        assume(RAND_COL not in bg_color.casefold())
+    logger.info("fg color: {}, bg color: {}", fg_color, bg_color)
 
     with app.test_request_context():
         img_args = ImageArgs.from_request(valfilter(bool, args))
         size = (width, height)
-        im = make_image(
-            size,
-            get_color(bg_color or "000"),
-            get_color(fg_color or "aaa"),
-            image_format,
-            img_args,
-        )
+        p = save_image(size, bg_color, fg_color, image_format, img_args)
+        im = Image.open(p)
         assert im.size == size
 
 
@@ -166,12 +105,11 @@ def test_create_images_using_function(
     width=dim_strategy,
     height=dim_strategy,
     image_format=st.sampled_from(IMG_FORMATS),
-    fg_color=color_strategy,
-    bg_color=color_strategy,
+    fg_color=opt_color_strategy,
+    bg_color=opt_color_strategy,
     args=args_strategy,
 )
 def test_create_images_using_client(
-    # client: FlaskClient,
     config,
     width: int,
     height: int,
@@ -197,12 +135,7 @@ def test_create_images_using_client(
 @pytest.mark.skipif(pytesseract is None, reason="pytesseract not installed")
 def test_random_text(client: FlaskClient):
     url = make_route(638, 328, "cef", "555", "png")
-    args = {
-        "text": "Some Random Text",
-        "dpi": None,
-        "alpha": None,
-        "random_text": True,
-    }
+    args = {"text": "Some Random Text", "dpi": None, "alpha": None, "random_text": True}
     query = urlencode(valfilter(bool, args))
     url = "?".join([url, query])
     res: Response = client.get(url, follow_redirects=False)
@@ -210,9 +143,7 @@ def test_random_text(client: FlaskClient):
     img_type = imghdr.what("filename", h=res.data)
     assert img_type == "png"
     im = Image.open(io.BytesIO(res.data))
-    assert im.size == (638, 328)
-    headers = res.headers
-    from_header = headers.get("X-Random-Text")
+    from_header = res.headers.get("X-Random-Text")
     assert from_header is not None
     from_ocr = pytesseract.image_to_string(im).strip()
     logger.info("Got text from OCR: {0}", from_ocr)

@@ -3,10 +3,12 @@ import os
 import re
 from typing import List, Optional, Pattern, Set
 
+import attr
 from flask import current_app
 
 from .._types import Dimension
 from . import bp
+from .args import ImageArgs
 
 fname_tbl = str.maketrans({"#": "", " ": "-", ".": "", "/": "-", "\\": "-"})
 
@@ -43,13 +45,21 @@ class GeneratedFiles(object):
     def need_to_clean(self) -> bool:
         return len(self.files) > self.max_files
 
-    def params_hash(self, *params) -> str:
+    def hash_strings(self, *strings: str) -> str:
         hasher = self.hash_function()  # type: ignore
-        for param in params:
-            hasher.update(repr(param).encode("utf-8"))
+        for s in strings:
+            hasher.update(s.encode("utf-8"))
         return hasher.hexdigest()
 
-    def get_file_name(self, size: Dimension, bg: str, fg: str, fmt: str, *args) -> str:
+    def params_hash(self, *params) -> str:
+        return self.hash_strings(map(repr, params))
+
+    def get_file_name(
+        self, size: Dimension, bg: str, fg: str, fmt: str, args: ImageArgs
+    ) -> str:
+        if args.text:
+            args = attr.evolve(args, text=self.hash_strings(args.text))
+        args = attr.astuple(args)
         if not current_app.config.get("HASH_IMG_FILE_NAMES", True):
             parts = ["x".join(map(str, size)), bg, fg] + list(args)
             base_name = "-".join(map(str, parts)).translate(fname_tbl)

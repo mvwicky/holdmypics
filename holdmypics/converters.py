@@ -2,8 +2,9 @@ from werkzeug.routing import BaseConverter, ValidationError
 
 from ._types import Dimension
 
+RAND_COLOR = "rand".casefold()
 COLOR_REGEX = r"(?:(?:[A-Fa-f0-9]{3}){1,2})"
-RAND_REGEX = r"(?i:rand)"
+RAND_REGEX = f"(?i:{RAND_COLOR})"
 
 
 class DimensionConverter(BaseConverter):
