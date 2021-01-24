@@ -1,6 +1,6 @@
 {
   "name": "holdmypics",
-  "version": "0.17.0",
+  "version": "0.17.1",
   "description": "Placeholder image generator",
   "repository": "https://github.com/mvwicky/holdmypics.git",
   "license": "MIT",
@@ -13,27 +13,6 @@
     "dev": "cross-env NODE_ENV=development webpack --config webpack.config.ts --progress",
     "prod": "cross-env NODE_ENV=production webpack --config webpack.config.ts --progress",
     "watch": "yarn run build:dev --watch"
-  },
-  "prettier": {
-    "arrowParens": "always",
-    "tabWidth": 2,
-    "overrides": [
-      {
-        "files": "*.ejs",
-        "options": {
-          "requirePragma": true
-        }
-      },
-      {
-        "files": [
-          "**/*.jinja"
-        ],
-        "options": {
-          "requirePragma": true,
-          "printWidth": 120
-        }
-      }
-    ]
   },
   "dependencies": {
     "friendly-words": "^1.1.10"
@@ -56,7 +35,6 @@
     "@types/optimize-css-assets-webpack-plugin": "^5.0.1",
     "@types/terser-webpack-plugin": "^4.0.0",
     "@types/webpack": "^4.41.2",
-    "@types/workbox-webpack-plugin": "^5.1.0",
     "@typescript-eslint/eslint-plugin": "^3.2.0",
     "@typescript-eslint/parser": "^3.2.0",
     "autoprefixer": "^9.7.4",
@@ -100,8 +78,7 @@
     "ts-node": "^8.6.2",
     "typescript": "^3.6.3",
     "webpack": "^4.41.5",
-    "webpack-cli": "^3.3.10",
-    "workbox-webpack-plugin": "^5.1.2"
+    "webpack-cli": "^3.3.10"
   },
   "engines": {
     "node": ">=12",

@@ -93,3 +93,8 @@ settings:
       directory:
         - src/tsconfig.json
         - tsconfig.json
+overrides:
+  - files: [webpack.config.ts]
+    env:
+      node: true
+      browser: false

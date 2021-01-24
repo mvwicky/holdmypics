@@ -1,15 +1,12 @@
-/* eslint-env node */
-
 import * as path from "path";
 import process from "process";
 
 import * as Clean from "clean-webpack-plugin";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
-import webpack from "webpack";
-
 import OptimizeCSSPlugin = require("optimize-css-assets-webpack-plugin");
 import TerserPlugin = require("terser-webpack-plugin");
+import webpack from "webpack";
 
 import * as pkg from "./package.json";
 
@@ -28,7 +25,7 @@ function ifProd<T>(obj: T): T | undefined {
 }
 
 const cleanExts = ["css", "js", "svg", "txt", "map"];
-const doClean = cleanExts.map((ext) => `**/*.${ext}`);
+const doClean: string[] = cleanExts.map((ext) => `**/*.${ext}`);
 const dontClean = ["!**/fonts", "!**/fonts/**/*", "!img", "!img/**/*"];
 const cleanPatterns = doClean.concat(dontClean);
 const cleanOpts: Clean.Options = {
@@ -59,17 +56,14 @@ function configureBabel(): webpack.RuleSetUseItem[] {
     {
       loader: require.resolve("babel-loader"),
       options: {
-        cacheDirectory: prodOr(
-          false,
-          path.resolve(__dirname, ".cache", "babel")
-        ),
+        cacheDirectory: relToNode(".cache", "babel", prodOr("prod", "dev")),
         cacheCompression: true,
         exclude: /node_modules/,
         presets: [
           [
             "@babel/preset-env",
             {
-              corejs: { version: "3.6", proposals: true },
+              corejs: { version: "3", proposals: true },
               debug: false,
               useBuiltIns: "usage",
               targets: { esmodules: true },
@@ -103,18 +97,8 @@ function configureStyles(): webpack.RuleSetUseItem[] {
         modules: false,
       },
     },
-    {
-      loader: require.resolve("postcss-loader"),
-    },
-    {
-      loader: require.resolve("sass-loader"),
-      options: {
-        implementation: require("sass"),
-        sassOptions: {
-          outputStyle: prodOr("compressed", "expanded"),
-        },
-      },
-    },
+    { loader: require.resolve("postcss-loader") },
+    { loader: require.resolve("sass-loader") },
   ];
 }
 
@@ -122,8 +106,8 @@ function configurePlugins(): webpack.Plugin[] {
   return [
     new Clean.CleanWebpackPlugin(cleanOpts),
     new MiniCssExtractPlugin({
-      filename: `style.[name].[contenthash:${hashlength}].css`,
-      chunkFilename: `[name].[contenthash:${hashlength}].css`,
+      filename: `style.[name].[contenthash].css`,
+      chunkFilename: `[name].[contenthash].css`,
     }),
     new HtmlWebpackPlugin({
       filename: path.join(templatesDir, "base-out.html"),
@@ -135,17 +119,17 @@ function configurePlugins(): webpack.Plugin[] {
     new webpack.DefinePlugin({
       PRODUCTION: JSON.stringify(prod),
     }),
-    new webpack.HashedModuleIdsPlugin({ hashDigestLength: 8 }),
+    new webpack.HashedModuleIdsPlugin({ hashDigestLength: 4 }),
   ];
 }
 
 const config: webpack.Configuration = {
   entry: pkg.entry,
   output: {
-    filename: `[name].[contenthash:${hashlength}].js`,
+    filename: `[name].[contenthash].js`,
     path: outPath,
     hashFunction: hashFn,
-    hashDigestLength: 64,
+    hashDigestLength: hashlength,
     publicPath,
     pathinfo: !prod,
   },
@@ -229,21 +213,11 @@ const config: webpack.Configuration = {
         new OptimizeCSSPlugin({
           cssProcessor: require("cssnano"),
           cssProcessorOptions: { preset: ["default"], map: true },
-          canPrint: false,
         })
       ),
     ]),
     splitChunks: {
       automaticNameDelimiter: "-",
-      cacheGroups: {
-        corejs_es: {
-          test: /[\\/]core-js[\\/]/,
-          name: "core-js",
-          minChunks: 1,
-          chunks: "all",
-          priority: 20,
-        },
-      },
     },
   },
   resolve: {
@@ -257,12 +231,7 @@ const config: webpack.Configuration = {
   stats: {
     modules: false,
     children: false,
-    excludeAssets: [
-      /fonts[\\/]spectral-/,
-      /\.map$/,
-      // /\.woff$/,
-      /\.LICENSE\.txt$/,
-    ],
+    excludeAssets: [/fonts[\\/]spectral-/, /\.map$/, /\.LICENSE\.txt$/],
     publicPath: true,
     cachedAssets: true,
   },

@@ -1,0 +1,19 @@
+{
+  "arrowParens": "always",
+  "tabWidth": 2,
+  "overrides": [
+    {
+      "files": "*.ejs",
+      "options": {
+        "requirePragma": true
+      }
+    },
+    {
+      "files": ["**/*.jinja"],
+      "options": {
+        "requirePragma": true,
+        "printWidth": 120
+      }
+    }
+  ]
+}

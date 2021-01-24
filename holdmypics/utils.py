@@ -47,5 +47,6 @@ def make_rules() -> List[Tuple[str, Dict[str, str]]]:
         (fmt_rule, colors_default),
         (bg_color, merge(fg_color_default, fmt_default)),
         ("/".join([bg_color, fmt_rule]), fg_color_default),
+        ("/".join([bg_color, fg_color]), fmt_default),
         ("/".join([bg_color, fg_color, fmt_rule]), {}),
     ]
