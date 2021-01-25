@@ -29,4 +29,9 @@ jobs:
           key: deps9-{{ .Branch }}-{{ checksum "poetry.lock" }}
           paths:
             - ".venv"
-            - "node_modules"
+      - store_artifacts:
+          path: .cache/pytest-report/report.html
+          destination: pytest-report.html
+      - store_artifacts:
+          path: .cache/.cov/htmlcov
+          destination: coverage
