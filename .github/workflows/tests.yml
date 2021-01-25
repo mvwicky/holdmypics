@@ -9,6 +9,8 @@ name: Tests
 jobs:
   tests:
     name: Test ${{ matrix.python-version }}
+    env:
+      TESTS_SKIP_INDEX: "1"
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
@@ -34,16 +36,16 @@ jobs:
           python get-poetry.py -y
           source $HOME/.poetry/env
           poetry config virtualenvs.in-project true
-      - name: Install dependencies
-        run: |
-          source $HOME/.poetry/env
-          poetry install --no-interaction --no-dev -E tests
-          yarn install --prod
       - name: Set up cache
         uses: actions/cache@v2
         with:
           path: .venv
           key: venv-${{ runner.os }}-${{ steps.full-python-version.outputs.version }}-${{ hashFiles('**/poetry.lock') }}
+      - name: Install dependencies
+        run: |
+          source $HOME/.poetry/env
+          poetry install --no-interaction --no-dev -E tests
+          yarn install --prod
       - name: Run pytest
         run: |
           source $HOME/.poetry/env
