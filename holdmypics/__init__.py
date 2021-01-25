@@ -1,12 +1,13 @@
 import re
+import sys
 import time
-from functools import partial
+from functools import lru_cache, partial
+from importlib.metadata import version
 from pathlib import Path
 from typing import TYPE_CHECKING, Optional
 
 from flask import Flask, Response, request, send_from_directory
 from loguru import logger
-from werkzeug.debug import DebuggedApplication
 from whitenoise import WhiteNoise
 
 from config import Config
@@ -21,8 +22,8 @@ redisw = WrappedRedis()
 
 HERE: Path = Path(__file__).resolve().parent
 
-
 CACHE_CONTROL_MAX = "max-age=315360000, public, immutable"
+PY_VERSION = ".".join(map(str, sys.version_info[:3]))
 
 exts = ["woff", "woff2", "js", "css"]
 exts_rev = [e[::-1] + "." for e in exts]
@@ -30,12 +31,25 @@ exts_group = "|".join(exts_rev)
 EXT_RE = re.compile("^(?:{0})".format(exts_group))
 
 
-def wn_add_headers(headers: "Headers", path: str, url: str):
+@lru_cache(maxsize=2)
+def get_powered_by(inc_whitenoise: bool) -> str:
+    python_version = "/".join(["Python", PY_VERSION])
+    flask_version = "/".join(["Flask", version("flask")])
+    parts = [python_version, flask_version]
+    if inc_whitenoise:
+        parts.append("/".join(["Whitenoise", version("whitenoise")]))
+    return ", ".join(parts)
+
+
+def wn_add_headers(version: str, headers: "Headers", path: str, url: str):
     logger.info("Serving static file: {0}", url)
-    headers["X-Powered-By"] = "Flask/WhiteNoise"
+    headers["X-Powered-By"] = get_powered_by(True)
+    headers["X-Version"] = version
 
 
-def immutable_file_test(path: str, url: str) -> bool:
+def immutable_file_test(debug: bool, path: str, url: str) -> bool:
+    if debug:
+        return False
     parts = url.rsplit("/", 1)
     if len(parts) == 1:
         return False
@@ -61,7 +75,9 @@ def configure_hsts(app: Flask):
         return None
 
 
-def after_request_callback(hsts_header: Optional[str], res: Response) -> Response:
+def after_request_callback(
+    hsts_header: Optional[str], version: str, res: Response
+) -> Response:
     log_request(res)
     endpoint = request.endpoint
     if endpoint == "core.index":
@@ -77,7 +93,8 @@ def after_request_callback(hsts_header: Optional[str], res: Response) -> Respons
     forwarded = request.headers.get("X-Forwarded-For", None)
     if forwarded is not None:
         res.headers["X-Was-Forwarded-For"] = forwarded
-    res.headers["X-Powered-By"] = "Flask"
+    res.headers["X-Powered-By"] = get_powered_by(False)
+    res.headers["X-Version"] = version
     elapsed = time.monotonic() - request.start_time
     res.headers["X-Processing-Time"] = elapsed
     return res
@@ -97,7 +114,8 @@ def create_app(config=Config):
 
     redisw.init_app(app)
 
-    from . import __version__, api, cli, core
+    from . import api, cli, core
+    from .__version__ import __version__
 
     app.register_blueprint(core.bp)
     app.register_blueprint(api.bp, url_prefix="/api")
@@ -108,14 +126,16 @@ def create_app(config=Config):
     app.wsgi_app = WhiteNoise(
         app.wsgi_app,
         autorefresh=True,
-        add_headers_function=wn_add_headers,
-        immutable_file_test=immutable_file_test,
+        add_headers_function=partial(wn_add_headers, __version__),
+        immutable_file_test=partial(immutable_file_test, config.DEBUG),
     )
 
     app.wsgi_app.add_files(str(HERE / "static"), prefix="static/")
     app.wsgi_app.add_files(str(base_path / "static"), prefix="static/")
 
     if config.DEBUG:
+        from werkzeug.debug import DebuggedApplication
+
         app.wsgi_app = DebuggedApplication(app.wsgi_app, evalex=True)
 
     def _before_request_cb():
@@ -125,10 +145,10 @@ def create_app(config=Config):
         return send_from_directory(app.root_path, "fav.ico")
 
     def _ctx():
-        return {"version": __version__.__version__}
+        return {"version": __version__}
 
     app.before_request(_before_request_cb)
-    app.after_request(partial(after_request_callback, HSTS_HEADER))
+    app.after_request(partial(after_request_callback, HSTS_HEADER, __version__))
     app.add_url_rule("/favicon.ico", "favicon", _favicon)
     app.context_processor(_ctx)
 

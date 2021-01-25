@@ -41,9 +41,7 @@ rules:
     - error
     - never
   prefer-const: error
-  semi:
-    - error
-    - always
+  semi: [error, always]
   sort-imports:
     - error
     - ignoreDeclarationSort: true
@@ -62,8 +60,7 @@ rules:
         - builtin
         - external
         - internal
-        - - sibling
-          - parent
+        - [sibling, parent]
         - unknown
         - index
       newlines-between: always
@@ -71,30 +68,28 @@ rules:
 settings:
   import/cache:
     lifetime: 60
-  import/core-modules:
-    - os
-    - path
-    - process
-    - fs
+  import/core-modules: [os, path, process, fs]
   import/extensions: [.js, .ts, .jsx, .tsx]
   import/external-module-folders: [node_modules]
   import/ignore:
     - \.(scss|css)$
     - autoprefixer
   import/parsers:
-    "@typescript-eslint/parser":
-      - .ts
+    "@typescript-eslint/parser": [.ts]
   import/resolver:
     webpack:
       config:
         resolve: { extensions: [.ts] }
     typescript:
       alwaysTryTypes: true
-      directory:
+      project:
         - src/tsconfig.json
         - tsconfig.json
 overrides:
-  - files: [webpack.config.ts]
+  - files: [webpack.config.ts, postcss.config.js]
     env:
       node: true
       browser: false
+  - files: ["src/ts/**/*.ts"]
+    globals:
+      PRODUCTION: readonly

@@ -3,7 +3,7 @@ default_language_version:
   python: python3.8
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.3.0
+    rev: v3.4.0
     hooks:
       - id: check-builtin-literals
       - id: check-merge-conflict
@@ -32,6 +32,6 @@ repos:
           - flake8-import-order
           - flake8-pytest-style
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v2.2.0
+    rev: v2.2.1
     hooks:
       - id: prettier

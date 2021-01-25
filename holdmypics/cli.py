@@ -12,11 +12,6 @@ from flask import Flask
 from loguru import logger
 from semver import VersionInfo
 
-from . import __version__
-from .generate import Generator
-from .package import Package
-from .server import Server
-
 SEMVER_BUMPS = {
     "major": VersionInfo.bump_major,
     "minor": VersionInfo.bump_minor,
@@ -60,6 +55,8 @@ def register(app: Flask):  # noqa: C901
     )
     def freeze(both: bool, dev: bool, hashes: bool):
         """Create a requirements.txt file."""
+        from .package import Package
+
         package: Package = Package.find_root()
         if both:
             logger.info("Freezing both requirement types.")
@@ -87,13 +84,16 @@ def register(app: Flask):  # noqa: C901
 
         The pyproject.toml version is treated as canonical.
         """
+        from . import __version__
+        from .package import Package
+
         package: Package = Package.find_root()
         proj = package.root_dir / "pyproject.toml"
         pkg = package.root_dir / "package.json"
 
         proj_data = toml.parse(proj.read_text())
 
-        poetry = get_in(["tool", "poetry"], proj_data)
+        poetry: dict = get_in(["tool", "poetry"], proj_data)
         version = semver.parse_version_info(poetry["version"])
         if bump:
             f = SEMVER_BUMPS[level]
@@ -126,10 +126,12 @@ def register(app: Flask):  # noqa: C901
             logger.warning("No package.json found.")
 
     @app.cli.command()
-    @click.option("--run/--no-run", default=True)
-    @click.option("--yarn/--no-yarn", default=True)
+    @click.option("--run/--no-run", default=True, help="Don't start the server.")
+    @click.option("--yarn/--no-yarn", default=True, help="Don't start yarn")
     def serve(run: bool, yarn: bool):
         """Run dev server and build client bundles."""
+        from .server import Server
+
         server = Server(app, start_run=run, start_yarn=yarn)
         server.start()
         server.loop()
@@ -188,5 +190,7 @@ def register(app: Flask):  # noqa: C901
 
         Dockerfiles will be based on a given [TEMPLATE]
         """
+        from .generate import Generator
+
         gen = Generator(template, dev_output, prod_output)
         gen.generate(dry_run, verbose, yes, port)

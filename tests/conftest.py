@@ -1,3 +1,4 @@
+import os
 from typing import TYPE_CHECKING
 
 import pytest
@@ -28,7 +29,8 @@ def pytest_configure(config: "Config"):
         "<level>{level:<8}</level> | "
         "<blue>{name}</blue>:<cyan>{line}</cyan> - <bold>{message}</bold>"
     )
-    logger.add("log/holdmytests.log", format=fmt, level="DEBUG", filter=_log_filt)
+    log_file = os.path.join("log", "holdmytests.log")
+    logger.add(log_file, format=fmt, level="DEBUG", filter=_log_filt)
     for name, kwargs in PROFILES.items():
         settings.register_profile(name, **kwargs)
     profile = env("HYPOTHESIS_PROFILE", default="ci", validate=OneOf(list(PROFILES)))

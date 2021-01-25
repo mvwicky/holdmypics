@@ -24,13 +24,13 @@ class Server(object):
         if self.start_yarn:
             self._start_yarn()
         if self.start_run:
-            dev_args = [
+            args = [
                 "gunicorn",
                 "wsgi:application",
                 "--config",
                 "python:gunicorn_config",
             ]
-            self._start_proc("dev_server", dev_args)
+            self._start_proc("dev_server", args)
         n = len(self.procs)
         ts = "" if n == 1 else "es"
         logger.info("Started {0} process{1}", n, ts)

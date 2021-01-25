@@ -1,6 +1,7 @@
 import checkSvg from "Feather/check.svg";
 import copySvg from "Feather/copy.svg";
 import refreshCwSvg from "Feather/refresh-cw.svg";
+import feather from "feather-icons";
 
 import { truthy } from "./helpers/bools";
 import { log } from "./log";
@@ -37,4 +38,5 @@ export function replaceIcons() {
   document
     .querySelectorAll<HTMLElement>("[data-icon]")
     .forEach(replaceIcon.bind(null));
+  feather.replace();
 }
