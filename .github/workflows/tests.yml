@@ -1,0 +1,45 @@
+---
+name: Tests
+"on":
+  push:
+    paths-ignore:
+      - "src/**"
+    branches:
+      - main
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        python-version: [3.9]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Set up Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+      - name: Get full python version
+        shell: bash
+        id: full-python-version
+        run: echo ::set-output name=version::$(python -c "import sys; print('-'.join(str(v) for v in sys.version_info))")
+      - name: Install poetry
+        run: |
+          curl -sSL -o get-poetry.py https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py
+          python get-poetry.py -y
+          source $HOME/.poetry/env
+          poetry config virtualenvs.in-project true
+      - name: Set up cache
+        uses: actions/cache@v2
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ steps.full-python-version.outputs.version }}-${{ hashFiles('**/poetry.lock') }}
+      - name: Install dependencies
+        run: |
+          source $HOME/.poetry/env
+          poetry install --no-interaction --no-dev -E tests
+          yarn install --prod
