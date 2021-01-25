@@ -1,30 +1,32 @@
 ---
 version: 2.1
+workflows:
+  version: 2
+  test:
+    jobs:
+      - test
 jobs:
-  build:
+  test:
     docker:
-      - image: cimg/python:3.8-node
+      - image: cimg/python:3.9-node
         environment:
           POETRY_VIRTUALENVS_IN_PROJECT: "1"
           POETRY_VIRTUALENVS_CREATE: "1"
           TESTS_SKIP_INDEX: "1"
-      - image: circleci/redis:6.0.8-alpine
+      - image: circleci/redis:6.0.10-alpine
     steps:
       - checkout
       - restore_cache:
           key: deps9-{{ .Branch }}-{{ checksum "poetry.lock" }}
-      # - run:
-      #     command: |
-      #       apt-get update
-      #       apt-get install tesseract-ocr libtesseract-dev
       - run:
           command: |
             curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
-            poetry install --no-interaction -E tests
+            poetry install --no-interaction --no-dev -E tests
             yarn install --prod
+      - run: |
+          poetry run pytest --no-empty-dpi
       - save_cache:
           key: deps9-{{ .Branch }}-{{ checksum "poetry.lock" }}
           paths:
             - ".venv"
-      - run: |
-          poetry run pytest --no-empty-dpi
+            - "node_modules"
