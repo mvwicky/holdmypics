@@ -10,7 +10,7 @@ from flask import Flask, Response, request, send_from_directory
 from loguru import logger
 from whitenoise import WhiteNoise
 
-from config import Config
+import config
 from .converters import ColorConverter, DimensionConverter
 from .logging import config_logging, log_request
 from .wrapped_redis import WrappedRedis
@@ -100,12 +100,12 @@ def after_request_callback(
     return res
 
 
-def create_app(config=Config):
-    log_file_name = config.LOG_FILE_NAME or __name__
-    config_logging(__name__, log_file_name, config.LOG_DIR, config.LOG_LEVEL)
+def create_app(cfg=config):
+    log_file_name = cfg.LOG_FILE_NAME or __name__
+    config_logging(__name__, log_file_name, cfg.LOG_DIR, cfg.LOG_LEVEL)
 
     app = Flask(__name__)
-    app.config.from_object(config)
+    app.config.from_object(cfg)
 
     HSTS_HEADER = configure_hsts(app)
 
@@ -127,13 +127,13 @@ def create_app(config=Config):
         app.wsgi_app,
         autorefresh=True,
         add_headers_function=partial(wn_add_headers, __version__),
-        immutable_file_test=partial(immutable_file_test, config.DEBUG),
+        immutable_file_test=partial(immutable_file_test, cfg.DEBUG),
     )
 
     app.wsgi_app.add_files(str(HERE / "static"), prefix="static/")
     app.wsgi_app.add_files(str(base_path / "static"), prefix="static/")
 
-    if config.DEBUG:
+    if cfg.DEBUG:
         from werkzeug.debug import DebuggedApplication
 
         app.wsgi_app = DebuggedApplication(app.wsgi_app, evalex=True)

@@ -9,7 +9,7 @@ import click
 from cytoolz import merge
 from jinja2 import Environment, FileSystemLoader, Template
 
-from config import Config
+import config
 
 PY_VERSION = ".".join(map(str, sys.version_info[0:3]))
 
@@ -34,7 +34,7 @@ class Generator(object):
     def confirm(self, file: Path, yes: bool) -> bool:
         if yes or not file.is_file():
             return True
-        rel = Config.rel_to_root(file)
+        rel = config.rel_to_root(file)
         return click.confirm("Overwrite {0}?".format(rel), default=True)
 
     def generate(self, dry_run: bool, verbosity: int, yes: bool, port: Optional[int]):
@@ -77,7 +77,7 @@ class Generator(object):
 
         if not dry_run:
             file.write_text(cts)
-            click.secho("Wrote {0}".format(Config.rel_to_root(file)), fg="blue")
+            click.secho("Wrote {0}".format(config.rel_to_root(file)), fg="blue")
 
     @property
     def template(self) -> Template:
