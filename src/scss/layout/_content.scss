@@ -8,6 +8,10 @@
   h1 {
     @include m-space("bottom", 4);
   }
+
+  & > * + * {
+    @include m-space("top", 2);
+  }
 }
 
 .row {
@@ -15,5 +19,4 @@
   flex-direction: row;
   justify-content: center;
   width: 100%;
-  @include m-space("bottom", 2);
 }

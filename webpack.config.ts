@@ -1,5 +1,4 @@
 import { join, resolve } from "path";
-import process from "process";
 
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
@@ -7,7 +6,7 @@ import TerserPlugin = require("terser-webpack-plugin");
 import webpack from "webpack";
 import type { Configuration } from "webpack";
 
-import * as pkg from "./package.json";
+import { config } from "./package.json";
 
 const prod = process.env.NODE_ENV === "production";
 
@@ -15,7 +14,7 @@ function compact<T>(arr: (T | undefined)[]): T[] {
   return arr.filter((e) => e !== undefined && typeof e !== "undefined") as T[];
 }
 
-function prodOr<P = any, D = any>(pVal: P, dVal: D): P | D {
+function prodOr<P = any, D = P>(pVal: P, dVal: D): P | D {
   return prod ? pVal : dVal;
 }
 
@@ -27,24 +26,23 @@ const relToRoot = (...args: string[]) => resolve(__dirname, ...args);
 const relToNode = (...args: string[]) => relToRoot("node_modules", ...args);
 const relToSrc = (...args: string[]) => relToRoot("src", ...args);
 
-const [hashFn, hashlength] = ["md5", 28];
+const [hashFunction, hashDigestLength] = ["md5", 28];
 
 const rootDir = relToRoot("holdmypics");
-const outPath = join(__dirname, "static", "dist");
-
 const templatesDir = join(rootDir, "core", "templates");
+const outPath = join(__dirname, "static", "dist");
 
 const mode = prodOr("production", "development");
 const publicPath = "/static/dist/";
 const contenthash = prodOr(".[contenthash]", "");
 
-const config: Configuration = {
-  entry: pkg.entry,
+const configuration: Configuration = {
+  entry: config.entry,
   output: {
     filename: `[name]${contenthash}.js`,
     path: outPath,
-    hashFunction: hashFn,
-    hashDigestLength: hashlength,
+    hashFunction,
+    hashDigestLength,
     publicPath,
   },
   devtool: prodOr("source-map", "cheap-module-source-map"),
@@ -69,30 +67,33 @@ const config: Configuration = {
     rules: [
       {
         test: /\.(ts)$/,
+        include: [relToSrc("ts")],
+        exclude: [/node_modules/],
         use: [
           {
             loader: require.resolve("babel-loader"),
             options: {
-              cacheDirectory: relToNode(".cache", "babel", mode),
-              cacheCompression: true,
+              cacheDirectory: false,
               exclude: /node_modules/,
-              presets: [
-                [
-                  "@babel/preset-env",
-                  {
-                    corejs: { version: "3", proposals: true },
-                    debug: false,
-                    useBuiltIns: "usage",
-                    targets: { esmodules: true },
-                    exclude: ["@babel/plugin-transform-template-literals"],
-                    bugfixes: true,
-                  },
-                ],
-                "@babel/typescript",
-              ],
+              presets: compact([
+                prodOr(
+                  [
+                    "@babel/preset-env",
+                    {
+                      corejs: { version: "3", proposals: true },
+                      debug: false,
+                      useBuiltIns: "usage",
+                      targets: { esmodules: true },
+                      exclude: ["@babel/plugin-transform-template-literals"],
+                      bugfixes: true,
+                    },
+                  ],
+                  undefined
+                ),
+                ["@babel/typescript", { onlyRemoveTypeImports: true }],
+              ]),
               plugins: [
                 "@babel/proposal-class-properties",
-                "@babel/plugin-transform-classes",
                 "@babel/proposal-object-rest-spread",
               ],
               parserOpts: {
@@ -101,7 +102,6 @@ const config: Configuration = {
             },
           },
         ],
-        include: [relToSrc("ts")],
       },
       {
         test: /\.svg$/,
@@ -182,9 +182,9 @@ const config: Configuration = {
   cache: {
     type: "filesystem",
     buildDependencies: {
-      config: [__filename],
+      config: [__filename, relToRoot("postcss.config.js")],
     },
   },
 };
 
-export default config;
+export default configuration;

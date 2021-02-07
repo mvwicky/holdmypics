@@ -1,18 +1,10 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2020",
     "module": "commonjs",
     "lib": ["dom", "ESNext"],
-    "allowJs": true,
-    "noEmit": true,
-    "strict": true,
-    "alwaysStrict": true,
-    "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true
+    "allowJs": true
   },
-  "files": ["./webpack.config.ts"]
+  "files": ["./webpack.config.ts"],
+  "extends": "./config/tsconfig.base.json"
 }

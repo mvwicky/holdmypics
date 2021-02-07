@@ -2,7 +2,6 @@ import "../scss/main.scss";
 
 import { rIC } from "./dom/idle";
 import { assertIsTag } from "./helpers/assert-is-tag";
-import { truthy } from "./helpers/bools";
 import { debounce } from "./helpers/debounce";
 import { elemIsTag } from "./helpers/elem-is-tag";
 import { replaceIcons } from "./icons";
@@ -34,10 +33,10 @@ const ARGS: readonly string[] = [
   "font",
 ];
 
-function isEndpointArgs(input: {
-  [k: string]: string;
-}): input is MakeEndpointArgs {
-  return ARGS.every((key) => key in input);
+function isEndpointArgs(
+  input: Record<string, string> | null
+): input is MakeEndpointArgs {
+  return input !== null && ARGS.every((key) => key in input);
 }
 
 function makeEndpoint(args: MakeEndpointArgs) {
@@ -102,7 +101,7 @@ function inputCallback(args: InputCallbackArgs) {
   log(`Input ${args.id} changed.`);
   const params = gatherParams(args.form);
   log(JSON.stringify(params, undefined, 2));
-  if (truthy(params) && isEndpointArgs(params)) {
+  if (isEndpointArgs(params)) {
     log(`Good parameters`);
     const url = makeEndpoint(params);
     args.endpoint.textContent = url.pathname + url.search;
@@ -122,7 +121,7 @@ async function main(this: Document) {
     return;
   }
   const endpoint = this.getElementById("endpoint-url");
-  if (!truthy(endpoint)) {
+  if (!endpoint) {
     return;
   }
   const btn = this.getElementById("copy-button");
@@ -137,14 +136,10 @@ async function main(this: Document) {
   rIC(() => initIcons(btn), { timeout: 3000 });
 
   const initialParams = gatherParams(form);
-  if (truthy(initialParams) && isEndpointArgs(initialParams)) {
-    rIC(
-      () => {
-        const url = makeEndpoint(initialParams);
-        btn.dataset.clipboardText = url.href;
-      },
-      { timeout: 3000 }
-    );
+  if (isEndpointArgs(initialParams)) {
+    rIC(() => (btn.dataset.clipboardText = makeEndpoint(initialParams).href), {
+      timeout: 3000,
+    });
   }
 
   const elements = form.elements;
@@ -165,13 +160,14 @@ async function main(this: Document) {
 }
 
 function initIcons(btn: HTMLButtonElement) {
-  replaceIcons();
-  const copyIconEl = btn.querySelector<HTMLElement>(".feather-copy");
-  const checkIconEl = btn.querySelector<HTMLElement>(".feather-check");
-  if (truthy(copyIconEl) && truthy(checkIconEl)) {
-    log("Everything seems to exist.");
-    afterFeather(btn, copyIconEl, checkIconEl);
-  }
+  replaceIcons().then(() => {
+    const copyIconEl = btn.querySelector<HTMLElement>(".feather-copy");
+    const checkIconEl = btn.querySelector<HTMLElement>(".feather-check");
+    if (copyIconEl && checkIconEl) {
+      log("Everything seems to exist.");
+      afterFeather(btn, copyIconEl, checkIconEl);
+    }
+  });
 }
 
 async function afterFeather(
@@ -207,8 +203,10 @@ async function afterFeather(
       const copy = new Clipboard(copyBtn);
       copy.on("success", () => {
         tip.show();
+        copyBtn.classList.add("just-copied");
         window.setTimeout(() => {
           tip.hide();
+          copyBtn.classList.remove("just-copied");
         }, 1500);
       });
       log("Check and copy icons exist.");

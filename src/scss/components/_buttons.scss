@@ -11,22 +11,65 @@
 }
 /* purgecss end ignore */
 
+$scale-max: 1.05;
+
+@keyframes copied {
+  from {
+    background-position: bottom right;
+    transform: scale3d(1, 1, 1);
+  }
+  50% {
+    transform: scale3d(#{$scale-max}, #{$scale-max}, #{$scale-max});
+  }
+  to {
+    background-position: bottom left;
+    transform: scale3d(1, 1, 1);
+  }
+}
+
 #copy-button {
+  --ring-color: hsl(210, 100%, 75%);
+  --gradient-from-color: rgba(44, 82, 130, 0.9);
+  --gradient-to-color: rgba(0, 100, 255, 0.3);
+  --gradient-color-stops: var(--gradient-from-color) 50%,
+    var(--gradient-to-color) 100%;
+  --feather-stroke: #ffffff;
   align-items: center;
+  animation-direction: normal;
+  animation-duration: 1250ms;
+  animation-fill-mode: backwards;
+  animation-timing-function: ease-in-out;
+  background-clip: padding-box;
+  background-image: linear-gradient(to right, var(--gradient-color-stops));
+  background-position: left bottom;
+  background-repeat: no-repeat;
+  background-size: 200% 100%;
   border-radius: 5px;
+  color: var(--feather-stroke);
   cursor: pointer;
   display: flex;
-  height: 2rem;
   justify-content: space-around;
+  padding: 0.33rem 0.5rem;
   &:disabled {
     --feather-stroke: hsl(0, 0%, 73%);
     cursor: default;
   }
-  &:not(:disabled) {
-    &:hover {
-      --feather-stroke: hsl(0, 0%, 100%);
-      background-color: hsl(210, 100%, 56%);
-      color: var(--feather-stroke);
+  &:not(:disabled):hover {
+    --feather-stroke: hsl(0, 0%, 100%);
+    background-color: hsl(210, 100%, 56%);
+    box-shadow: var(--ring-inset) 0 0 0 calc(3px + var(--ring-offset-width))
+      var(--ring-color);
+    color: var(--feather-stroke);
+  }
+  &::after {
+    content: "Copy to Clipboard";
+    margin-left: modular-scale(-2);
+  }
+  &.just-copied {
+    animation-name: copied;
+
+    &::after {
+      content: "Copied to Clipboard";
     }
   }
 }

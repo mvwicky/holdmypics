@@ -1,6 +1,6 @@
 {
   "name": "holdmypics",
-  "version": "0.18.0",
+  "version": "0.19.0",
   "description": "Placeholder image generator",
   "repository": "https://github.com/mvwicky/holdmypics.git",
   "license": "MIT",
@@ -11,10 +11,16 @@
     "build:dev": "cross-env NODE_ENV=development webpack --config webpack.config.ts --progress",
     "build:prod": "cross-env NODE_ENV=production webpack --config webpack.config.ts --progress",
     "dev": "cross-env NODE_ENV=development webpack --config webpack.config.ts --progress",
+    "lint": "yarn lint:eslint && yarn lint:styles",
     "lint:eslint": "eslint '**/*.ts' '**/*.js'",
     "lint:styles": "stylelint 'src/scss/**/*.scss'",
     "prod": "cross-env NODE_ENV=production webpack --config webpack.config.ts --progress",
     "watch": "yarn run build:dev --watch"
+  },
+  "config": {
+    "entry": {
+      "main": "./src/ts/main.ts"
+    }
   },
   "dependencies": {
     "friendly-words": "^1.1.10"
@@ -28,7 +34,6 @@
     "@babel/preset-typescript": "^7.8.3",
     "@fullhuman/postcss-purgecss": "^4.0.0",
     "@popperjs/core": "^2.0.6",
-    "@types/autoprefixer": "^9.7.1",
     "@types/clipboard": "^2.0.1",
     "@types/debug": "^4.1.5",
     "@types/feather-icons": "^4.7.0",
@@ -55,17 +60,17 @@
     "eslint-plugin-prettier": "^3.1.0",
     "feather-icons": "^4.24.0",
     "html-loader": "^1.0.0",
-    "html-webpack-plugin": "^5.0.0-beta.6",
+    "html-webpack-plugin": "^5.0.0",
     "mini-css-extract-plugin": "^1.3.4",
     "pattern.css": "^1.0.0",
     "postcss": "^8.2.4",
     "postcss-csso": "^5.0.0",
-    "postcss-loader": "^4.2.0",
+    "postcss-loader": "^5.0.0",
     "prettier": "^2.0.0",
     "rfs": "^9.0.3",
     "sanitize.css": "^11.0.0",
     "sass": "^1.25.0",
-    "sass-loader": "^10.1.1",
+    "sass-loader": "^11.0.0",
     "sass-mq": "^5.0.1",
     "stylelint": "^13.3.3",
     "stylelint-config-prettier": "^8.0.1",
@@ -76,15 +81,12 @@
     "tippy.js": "^6.0.0",
     "ts-node": "^9.1.1",
     "typescript": "^4.1.3",
-    "webpack": "^5.17.0",
+    "webpack": "^5.20.0",
     "webpack-cli": "^4.4.0"
   },
   "engines": {
     "node": ">=12",
     "npm": "6.14.x",
     "yarn": "1.x"
-  },
-  "entry": {
-    "main": "./src/ts/main.ts"
   }
 }

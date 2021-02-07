@@ -10,7 +10,9 @@
           "0 HtmlWebpackPlugin_0": 0,
           "0 HtmlWebpackPlugin_0-0": 563
         },
-        "usedIds": []
+        "usedIds": [
+          563
+        ]
       },
       "modules": {
         "byIdentifier": {
@@ -28,17 +30,24 @@
     "byName": {
       "clipboard": 0,
       "core-js": 1,
+      "feather": 142,
       "main": 1,
       "tippy": 3,
       "vendors-tippy": 3
     },
     "bySource": {
       "0 clipboard": 0,
+      "0 feather": 142,
       "0 main": 1,
       "0 tippy": 3,
       "1 main": 2
     },
-    "usedIds": []
+    "usedIds": [
+      0,
+      1,
+      3,
+      142
+    ]
   },
   "mini-css-extract-plugin /Users/michael/GitHub/holdmypics/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./src/scss/main.scss": [
     {
@@ -49,7 +58,9 @@
         "bySource": {
           "0 mini-css-extract-plugin": 323
         },
-        "usedIds": []
+        "usedIds": [
+          323
+        ]
       },
       "modules": {
         "byIdentifier": {
@@ -78,6 +89,7 @@
         },
         "usedIds": [
           11,
+          15,
           32,
           52,
           118,
@@ -143,6 +155,7 @@
   "modules": {
     "byIdentifier": {
       "./node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use[0]!./src/ts/helpers/elem-is-tag.ts": 5302,
+      "./node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use[0]!./src/ts/main.ts|3fc75c0655c43a6b79b0fa981d04d24b": 961,
       "./node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use[0]!./src/ts/main.ts|8514e4f13e06128e4110fb2e27981d22": 9677,
       "./node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use[0]!./src/ts/random-text.ts": 5977,
       "./node_modules/clipboard/dist/clipboard.js": 2152,
@@ -154,6 +167,9 @@
       "./node_modules/core-js/internals/an-object.js": 9670,
       "./node_modules/core-js/internals/array-from.js": 8457,
       "./node_modules/core-js/internals/array-includes.js": 1318,
+      "./node_modules/core-js/internals/array-method-is-strict.js": 341,
+      "./node_modules/core-js/internals/array-method-uses-to-length.js": 207,
+      "./node_modules/core-js/internals/array-reduce.js": 671,
       "./node_modules/core-js/internals/call-with-safe-iteration-closing.js": 3411,
       "./node_modules/core-js/internals/check-correctness-of-iteration.js": 7072,
       "./node_modules/core-js/internals/classof-raw.js": 4326,
@@ -256,6 +272,7 @@
       "./node_modules/core-js/internals/well-known-symbol.js": 5112,
       "./node_modules/core-js/internals/whitespaces.js": 1361,
       "./node_modules/core-js/modules/es.array.iterator.js": 6992,
+      "./node_modules/core-js/modules/es.array.reduce.js": 827,
       "./node_modules/core-js/modules/es.promise.js": 8674,
       "./node_modules/core-js/modules/es.regexp.exec.js": 4916,
       "./node_modules/core-js/modules/es.string.iterator.js": 8783,
@@ -288,8 +305,6 @@
     "usedIds": [
       30,
       36,
-      72,
-      103,
       111,
       133,
       212,
@@ -297,8 +312,8 @@
       268,
       285,
       317,
-      336,
       408,
+      418,
       490,
       590,
       647,
@@ -307,6 +322,7 @@
       748,
       842,
       857,
+      961,
       1150,
       1223,
       1236,
@@ -321,16 +337,13 @@
       1694,
       1913,
       1956,
-      1957,
       2109,
       2152,
       2248,
       2261,
-      2266,
       2309,
       2534,
       2788,
-      2813,
       2999,
       3070,
       3099,
@@ -345,18 +358,14 @@
       3505,
       3887,
       3948,
-      4092,
       4326,
       4488,
-      4592,
-      4647,
       4664,
       4705,
       4765,
       4916,
       4994,
       5005,
-      5082,
       5112,
       5181,
       5296,
@@ -372,10 +381,8 @@
       6091,
       6135,
       6200,
-      6306,
       6324,
       6340,
-      6465,
       6656,
       6707,
       6833,
@@ -387,7 +394,6 @@
       7392,
       7466,
       7497,
-      7512,
       7593,
       7651,
       7659,
@@ -397,25 +403,19 @@
       8003,
       8006,
       8113,
-      8222,
-      8276,
       8324,
       8361,
       8457,
-      8498,
       8508,
       8523,
       8536,
       8544,
       8554,
-      8563,
       8674,
       8710,
       8783,
       8880,
-      9040,
       9114,
-      9137,
       9478,
       9518,
       9670,
