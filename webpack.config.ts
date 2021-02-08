@@ -153,7 +153,6 @@ const configuration: Configuration = {
             compress: {
               drop_console: false,
               drop_debugger: true,
-              ecma: 2018,
               global_defs: {
                 PRODUCTION: true,
               },
@@ -181,7 +180,7 @@ const configuration: Configuration = {
     publicPath: true,
     cachedAssets: true,
   },
-  recordsPath: relToSrc("webpack-records.json"),
+  recordsPath: relToSrc(`webpack-records-${prodOr("prod", "dev")}.json`),
   cache: {
     type: "filesystem",
     buildDependencies: {

@@ -3,117 +3,37 @@
     {
       "chunks": {
         "byName": {
-          "HtmlWebpackPlugin_0": 0,
           "HtmlWebpackPlugin_0-0": 563
         },
         "bySource": {
-          "0 HtmlWebpackPlugin_0": 0,
           "0 HtmlWebpackPlugin_0-0": 563
         },
-        "usedIds": [
-          563
-        ]
+        "usedIds": [563]
       },
       "modules": {
         "byIdentifier": {
           "./node_modules/html-webpack-plugin/lib/loader.js!./src/index.ejs": 582,
           "data:text/javascript,__webpack_public_path__ = htmlWebpackPluginPublicPath;": 187
         },
-        "usedIds": [
-          187,
-          582
-        ]
+        "usedIds": [187, 582]
       }
     }
   ],
   "chunks": {
     "byName": {
-      "clipboard": 0,
-      "core-js": 1,
+      "clipboard": 997,
       "feather": 142,
-      "main": 1,
-      "tippy": 3,
-      "vendors-tippy": 3
+      "main": 666,
+      "runtime": 666
     },
     "bySource": {
-      "0 clipboard": 0,
+      "0 clipboard": 997,
       "0 feather": 142,
-      "0 main": 1,
-      "0 tippy": 3,
-      "1 main": 2
+      "0 main": 666,
+      "1 main": 179
     },
-    "usedIds": [
-      0,
-      1,
-      3,
-      142
-    ]
+    "usedIds": [142, 666, 997]
   },
-  "mini-css-extract-plugin /Users/michael/GitHub/holdmypics/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./src/scss/main.scss": [
-    {
-      "chunks": {
-        "byName": {
-          "mini-css-extract-plugin": 323
-        },
-        "bySource": {
-          "0 mini-css-extract-plugin": 323
-        },
-        "usedIds": [
-          323
-        ]
-      },
-      "modules": {
-        "byIdentifier": {
-          "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/sanitize.css/forms.css": 11,
-          "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/sanitize.css/sanitize.css": 32,
-          "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/tippy.js/dist/backdrop.css": 496,
-          "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/tippy.js/dist/svg-arrow.css": 180,
-          "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/tippy.js/themes/light-border.css": 621,
-          "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/tippy.js/themes/light.css": 866,
-          "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/tippy.js/themes/material.css": 623,
-          "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/tippy.js/themes/translucent.css": 52,
-          "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./src/scss/main.scss": 517,
-          "./node_modules/css-loader/dist/runtime/api.js": 645,
-          "./node_modules/css-loader/dist/runtime/cssWithMappingToString.js": 15,
-          "./node_modules/css-loader/dist/runtime/getUrl.js": 667,
-          "./src/scss/theme/fonts/fira-mono-v8-latin-regular.woff": 118,
-          "./src/scss/theme/fonts/fira-mono-v8-latin-regular.woff2": 229,
-          "./src/scss/theme/fonts/spectral-v6-latin-200.woff": 559,
-          "./src/scss/theme/fonts/spectral-v6-latin-200.woff2": 136,
-          "./src/scss/theme/fonts/spectral-v6-latin-700.woff": 681,
-          "./src/scss/theme/fonts/spectral-v6-latin-700.woff2": 769,
-          "./src/scss/theme/fonts/spectral-v6-latin-italic.woff": 997,
-          "./src/scss/theme/fonts/spectral-v6-latin-italic.woff2": 507,
-          "./src/scss/theme/fonts/spectral-v6-latin-regular.woff": 438,
-          "./src/scss/theme/fonts/spectral-v6-latin-regular.woff2": 574
-        },
-        "usedIds": [
-          11,
-          15,
-          32,
-          52,
-          118,
-          136,
-          180,
-          229,
-          438,
-          496,
-          507,
-          517,
-          559,
-          574,
-          621,
-          623,
-          645,
-          667,
-          681,
-          769,
-          866,
-          997
-        ]
-      }
-    }
-  ],
   "mini-css-extract-plugin /Users/michael/GitHub/holdmypics/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[2].use[3]!./src/scss/main.scss": [
     {
       "chunks": {
@@ -123,20 +43,12 @@
         "bySource": {
           "0 mini-css-extract-plugin": 323
         },
-        "usedIds": [
-          323
-        ]
+        "usedIds": [323]
       },
       "modules": {
         "byIdentifier": {
           "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[2].use[3]!./node_modules/sanitize.css/forms.css": 440,
           "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[2].use[3]!./node_modules/sanitize.css/sanitize.css": 167,
-          "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[2].use[3]!./node_modules/tippy.js/dist/backdrop.css": 533,
-          "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[2].use[3]!./node_modules/tippy.js/dist/svg-arrow.css": 355,
-          "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[2].use[3]!./node_modules/tippy.js/themes/light-border.css": 150,
-          "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[2].use[3]!./node_modules/tippy.js/themes/light.css": 814,
-          "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[2].use[3]!./node_modules/tippy.js/themes/material.css": 165,
-          "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[2].use[3]!./node_modules/tippy.js/themes/translucent.css": 561,
           "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[2].use[3]!./src/scss/main.scss": 26,
           "./node_modules/css-loader/dist/runtime/api.js": 645,
           "./node_modules/css-loader/dist/runtime/cssWithMappingToString.js": 15,
@@ -157,70 +69,26 @@
           26,
           118,
           136,
-          150,
           167,
           180,
           229,
-          355,
           438,
           440,
-          533,
           559,
-          561,
           574,
           645,
           667,
           681,
           769,
-          814,
           997
         ]
-      }
-    }
-  ],
-  "mini-css-extract-plugin node_modules/css-loader/dist/cjs.js??ref--6-1!node_modules/postcss-loader/src/index.js!node_modules/sass-loader/dist/cjs.js!src/scss/main.scss": [
-    {
-      "chunks": {
-        "byName": {
-          "mini-css-extract-plugin": 0
-        },
-        "bySource": {
-          "0 mini-css-extract-plugin": 0
-        },
-        "usedIds": [
-          0
-        ]
-      },
-      "modules": {
-        "byIdentifier": {},
-        "usedIds": {}
-      }
-    }
-  ],
-  "mini-css-extract-plugin node_modules/css-loader/dist/cjs.js??ref--6-1!node_modules/postcss-loader/src/index.js!node_modules/sass-loader/dist/cjs.js??ref--6-3!src/scss/main.scss": [
-    {
-      "chunks": {
-        "byName": {
-          "mini-css-extract-plugin": 0
-        },
-        "bySource": {
-          "0 mini-css-extract-plugin": 0
-        },
-        "usedIds": [
-          0
-        ]
-      },
-      "modules": {
-        "byIdentifier": {},
-        "usedIds": {}
       }
     }
   ],
   "modules": {
     "byIdentifier": {
       "./node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use[0]!./src/ts/helpers/elem-is-tag.ts": 5302,
-      "./node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use[0]!./src/ts/main.ts|3fc75c0655c43a6b79b0fa981d04d24b": 961,
-      "./node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use[0]!./src/ts/main.ts|8514e4f13e06128e4110fb2e27981d22": 9677,
+      "./node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use[0]!./src/ts/main.ts|3fc75c0655c43a6b79b0fa981d04d24b": 2961,
       "./node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use[0]!./src/ts/random-text.ts": 5977,
       "./node_modules/clipboard/dist/clipboard.js": 2152,
       "./node_modules/core-js/internals/a-function.js": 3099,
@@ -231,14 +99,10 @@
       "./node_modules/core-js/internals/an-object.js": 9670,
       "./node_modules/core-js/internals/array-from.js": 8457,
       "./node_modules/core-js/internals/array-includes.js": 1318,
-      "./node_modules/core-js/internals/array-method-is-strict.js": 341,
-      "./node_modules/core-js/internals/array-method-uses-to-length.js": 207,
-      "./node_modules/core-js/internals/array-reduce.js": 671,
       "./node_modules/core-js/internals/call-with-safe-iteration-closing.js": 3411,
       "./node_modules/core-js/internals/check-correctness-of-iteration.js": 7072,
       "./node_modules/core-js/internals/classof-raw.js": 4326,
       "./node_modules/core-js/internals/classof.js": 648,
-      "./node_modules/core-js/internals/collection-delete-all.js": 4092,
       "./node_modules/core-js/internals/copy-constructor-properties.js": 9920,
       "./node_modules/core-js/internals/correct-prototype-getter.js": 8544,
       "./node_modules/core-js/internals/create-iterator-constructor.js": 4994,
@@ -250,8 +114,8 @@
       "./node_modules/core-js/internals/document-create-element.js": 317,
       "./node_modules/core-js/internals/dom-iterables.js": 8324,
       "./node_modules/core-js/internals/engine-is-ios.js": 6833,
-      "./node_modules/core-js/internals/engine-is-node.js": 268,
-      "./node_modules/core-js/internals/engine-is-webos-webkit.js": 36,
+      "./node_modules/core-js/internals/engine-is-node.js": 5268,
+      "./node_modules/core-js/internals/engine-is-webos-webkit.js": 1036,
       "./node_modules/core-js/internals/engine-user-agent.js": 8113,
       "./node_modules/core-js/internals/engine-v8-version.js": 7392,
       "./node_modules/core-js/internals/enum-bug-keys.js": 748,
@@ -262,7 +126,6 @@
       "./node_modules/core-js/internals/get-built-in.js": 5005,
       "./node_modules/core-js/internals/get-iterator-method.js": 1246,
       "./node_modules/core-js/internals/get-iterator.js": 8554,
-      "./node_modules/core-js/internals/get-map-iterator.js": 4647,
       "./node_modules/core-js/internals/get-substitution.js": 647,
       "./node_modules/core-js/internals/global.js": 7854,
       "./node_modules/core-js/internals/has.js": 6656,
@@ -278,7 +141,7 @@
       "./node_modules/core-js/internals/is-object.js": 111,
       "./node_modules/core-js/internals/is-pure.js": 1913,
       "./node_modules/core-js/internals/iterate.js": 408,
-      "./node_modules/core-js/internals/iterator-close.js": 212,
+      "./node_modules/core-js/internals/iterator-close.js": 9212,
       "./node_modules/core-js/internals/iterators-core.js": 3383,
       "./node_modules/core-js/internals/iterators.js": 7497,
       "./node_modules/core-js/internals/microtask.js": 5948,
@@ -310,7 +173,6 @@
       "./node_modules/core-js/internals/regexp-flags.js": 7066,
       "./node_modules/core-js/internals/regexp-sticky-helpers.js": 2999,
       "./node_modules/core-js/internals/require-object-coercible.js": 4488,
-      "./node_modules/core-js/internals/same-value-zero.js": 6465,
       "./node_modules/core-js/internals/same-value.js": 1150,
       "./node_modules/core-js/internals/set-global.js": 3505,
       "./node_modules/core-js/internals/set-species.js": 6340,
@@ -336,48 +198,25 @@
       "./node_modules/core-js/internals/well-known-symbol.js": 5112,
       "./node_modules/core-js/internals/whitespaces.js": 1361,
       "./node_modules/core-js/modules/es.array.iterator.js": 6992,
-      "./node_modules/core-js/modules/es.array.reduce.js": 827,
       "./node_modules/core-js/modules/es.promise.js": 8674,
       "./node_modules/core-js/modules/es.regexp.exec.js": 4916,
       "./node_modules/core-js/modules/es.string.iterator.js": 8783,
       "./node_modules/core-js/modules/es.string.replace.js": 5306,
       "./node_modules/core-js/modules/es.string.search.js": 4765,
       "./node_modules/core-js/modules/es.string.trim.js": 3210,
-      "./node_modules/core-js/modules/esnext.map.delete-all.js": 72,
-      "./node_modules/core-js/modules/esnext.map.every.js": 9137,
-      "./node_modules/core-js/modules/esnext.map.filter.js": 1957,
-      "./node_modules/core-js/modules/esnext.map.find-key.js": 103,
-      "./node_modules/core-js/modules/esnext.map.find.js": 6306,
-      "./node_modules/core-js/modules/esnext.map.includes.js": 4592,
-      "./node_modules/core-js/modules/esnext.map.key-of.js": 8276,
-      "./node_modules/core-js/modules/esnext.map.map-keys.js": 5082,
-      "./node_modules/core-js/modules/esnext.map.map-values.js": 2813,
-      "./node_modules/core-js/modules/esnext.map.merge.js": 8222,
-      "./node_modules/core-js/modules/esnext.map.reduce.js": 8563,
-      "./node_modules/core-js/modules/esnext.map.some.js": 336,
-      "./node_modules/core-js/modules/esnext.map.update.js": 7512,
       "./node_modules/core-js/modules/web.dom-collections.iterator.js": 3948,
       "./node_modules/core-js/modules/web.url-search-params.js": 1637,
       "./node_modules/core-js/modules/web.url.js": 285,
-      "./node_modules/feather-icons/dist/feather.js": 8508,
-      "./node_modules/html-loader/dist/cjs.js??ruleSet[1].rules[1].use[0]!./node_modules/feather-icons/dist/icons/check.svg": 9040,
-      "./node_modules/html-loader/dist/cjs.js??ruleSet[1].rules[1].use[0]!./node_modules/feather-icons/dist/icons/copy.svg": 8498,
-      "./node_modules/html-loader/dist/cjs.js??ruleSet[1].rules[1].use[0]!./node_modules/feather-icons/dist/icons/refresh-cw.svg": 2266,
-      "./node_modules/tippy.js/dist/tippy.esm.js|39723ad5d9b7a6c10045b8b465947c48": 418,
-      "./node_modules/tippy.js/dist/tippy.esm.js|e0346f3d58f87fbb421407e4f095466e": 5252
+      "./node_modules/feather-icons/dist/feather.js": 8508
     },
     "usedIds": [
       30,
-      36,
       111,
       133,
-      212,
       261,
-      268,
       285,
       317,
       408,
-      418,
       490,
       590,
       647,
@@ -386,7 +225,7 @@
       748,
       842,
       857,
-      961,
+      1036,
       1150,
       1223,
       1236,
@@ -408,6 +247,7 @@
       2309,
       2534,
       2788,
+      2961,
       2999,
       3070,
       3099,
@@ -432,6 +272,7 @@
       5005,
       5112,
       5181,
+      5268,
       5296,
       5302,
       5306,
@@ -480,6 +321,7 @@
       8783,
       8880,
       9114,
+      9212,
       9478,
       9518,
       9670,

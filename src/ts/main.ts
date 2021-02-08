@@ -11,10 +11,6 @@ function getClipboard() {
   return import(/* webpackChunkName: "clipboard" */ "clipboard");
 }
 
-function getTippy() {
-  return import(/* webpackChunkName: "tippy" */ "tippy.js");
-}
-
 function getRand() {
   return import(
     /* webpackChunkName: "random-text" */
@@ -171,30 +167,14 @@ function initIcons(btn: HTMLButtonElement) {
 }
 
 async function afterFeather(copyBtn: HTMLButtonElement) {
-  const { default: tippy, roundArrow } = await getTippy();
   const { default: Clipboard } = await getClipboard();
   rIC(
     () => {
-      const tip = tippy(copyBtn, {
-        trigger: "manual",
-        ignoreAttributes: true,
-        content: "Copied to Clipboard",
-        theme: "light light-border clipboard-tooltip",
-        arrow: roundArrow,
-        offset: [0, 12],
-        animation: "shift-away",
-      });
-      copyBtn.onanimationstart = (event: AnimationEvent) => {
-        log(`Start: ${event.animationName}`);
-      };
       copyBtn.onanimationend = (event: AnimationEvent) => {
-        log(`End: ${event.animationName}`);
-        tip.hide();
         copyBtn.classList.remove("just-copied");
       };
       const copy = new Clipboard(copyBtn);
       copy.on("success", () => {
-        tip.show();
         copyBtn.classList.add("just-copied");
       });
       log("Check and copy icons exist.");
