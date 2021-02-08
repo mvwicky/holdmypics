@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+# [Bash "strict mode"](http://redsymbol.net/articles/unofficial-bash-strict-mode/)
+set -euo pipefail
+IFS=$'\n\t'
+
+output() {
+  echo "-----> $*"
+}
+
+if [[ ! -f "./Procfile" ]]; then
+  cd ..
+fi
+# Only should ever have to traverse up one level.
+if [[ ! -f "./Procfile" ]]; then
+  exit 1
+fi
+
+python -m whitenoise.compress static/dist

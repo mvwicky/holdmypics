@@ -5,7 +5,7 @@
 .gitignore
 .vscode/
 *.sublime-*
-bin/
+bin/*.sh
 config/
 docker-*
 docker-compose.*
