@@ -165,16 +165,12 @@ function initIcons(btn: HTMLButtonElement) {
     const checkIconEl = btn.querySelector<HTMLElement>(".feather-check");
     if (copyIconEl && checkIconEl) {
       log("Everything seems to exist.");
-      afterFeather(btn, copyIconEl, checkIconEl);
     }
+    afterFeather(btn);
   });
 }
 
-async function afterFeather(
-  copyBtn: HTMLButtonElement,
-  copyIcon: HTMLElement,
-  checkIcon: HTMLElement
-) {
+async function afterFeather(copyBtn: HTMLButtonElement) {
   const { default: tippy, roundArrow } = await getTippy();
   const { default: Clipboard } = await getClipboard();
   rIC(
@@ -187,27 +183,19 @@ async function afterFeather(
         arrow: roundArrow,
         offset: [0, 12],
         animation: "shift-away",
-        onHidden: () => {
-          window.requestAnimationFrame(() => {
-            checkIcon.classList.add("d-none");
-            copyIcon.classList.remove("d-none");
-          });
-        },
-        onShow: () => {
-          window.requestAnimationFrame(() => {
-            checkIcon.classList.remove("d-none");
-            copyIcon.classList.add("d-none");
-          });
-        },
       });
+      copyBtn.onanimationstart = (event: AnimationEvent) => {
+        log(`Start: ${event.animationName}`);
+      };
+      copyBtn.onanimationend = (event: AnimationEvent) => {
+        log(`End: ${event.animationName}`);
+        tip.hide();
+        copyBtn.classList.remove("just-copied");
+      };
       const copy = new Clipboard(copyBtn);
       copy.on("success", () => {
         tip.show();
         copyBtn.classList.add("just-copied");
-        window.setTimeout(() => {
-          tip.hide();
-          copyBtn.classList.remove("just-copied");
-        }, 1500);
       });
       log("Check and copy icons exist.");
       copyBtn.disabled = false;

@@ -1,6 +1,6 @@
 {
   "name": "holdmypics",
-  "version": "0.19.0",
+  "version": "0.19.1",
   "description": "Placeholder image generator",
   "repository": "https://github.com/mvwicky/holdmypics.git",
   "license": "MIT",
@@ -66,6 +66,7 @@
     "postcss": "^8.2.4",
     "postcss-csso": "^5.0.0",
     "postcss-loader": "^5.0.0",
+    "postcss-reporter": "^7.0.2",
     "prettier": "^2.0.0",
     "rfs": "^9.0.3",
     "sanitize.css": "^11.0.0",

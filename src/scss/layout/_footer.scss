@@ -1,20 +1,14 @@
-@use "sass:map";
-
 footer {
   border: 1px solid var(--border);
   text-align: center;
   width: 100%;
-  @include m-short(4 0);
+  @include font-scale(-1);
   @include p-short(3);
-  .footer-group {
-    @include p-space("bottom", 3);
-    &:last-child {
-      padding-bottom: 0;
-    }
+
+  & > * + * {
+    @include m-space("top", 3);
   }
-  div {
-    @include font-scale(-1);
-  }
+
   h6 {
     @include font-scale(0);
     @include m-short(2);

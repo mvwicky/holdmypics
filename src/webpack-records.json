@@ -114,6 +114,70 @@
       }
     }
   ],
+  "mini-css-extract-plugin /Users/michael/GitHub/holdmypics/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[2].use[3]!./src/scss/main.scss": [
+    {
+      "chunks": {
+        "byName": {
+          "mini-css-extract-plugin": 323
+        },
+        "bySource": {
+          "0 mini-css-extract-plugin": 323
+        },
+        "usedIds": [
+          323
+        ]
+      },
+      "modules": {
+        "byIdentifier": {
+          "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[2].use[3]!./node_modules/sanitize.css/forms.css": 440,
+          "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[2].use[3]!./node_modules/sanitize.css/sanitize.css": 167,
+          "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[2].use[3]!./node_modules/tippy.js/dist/backdrop.css": 533,
+          "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[2].use[3]!./node_modules/tippy.js/dist/svg-arrow.css": 355,
+          "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[2].use[3]!./node_modules/tippy.js/themes/light-border.css": 150,
+          "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[2].use[3]!./node_modules/tippy.js/themes/light.css": 814,
+          "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[2].use[3]!./node_modules/tippy.js/themes/material.css": 165,
+          "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[2].use[3]!./node_modules/tippy.js/themes/translucent.css": 561,
+          "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[2].use[3]!./src/scss/main.scss": 26,
+          "./node_modules/css-loader/dist/runtime/api.js": 645,
+          "./node_modules/css-loader/dist/runtime/cssWithMappingToString.js": 15,
+          "./node_modules/css-loader/dist/runtime/getUrl.js": 667,
+          "./src/scss/theme/fonts/fira-mono-v8-latin-regular.woff": 118,
+          "./src/scss/theme/fonts/fira-mono-v8-latin-regular.woff2": 229,
+          "./src/scss/theme/fonts/spectral-v6-latin-200.woff": 559,
+          "./src/scss/theme/fonts/spectral-v6-latin-200.woff2": 136,
+          "./src/scss/theme/fonts/spectral-v6-latin-700.woff": 681,
+          "./src/scss/theme/fonts/spectral-v6-latin-700.woff2": 769,
+          "./src/scss/theme/fonts/spectral-v6-latin-italic.woff": 997,
+          "./src/scss/theme/fonts/spectral-v6-latin-italic.woff2": 438,
+          "./src/scss/theme/fonts/spectral-v6-latin-regular.woff": 180,
+          "./src/scss/theme/fonts/spectral-v6-latin-regular.woff2": 574
+        },
+        "usedIds": [
+          15,
+          26,
+          118,
+          136,
+          150,
+          167,
+          180,
+          229,
+          355,
+          438,
+          440,
+          533,
+          559,
+          561,
+          574,
+          645,
+          667,
+          681,
+          769,
+          814,
+          997
+        ]
+      }
+    }
+  ],
   "mini-css-extract-plugin node_modules/css-loader/dist/cjs.js??ref--6-1!node_modules/postcss-loader/src/index.js!node_modules/sass-loader/dist/cjs.js!src/scss/main.scss": [
     {
       "chunks": {

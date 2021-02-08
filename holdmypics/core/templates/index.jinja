@@ -13,6 +13,7 @@
 {%- endmacro %}
 
 {% block content %}
+<div class="wrapper">
 <main class="content">
   <div class="row justify-content-center text-row">
     <h1>{{ title }}</h1>
@@ -62,7 +63,7 @@
       title="Copy image URL to clipboard."
     >
       <i data-feather="copy" title="Copy to clipboard."></i>
-      <i class="d-none" data-feather="check" title="Copied"></i>
+      <i data-feather="check" title="Copied"></i>
     </button>
   </div>
   {#
@@ -168,27 +169,26 @@
     </div>
   </section>
 </main>
-<div class="row">
-  <footer>
-    <div class="footer-group">
-      <h6>Powered by {{ external("https://palletsprojects.com/p/flask/", "Flask") }}</h6>
-      <h6>And {{ external("https://www.heroku.com/", "Heroku") }}</h6>
+<footer>
+  <div class="footer-group">
+    <h6>Powered by {{ external("https://palletsprojects.com/p/flask/", "Flask") }}</h6>
+    <h6>And {{ external("https://www.heroku.com/", "Heroku") }}</h6>
+  </div>
+  <div class="footer-group">
+    <div>
+      Fira Mono, Fira Sans, Overpass, and Spectral are licensed under the
+      <a href="{{ ofl_license }}">Open Font License</a>.
     </div>
-    <div class="footer-group">
-      <div>
-        Fira Mono, Fira Sans, Overpass, and Spectral are licensed under the
-        <a href="{{ ofl_license }}">Open Font License</a>.
-      </div>
-      <div>Roboto is licensed under the <a href="{{ apache_license }}">Apache License</a>.</div>
-    </div>
-    {% set tag = "v" ~ version %}
-    {% set github_url = "https://github.com/mvwicky/holdmypics/tree/" ~ tag %}
-    <div class="footer-group">
-      <h6>Created by Michael Van Wickle</h6>
-      <h6>
-        Version: <code>{{ external(github_url, version) }}</code>
-      </h6>
-    </div>
-  </footer>
+    <div>Roboto is licensed under the <a href="{{ apache_license }}">Apache License</a>.</div>
+  </div>
+  {% set tag = "v" ~ version %}
+  {% set github_url = "https://github.com/mvwicky/holdmypics/tree/" ~ tag %}
+  <div class="footer-group">
+    <h6>Created by Michael Van Wickle</h6>
+    <h6>
+      Version: <code>{{ external(github_url, version) }}</code>
+    </h6>
+  </div>
+</footer>
 </div>
 {% endblock content %}

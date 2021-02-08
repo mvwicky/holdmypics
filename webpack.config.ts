@@ -129,7 +129,10 @@ const configuration: Configuration = {
             },
           },
           { loader: require.resolve("postcss-loader") },
-          { loader: require.resolve("sass-loader") },
+          {
+            loader: require.resolve("sass-loader"),
+            options: { sassOptions: { outputStyle: "expanded" } },
+          },
         ],
       },
       {

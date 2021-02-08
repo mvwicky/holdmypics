@@ -1,8 +1,12 @@
-html {
-  padding: 1em;
-  @include mq($from: "sm") {
-    padding: 1rem calc(40% - 17rem);
-  }
+.wrapper {
+  display: grid;
+  grid-template-columns: 1fr min(100ch, 100%) 1fr;
+
+  @include m-short(3 2);
+}
+
+.wrapper > * {
+  grid-column: 2;
 }
 
 body {

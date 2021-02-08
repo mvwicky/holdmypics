@@ -9,9 +9,8 @@
   vertical-align: middle;
   width: var(--feather-size, 1em);
 }
-/* purgecss end ignore */
 
-$scale-max: 1.05;
+$scale-max: 1.06;
 
 @keyframes copied {
   from {
@@ -56,8 +55,8 @@ $scale-max: 1.05;
   }
   &:not(:disabled):hover {
     --feather-stroke: hsl(0, 0%, 100%);
-    background-color: hsl(210, 100%, 56%);
-    box-shadow: var(--ring-inset) 0 0 0 calc(3px + var(--ring-offset-width))
+    --gradient-from-color: hsl(210, 100%, 56%);
+    box-shadow: var(--ring-inset) 0 0 0 calc(2px + var(--ring-offset-width))
       var(--ring-color);
     color: var(--feather-stroke);
   }
@@ -65,11 +64,24 @@ $scale-max: 1.05;
     content: "Copy to Clipboard";
     margin-left: modular-scale(-2);
   }
+  & .feather-check {
+    display: none;
+  }
+  & .feather-copy {
+    display: block;
+  }
   &.just-copied {
     animation-name: copied;
 
     &::after {
-      content: "Copied to Clipboard";
+      content: "Copied!";
+    }
+    & .feather-check {
+      display: block;
+    }
+    & .feather-copy {
+      display: none;
     }
   }
 }
+/* purgecss end ignore */
