@@ -26,7 +26,7 @@ CACHE_CONTROL_MAX = "max-age=315360000, public, immutable"
 PY_VERSION = ".".join(map(str, sys.version_info[:3]))
 
 exts = ["woff", "woff2", "js", "css"]
-exts_rev = [e[::-1] + "." for e in exts]
+exts_rev = ["".join((e[::-1], ".")) for e in exts]
 exts_group = "|".join(exts_rev)
 EXT_RE = re.compile("^(?:{0})".format(exts_group))
 
@@ -100,11 +100,15 @@ def after_request_callback(
     return res
 
 
-def create_app(cfg=config):
+class Holdmypics(Flask):
+    pass
+
+
+def create_app(cfg=config) -> Holdmypics:
     log_file_name = cfg.LOG_FILE_NAME or __name__
     config_logging(__name__, log_file_name, cfg.LOG_DIR, cfg.LOG_LEVEL)
 
-    app = Flask(__name__)
+    app = Holdmypics(__name__)
     app.config.from_object(cfg)
 
     HSTS_HEADER = configure_hsts(app)

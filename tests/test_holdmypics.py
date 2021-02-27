@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import imghdr
 import io
 import os
@@ -14,7 +16,7 @@ from PIL import Image
 
 from holdmypics import create_app
 from holdmypics.api.args import ImageArgs
-from holdmypics.api.img import save_image
+from holdmypics.api.img import GeneratedImage
 from holdmypics.converters import COLOR_REGEX
 
 try:
@@ -27,23 +29,12 @@ IMG_FORMATS = ["png", "webp", "jpeg", "gif"]
 
 
 def make_route(
-    width: int, height: int, bg_color: str = None, fg_color: str = None, fmt: str = None
+    sz: tuple[int, int], bg_color: str = None, fg_color: str = None, fmt: str = None
 ) -> str:
     if not any([bg_color, fg_color, fmt]):
         pytest.fail("Can't make a route with just size")
-    parts = ["{0}x{1}".format(width, height), bg_color, fg_color, fmt]
+    parts = ["{0}x{1}".format(*sz), bg_color, fg_color, fmt]
     return "".join(["/api/", "/".join(filter(bool, parts)), "/"])
-
-
-def make_url(
-    width: int, height: int, fmt: int, bg_color: str, fg_color: str, text: str
-):
-    path = make_route(width, height, bg_color, fg_color, fmt)
-    if text is not None:
-        query = urlencode({"text": text})
-        return "?".join([path, query])
-    else:
-        return path
 
 
 @pytest.mark.skipif(SKIP_INDEX, reason="Not testing client-side stuff.")
@@ -52,7 +43,8 @@ def test_index(client):
     assert res.status_code == 200
 
 
-dim_strategy = st.integers(min_value=1, max_value=8192)
+dim_strategy = st.integers(min_value=32, max_value=8192)
+size_strategy = st.tuples(dim_strategy, dim_strategy)
 color_strategy = st.from_regex(COLOR_REGEX, fullmatch=True)
 opt_color_strategy = st.one_of(st.none(), color_strategy)
 alpha_strategy = st.one_of(
@@ -70,12 +62,11 @@ def test_favicon(client: FlaskClient):
     url = "/favicon.ico"
     res: Response = client.get(url)
     assert res.status_code == 200
-    assert res.content_type in ["image/x-icon", "image/vnd.microsoft.icon"]
+    assert res.content_type in {"image/x-icon", "image/vnd.microsoft.icon"}
 
 
 @given(
-    width=dim_strategy,
-    height=dim_strategy,
+    size=size_strategy,
     image_format=st.sampled_from(IMG_FORMATS),
     fg_color=color_strategy,
     bg_color=color_strategy,
@@ -83,8 +74,7 @@ def test_favicon(client: FlaskClient):
 )
 def test_create_images_using_function(
     config,
-    width: int,
-    height: int,
+    size: tuple[int, int],
     image_format: str,
     fg_color: str,
     bg_color: str,
@@ -95,15 +85,17 @@ def test_create_images_using_function(
 
     with app.test_request_context():
         img_args = ImageArgs.from_request(valfilter(bool, args))
-        size = (width, height)
-        p = save_image(size, bg_color, fg_color, image_format, img_args)
+        img = GeneratedImage(size, bg_color, fg_color, image_format, img_args)
+        assert img.get_save_kw()
+        p = img.get_path()
+        assert os.path.isfile(p)
+        assert os.path.getsize(p)
         im = Image.open(p)
         assert im.size == size
 
 
 @given(
-    width=dim_strategy,
-    height=dim_strategy,
+    size=size_strategy,
     image_format=st.sampled_from(IMG_FORMATS),
     fg_color=opt_color_strategy,
     bg_color=opt_color_strategy,
@@ -111,8 +103,7 @@ def test_create_images_using_function(
 )
 def test_create_images_using_client(
     config,
-    width: int,
-    height: int,
+    size: tuple[int, int],
     image_format: str,
     fg_color: Optional[str],
     bg_color: Optional[str],
@@ -121,7 +112,7 @@ def test_create_images_using_client(
     app = create_app(config)
     with app.test_client() as client:
         query = args and urlencode(valfilter(bool, args))
-        url = make_route(width, height, bg_color, fg_color, image_format)
+        url = make_route(size, bg_color, fg_color, image_format)
         if query:
             url = "?".join([url, query])
         res = client.get(url, follow_redirects=False)
@@ -129,12 +120,12 @@ def test_create_images_using_client(
         img_type = imghdr.what("filename", h=res.data)
         assert img_type == image_format
         im = Image.open(io.BytesIO(res.data))
-        assert im.size == (width, height)
+        assert im.size == size
 
 
 @pytest.mark.skipif(pytesseract is None, reason="pytesseract not installed")
 def test_random_text(client: FlaskClient):
-    url = make_route(638, 328, "cef", "555", "png")
+    url = make_route((638, 328), "cef", "555", "png")
     args = {"text": "Some Random Text", "dpi": None, "alpha": None, "random_text": True}
     query = urlencode(valfilter(bool, args))
     url = "?".join([url, query])
@@ -151,7 +142,7 @@ def test_random_text(client: FlaskClient):
 
 
 def test_forwarding_headers(client: FlaskClient):
-    path = make_route(638, 328, "cef", "555", "png")
+    path = make_route((638, 328), "cef", "555", "png")
     args = {"text": "Some Random Text"}
     query = urlencode(args)
     url = "?".join([path, query])

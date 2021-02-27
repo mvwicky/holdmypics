@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import random
 from string import hexdigits
-from typing import NamedTuple, Tuple
+from typing import NamedTuple
 
 from cytoolz import memoize
 from loguru import logger
@@ -51,7 +53,7 @@ def pt_to_px(pt: float) -> float:
     return pt / PX_PER_PT
 
 
-def guess_size(height: int, font_name: str) -> Tuple[ImageFont, int]:
+def guess_size(height: int, font_name: str) -> tuple[ImageFont, int]:
     """Try and figure out the correct font size for a given height and font.
 
     Args:

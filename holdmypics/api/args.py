@@ -1,4 +1,7 @@
-from typing import Mapping, Optional
+from __future__ import annotations
+
+from collections.abc import Mapping
+from typing import Optional
 
 import attr
 import marshmallow as ma

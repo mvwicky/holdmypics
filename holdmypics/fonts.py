@@ -1,22 +1,24 @@
+from __future__ import annotations
+
 from functools import partial
 from pathlib import Path
-from typing import Dict, List, Optional, Set
+from typing import Optional
 
 import attr
 from flask import current_app
-from PIL import ImageFont
+from PIL.ImageFont import ImageFont, truetype
 
 none_attr = partial(attr.ib, default=None, init=False)
 
 
 @attr.s(auto_attribs=True, slots=True)
 class Fonts(object):
-    font_sizes: List[int] = attr.ib(factory=partial(list, range(4, 289, 4)), init=False)
+    font_sizes: list[int] = attr.ib(factory=partial(list, range(4, 289, 4)), init=False)
     _font_dir: Optional[Path] = none_attr()
-    _font_files: Dict[str, Path] = none_attr()
-    _fonts: Dict[str, Dict[int, ImageFont.ImageFont]] = none_attr()
+    _font_files: dict[str, Path] = none_attr()
+    _fonts: dict[str, dict[int, ImageFont]] = none_attr()
     _num_sizes: Optional[int] = none_attr()
-    _font_names: Set[str] = none_attr()
+    _font_names: set[str] = none_attr()
     _max_size: int = none_attr()
     _min_size: int = none_attr()
 
@@ -33,24 +35,24 @@ class Fonts(object):
         return self._font_dir
 
     @property
-    def font_files(self) -> Dict[str, Path]:
+    def font_files(self) -> dict[str, Path]:
         if self._font_files is None:
             font_dir = self.font_dir
             self._font_files = {f.stem: f for f in font_dir.glob("*.ttf")}
         return self._font_files
 
     @property
-    def fonts(self) -> Dict[str, Dict[int, ImageFont.ImageFont]]:
+    def fonts(self) -> dict[str, dict[int, ImageFont]]:
         if self._fonts is None:
             sizes, files = self.font_sizes, self.font_files
             self._fonts = {
-                name: {sz: ImageFont.truetype(str(file), size=sz) for sz in sizes}
+                name: {sz: truetype(str(file), size=sz) for sz in sizes}
                 for (name, file) in files.items()
             }
         return self._fonts
 
     @property
-    def font_names(self) -> Set[str]:
+    def font_names(self) -> set[str]:
         if self._font_names is None:
             self._font_names = set(self.font_files)
         return self._font_names

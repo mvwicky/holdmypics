@@ -1,5 +1,7 @@
 # TODO
 
+## Backend
+
 - [ ] More image variations
   - Tiled images
 - [ ] _Animation_
@@ -8,3 +10,7 @@
 - [ ] Refactor out image creation stuff into a library
 - [ ] Write more tests. Basically download an image from every endpoint/argument combination and verify.
   - e.g., open the file w/ Pillow and make sure the colors/alpha are right
+
+## Frontend
+
+- [ ] Replace `webpack` with `esbuild` (at least for the TypeScript parts)

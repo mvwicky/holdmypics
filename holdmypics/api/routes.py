@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import random
-from typing import Callable
+from collections.abc import Callable
 from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 
 from cytoolz import merge
@@ -17,28 +19,22 @@ from PIL import features
 
 from .. import redisw
 from .._types import Dimension, ResponseType
-from ..constants import COUNT_KEY, img_formats
+from ..constants import COUNT_KEY, img_formats, NO_CACHE
 from ..fonts import fonts
 from ..utils import make_rules
 from . import bp
 from .anim import make_anim
 from .args import ImageArgs
 from .files import files
-from .img import save_image
+from .img import GeneratedImage  # , save_image
 from .utils import normalize_fmt, random_color
-
-ViewFunc = Callable
 
 WEBP_ANIM = features.check_feature("webp_anim")
 ANIM_FMTS = {"gif"}.union({"webp"} if WEBP_ANIM else set())
 RAND_STR = "rand"
 
 
-def image_response(size: Dimension, bg: str, fg: str, fmt: str, args: ImageArgs) -> str:
-    return save_image(size, bg, fg, fmt, args)
-
-
-def make_route(prefix: str = "") -> ViewFunc:
+def make_route(prefix: str = "") -> Callable:
     rule_parts = make_rules()
     rules = []
 
@@ -46,7 +42,7 @@ def make_route(prefix: str = "") -> ViewFunc:
         rule = "/<dim:size>/" + part + "/"
         rules.append((rule, defaults))
 
-    def func(f: ViewFunc) -> ViewFunc:
+    def func(f: Callable) -> Callable:
         for rule, defaults in rules:
             bp.add_url_rule(prefix + rule, None, f, defaults=defaults)
         return f
@@ -105,7 +101,8 @@ def image_route(
         if fg_lower == RAND_STR:
             fg_color = random_color()
 
-    path = image_response(size, bg_color, fg_color, fmt, args)
+    img = GeneratedImage(size, bg_color, fg_color, fmt, args)
+    path = img.get_path()
     if files.need_to_clean:
         after_this_request(do_cleanup)
 
@@ -116,7 +113,7 @@ def image_route(
     }
     res: Response = send_file(path, **kw)  # type: ignore
     if args.random_text or RAND_STR in {bg_lower, fg_lower}:
-        res.headers["Cache-Control"] = "max-age=0, no-cache, must-revalidate"
+        res.headers["Cache-Control"] = NO_CACHE
     if args.random_text:
         res.headers["X-Random-Text"] = args.text
 

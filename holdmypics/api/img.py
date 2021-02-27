@@ -1,24 +1,23 @@
-import os
-from typing import Callable, Dict, Tuple, Union
+from __future__ import annotations
 
+import os
+from collections.abc import Callable
+from typing import Any, ClassVar
+
+import attr
 from humanize import naturalsize
 from loguru import logger
 from PIL import Image
 
 from .. import redisw
-from .._types import Dimension
 from ..constants import COUNT_KEY
 from ..converters import RAND_COLOR
-from ..utils import profile
 from .args import ImageArgs
 from .files import files
 from .utils import TextArgs, draw_text, get_color, normalize_fmt, random_color
 
-OptValues = Union[str, bool, int, Tuple[int, int]]
-
 MODE = "RGBA"
-
-opt_kw: Dict[str, Callable[[ImageArgs], Dict[str, OptValues]]] = {
+OPT_KW: dict[str, Callable[[ImageArgs], dict[str, Any]]] = {
     "jpeg": lambda args: {"optimize": True, "dpi": (args.dpi, args.dpi)},
     "png": lambda args: {"optimize": True, "dpi": (args.dpi, args.dpi)},
     "webp": lambda _: {"quality": 100, "method": 6},
@@ -26,50 +25,56 @@ opt_kw: Dict[str, Callable[[ImageArgs], Dict[str, OptValues]]] = {
 }
 
 
-@profile
-def make_image(
-    size: Dimension, bg_color: str, fg_color: str, fmt: str, args: ImageArgs
-) -> Image.Image:
-    fmt = normalize_fmt(fmt)
-    im = Image.new(MODE, size, bg_color)
-    if args.alpha < 1:
-        alpha_im = Image.new("L", size, int(args.alpha * 255))
-        im.putalpha(alpha_im)
-    if args.text is not None:
-        text_args = TextArgs(fg_color, args.text, args.font_name, args.debug)
-        im = draw_text(im, text_args)
-    if fmt == "jpeg":
-        im = im.convert("RGB")
-    return im
+def color_converter(col: str) -> str:
+    col = str.casefold(col)
+    col = col if col != RAND_COLOR else random_color()
+    return get_color(col)
 
 
-def save_image(
-    size: Dimension, bg_color: str, fg_color: str, fmt: str, args: ImageArgs
-) -> str:
-    """Create an image or find an existing one and produce its path."""
-    fmt = normalize_fmt(fmt)
-    bg_color, fg_color = map(str.casefold, (bg_color, fg_color))
-    if bg_color == RAND_COLOR:
-        bg_color = random_color()
-    if fg_color == RAND_COLOR:
-        fg_color = random_color()
+@attr.s(slots=True, auto_attribs=True)
+class GeneratedImage(object):
+    mode: ClassVar[str] = "RGBA"
 
-    bg_color, fg_color = get_color(bg_color), get_color(fg_color)
-    path = files.get_file_name(size, bg_color, fg_color, fmt, args)
+    size: tuple[int, int]
+    bg_color: str = attr.ib(converter=color_converter)
+    fg_color: str = attr.ib(converter=color_converter)
+    fmt: str = attr.ib(converter=normalize_fmt)
+    args: ImageArgs
 
-    if os.path.isfile(path):
-        os.utime(path)
-        logger.debug("Already existed")
-        return path
-    else:
-        im = make_image(size, bg_color, fg_color, fmt, args)
-        save_kw = {}
-        kw_func = opt_kw.get(fmt, None)
-        if kw_func is not None:  # pragma: no cover
-            save_kw.update(kw_func(args))
-        im.save(path, **save_kw)
-        im.close()
-        sz = naturalsize(os.path.getsize(path), format="%.3f")
-        logger.info('Created "{0}" ({1})', path, sz)
-        redisw.client.incr(COUNT_KEY)
+    def get_save_kw(self) -> dict[str, Any]:
+        kw_func = OPT_KW.get(self.fmt, None)
+        if kw_func is not None:
+            return kw_func(self.args)
+        else:
+            return {}
+
+    def make(self) -> Image.Image:
+        im = Image.new(self.mode, self.size, self.bg_color)
+        args = self.args
+        if args.alpha < 1:
+            alpha_im = Image.new("L", self.size, int(args.alpha * 255))
+            im.putalpha(alpha_im)
+        if args.text is not None:
+            text_args = TextArgs(self.fg_color, args.text, args.font_name, args.debug)
+            im = draw_text(im, text_args)
+        if self.fmt == "jpeg":
+            im = im.convert("RGB")
+        return im
+
+    def get_path(self) -> str:
+        path = files.get_file_name(
+            self.size, self.bg_color, self.fg_color, self.fmt, self.args
+        )
+        if os.path.isfile(path):
+            os.utime(path)
+            logger.debug("Already existed at {0}", path)
+            return path
+        else:
+            im = self.make()
+            save_kw = self.get_save_kw()
+            im.save(path, **save_kw)
+            im.close()
+            sz = naturalsize(os.path.getsize(path), format="%.3f")
+            logger.info('Created "{0}" ({1})', path, sz)
+            redisw.client.incr(COUNT_KEY)
         return path

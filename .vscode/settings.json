@@ -51,5 +51,6 @@
     },
     "editor.formatOnSave": true
   },
-  "cSpell.enabled": false
+  "cSpell.enabled": false,
+  "restructuredtext.languageServer.disabled": true
 }

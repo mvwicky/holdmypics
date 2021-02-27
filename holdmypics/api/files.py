@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import hashlib
 import os
 import re
-from typing import List, Optional, Pattern, Set
+from typing import Optional
 
 import attr
 from flask import current_app
@@ -18,16 +20,15 @@ class GeneratedFiles(object):
 
     hash_function = hashlib.md5
     extensions = ["png", "webp", "jpg", "jpeg", "gif"]
-    fmt_re: Pattern = re.compile("\\.({0})$".format("|".join(extensions)))
+    fmt_re: re.Pattern = re.compile("\\.({0})$".format("|".join(extensions)))
 
     def __init__(self) -> None:
-        self.files: Set[str] = set()
+        self.files: set[str] = set()
         self._max_files: Optional[int] = None
 
     def find_current(self) -> None:
-        pred = self.fmt_re.search
         images_folder = self.images_folder
-        files = filter(pred, os.listdir(images_folder))
+        files = filter(self.fmt_re.search, os.listdir(images_folder))
         for file in files:
             self.files.add(os.path.join(images_folder, file))
 
@@ -72,7 +73,7 @@ class GeneratedFiles(object):
 
         return path
 
-    def collect_for_cleaning(self) -> List[str]:
+    def collect_for_cleaning(self) -> list[str]:
         images_folder = self.images_folder
         files = [os.path.join(images_folder, f) for f in os.listdir(images_folder)]
         return sorted(filter(os.path.isfile, files), key=os.path.getatime)

@@ -11,24 +11,27 @@ if TYPE_CHECKING:
     from _pytest.config import Config
     from _pytest.tmpdir import TempPathFactory
 
+MAX_LOG_SIZE = 3 * (1024 ** 2)
 PROFILES = {
     "ci": {"max_examples": 50, "deadline": None},
     "dev": {"max_examples": 25, "deadline": None},
 }
 
 
-def _log_filt(record: dict) -> bool:
-    return "test" in record["name"]
-
-
 def configure_logging():
     fmt = (
-        "[<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>] | "
-        "<level>{level:<8}</level> | "
+        "[<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>] <level>{level:<8}</level> "
         "<blue>{name}</blue>:<cyan>{line}</cyan> - <bold>{message}</bold>"
     )
     log_file = os.path.join("log", "holdmytests.log")
-    logger.add(log_file, format=fmt, level="DEBUG", filter=_log_filt)
+    log_kw = {
+        "format": fmt,
+        "level": "DEBUG",
+        "compression": "tar.gz",
+        "retention": 5,
+        "rotation": MAX_LOG_SIZE,
+    }
+    logger.add(log_file, **log_kw)
 
 
 def pytest_configure(config: "Config"):
@@ -55,6 +58,7 @@ def config_fixture(tmp_path_factory: "TempPathFactory"):
         "TESTING": True,
         "SAVED_IMAGES_MAX_NUM": 250,
         "LOG_FILE_NAME": "holdmypics-test",
+        "SAVED_IMAGES_CACHE_DIR": image_dir,
     }
     _config.__dict__.update(test_config)
 

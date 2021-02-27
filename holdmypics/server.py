@@ -1,9 +1,10 @@
+from __future__ import annotations
+
 import os
-import subprocess
 import time
+from collections.abc import Sequence
 from pathlib import Path
-from subprocess import TimeoutExpired
-from typing import Dict, Sequence
+from subprocess import Popen, TimeoutExpired
 
 import attr
 from flask import Blueprint, Flask
@@ -18,7 +19,7 @@ class Server(object):
     start_run: bool = True
     start_yarn: bool = True
 
-    procs: Dict[str, subprocess.Popen] = attr.ib(init=False, factory=dict)
+    procs: dict[str, Popen] = attr.ib(init=False, factory=dict)
 
     def start(self):
         if self.start_yarn:
@@ -37,7 +38,7 @@ class Server(object):
 
     def _start_proc(self, name: str, args: Sequence[str], **kwargs):
         logger.info("Starting process `{0}`", " ".join(args))
-        self.procs[name] = subprocess.Popen(args, **kwargs)
+        self.procs[name] = Popen(args, **kwargs)
 
     def _start_yarn(self):
         bp: Blueprint = self.app.blueprints.get("core")
