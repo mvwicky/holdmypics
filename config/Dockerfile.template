@@ -34,4 +34,4 @@ EXPOSE {{ port }}
 
 USER ${APP_USER}:${APP_USER}
 
-CMD ["gunicorn", "wsgi:application", "--config", "python:gunicorn_config"]
+CMD ["gunicorn", "wsgi:application", "--config", "python:{{ gunicorn_config }}"]

@@ -2,11 +2,10 @@ import sys
 from difflib import SequenceMatcher
 from functools import partial
 from pathlib import Path
-from typing import Optional
+from typing import ClassVar, Optional, Union
 
 import attr
 import click
-from cytoolz import merge
 from jinja2 import Environment, FileSystemLoader, Template
 
 import config
@@ -24,6 +23,11 @@ def diff_contents(a: str, b: str) -> SequenceMatcher:
 
 @attr.s(slots=True, auto_attribs=True)
 class Generator(object):
+    common_context: ClassVar[dict[str, str]] = {
+        "python_version": PY_VERSION,
+        "gunicorn_config": "config/gunicorn_config",
+    }
+
     template_file: Path = attr.ib(converter=Path)
     dev_dir: Path = attr.ib(converter=Path)
     prod_dir: Path = attr.ib(converter=Path)
@@ -37,22 +41,30 @@ class Generator(object):
         rel = config.rel_to_root(file)
         return click.confirm("Overwrite {0}?".format(rel), default=True)
 
+    def get_context(
+        self, dev: bool, port: Optional[int]
+    ) -> dict[str, Union[str, bool, int]]:
+        build_suffix = ":dev" if dev else ""
+        req_suffix = "-dev" if dev else ""
+        ctx = {
+            **self.common_context,
+            "yarn_build": f"build{build_suffix}",
+            "requirements": f"requirements{req_suffix}.txt",
+            "dev": dev,
+        }
+        if port is not None:
+            ctx["port"] = port
+        return ctx
+
     def generate(self, dry_run: bool, verbosity: int, yes: bool, port: Optional[int]):
-        common_context = {"python_version": PY_VERSION}
-        contexts = [
-            (True, {"yarn_build": "build:dev", "requirements": "requirements-dev.txt"}),
-            (False, {"yarn_build": "build", "requirements": "requirements.txt"}),
-        ]
-        for dev, context in contexts:
+        for dev in (True, False):
             mode = "dev" if dev else "prod"
-            click.secho("Rendering {0} template.".format(mode), fg="green", bold=True)
+            click.secho(f"Rendering {mode} template.", fg="green", bold=True)
             folder = self.dev_dir if dev else self.prod_dir
             if not folder.is_dir():
                 folder.mkdir()
             file: Path = folder / "Dockerfile"
-            ctx = merge(common_context, context, {"dev": dev})
-            if port is not None:
-                ctx.update({"port": port})
+            ctx = self.get_context(dev, port)
             self.render(file, ctx, dry_run, verbosity, yes)
 
     def render(

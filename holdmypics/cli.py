@@ -180,7 +180,7 @@ def register(app: Flask):  # noqa: C901
         default=None,
         help="The exposed port in the resulting container.",
     )
-    def generate_dockerfiles(
+    def dockerfiles(
         template: str,
         dev_output: str,
         prod_output: str,
