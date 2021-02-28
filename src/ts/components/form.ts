@@ -1,4 +1,5 @@
 import { elemIsTag } from "../helpers/elem-is-tag";
+import type { EndpointPathArgs, FormInput } from "../types";
 
 const checks = [elemIsTag.bind(null, "input"), elemIsTag.bind(null, "select")];
 

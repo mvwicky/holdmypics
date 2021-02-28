@@ -6,5 +6,5 @@
     "allowJs": true
   },
   "files": ["./webpack.config.ts"],
-  "extends": "./tsconfig.base.json"
+  "extends": "./config/tsconfig.base.json"
 }

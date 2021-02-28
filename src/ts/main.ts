@@ -6,6 +6,7 @@ import { debounce } from "./helpers/debounce";
 import { elemIsTag } from "./helpers/elem-is-tag";
 import { replaceIcons } from "./icons";
 import { log } from "./log";
+import type { FormInput, InputCallbackArgs, MakeEndpointArgs } from "./types";
 
 function getClipboard() {
   return import(/* webpackChunkName: "clipboard" */ "clipboard");
@@ -191,13 +192,3 @@ async function afterFeather(copyBtn: HTMLButtonElement) {
     main.bind(d)();
   }
 })(document, window);
-
-declare global {
-  interface Window {
-    requestIdleCallback: (
-      callback: (deadline: RequestIdleCallbackDeadline) => void,
-      opts?: RequestIdleCallbackOptions
-    ) => RequestIdleCallbackHandle;
-    cancelIdleCallback: (handle: RequestIdleCallbackHandle) => void;
-  }
-}

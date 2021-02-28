@@ -1,3 +1,5 @@
+import type { NodeMaybe } from "../types";
+
 export type TagMap = HTMLElementTagNameMap;
 
 function elemIsTag<K extends keyof TagMap>(

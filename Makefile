@@ -72,7 +72,7 @@ webpack:
 
 version-tag:
 ifeq ($(strip $(DRY_RUN)),)
-	@git tag $(VERSION_TAG)
+	@git tag $(VERSION_TAG) -m $(VERSION_TAG)
 else
 	@echo $(VERSION_TAG)
 endif

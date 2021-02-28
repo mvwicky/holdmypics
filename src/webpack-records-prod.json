@@ -13,9 +13,10 @@
       "modules": {
         "byIdentifier": {
           "./node_modules/html-webpack-plugin/lib/loader.js!./src/index.ejs": 582,
+          "data:text/javascript,__webpack_public_path__ = __webpack_base_uri__ = htmlWebpackPluginPublicPath;": 295,
           "data:text/javascript,__webpack_public_path__ = htmlWebpackPluginPublicPath;": 187
         },
-        "usedIds": [187, 582]
+        "usedIds": [295, 582]
       }
     }
   ],
@@ -23,17 +24,70 @@
     "byName": {
       "clipboard": 997,
       "feather": 142,
-      "main": 666,
-      "runtime": 666
+      "main": 179,
+      "runtime": 229
     },
     "bySource": {
       "0 clipboard": 997,
       "0 feather": 142,
-      "0 main": 666,
+      "0 main": 229,
       "1 main": 179
     },
-    "usedIds": [142, 666, 997]
+    "usedIds": [142, 179, 229, 997]
   },
+  "mini-css-extract-plugin /Users/michael/GitHub/holdmypics/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[1].use[3]!./src/scss/main.scss": [
+    {
+      "chunks": {
+        "byName": {
+          "child": 396,
+          "mini-css-extract-plugin": 323
+        },
+        "bySource": {
+          "0 child": 396,
+          "0 mini-css-extract-plugin": 323
+        },
+        "usedIds": [396]
+      },
+      "modules": {
+        "byIdentifier": {
+          "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[1].use[3]!./node_modules/sanitize.css/forms.css": 91,
+          "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[1].use[3]!./node_modules/sanitize.css/sanitize.css": 994,
+          "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[1].use[3]!./src/scss/main.scss": 975,
+          "./node_modules/css-loader/dist/runtime/api.js": 645,
+          "./node_modules/css-loader/dist/runtime/cssWithMappingToString.js": 15,
+          "./node_modules/css-loader/dist/runtime/getUrl.js": 667,
+          "./src/scss/theme/fonts/fira-mono-v8-latin-regular.woff": 118,
+          "./src/scss/theme/fonts/fira-mono-v8-latin-regular.woff2": 229,
+          "./src/scss/theme/fonts/spectral-v6-latin-200.woff": 559,
+          "./src/scss/theme/fonts/spectral-v6-latin-200.woff2": 136,
+          "./src/scss/theme/fonts/spectral-v6-latin-700.woff": 681,
+          "./src/scss/theme/fonts/spectral-v6-latin-700.woff2": 769,
+          "./src/scss/theme/fonts/spectral-v6-latin-italic.woff": 997,
+          "./src/scss/theme/fonts/spectral-v6-latin-italic.woff2": 438,
+          "./src/scss/theme/fonts/spectral-v6-latin-regular.woff": 180,
+          "./src/scss/theme/fonts/spectral-v6-latin-regular.woff2": 574
+        },
+        "usedIds": [
+          15,
+          91,
+          118,
+          136,
+          180,
+          229,
+          438,
+          559,
+          574,
+          645,
+          667,
+          681,
+          769,
+          975,
+          994,
+          997
+        ]
+      }
+    }
+  ],
   "mini-css-extract-plugin /Users/michael/GitHub/holdmypics/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[2].use[3]!./src/scss/main.scss": [
     {
       "chunks": {

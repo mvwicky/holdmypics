@@ -1,16 +1,7 @@
-type RequestIdleCallbackHandle = any;
-type RequestIdleCallbackOptions = {
-  timeout?: number;
-};
-type RequestIdleCallbackDeadline = {
-  readonly didTimeout: boolean;
-  timeRemaining: () => number;
-};
+export type FormInput = HTMLInputElement | HTMLSelectElement;
+export type NodeMaybe = Node | null | undefined;
 
-type FormInput = HTMLInputElement | HTMLSelectElement;
-type NodeMaybe = Node | null | undefined;
-
-interface MakeEndpointArgs {
+export interface MakeEndpointArgs {
   [k: string]: string;
   width: string;
   height: string;
@@ -23,7 +14,7 @@ interface MakeEndpointArgs {
   randomText: string;
 }
 
-interface EndpointPathArgs {
+export interface EndpointPathArgs {
   width: string;
   height: string;
   bg: string;
@@ -43,17 +34,9 @@ interface EndpointArgs {
   query: EndpointQueryArgs;
 }
 
-interface AnyFunc {
-  (...args: any[]): any;
-}
 declare const PRODUCTION: boolean;
 
-declare module "*.svg" {
-  const value: string;
-  export default value;
-}
-
-interface InputCallbackArgs {
+export interface InputCallbackArgs {
   btn: HTMLElement;
   endpoint: HTMLElement;
   form: HTMLFormElement;

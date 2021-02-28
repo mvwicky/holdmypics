@@ -1,3 +1,7 @@
+interface AnyFunc {
+  (...args: any[]): any;
+}
+
 export function debounce<F extends AnyFunc>(
   func: F,
   wait: number = 250,

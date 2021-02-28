@@ -1,1 +1,3 @@
 static/
+!.eleventy.js
+**/.eslintrc.js

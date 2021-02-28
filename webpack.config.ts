@@ -2,8 +2,8 @@ import { join, resolve } from "path";
 
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
-import TerserPlugin = require("terser-webpack-plugin");
-import webpack from "webpack";
+import TerserPlugin from "terser-webpack-plugin";
+import { DefinePlugin } from "webpack";
 import type { Configuration } from "webpack";
 
 import { config } from "./package.json";
@@ -23,14 +23,12 @@ function ifProd<T>(obj: T): T | undefined {
 }
 
 const relToRoot = (...args: string[]) => resolve(__dirname, ...args);
-const relToNode = (...args: string[]) => relToRoot("node_modules", ...args);
 const relToSrc = (...args: string[]) => relToRoot("src", ...args);
 
 const [hashFunction, hashDigestLength] = ["md5", 28];
 
-const rootDir = relToRoot("holdmypics");
-const templatesDir = join(rootDir, "core", "templates");
-const outPath = join(__dirname, "static", "dist");
+const templatesDir = relToRoot("holdmypics", "core", "templates");
+const outPath = relToRoot("static", "dist");
 
 const mode = prodOr("production", "development");
 const publicPath = "/static/dist/";
@@ -59,7 +57,7 @@ const configuration: Configuration = {
       meta: {},
       cache: false,
     }),
-    new webpack.DefinePlugin({
+    new DefinePlugin({
       PRODUCTION: JSON.stringify(prod),
     }),
   ],
@@ -76,41 +74,23 @@ const configuration: Configuration = {
               cacheDirectory: false,
               exclude: /node_modules/,
               presets: compact([
-                prodOr(
-                  [
-                    "@babel/preset-env",
-                    {
-                      corejs: { version: "3", proposals: true },
-                      debug: false,
-                      useBuiltIns: "usage",
-                      targets: { esmodules: true },
-                      exclude: ["@babel/plugin-transform-template-literals"],
-                      bugfixes: true,
-                    },
-                  ],
-                  undefined
-                ),
+                ifProd([
+                  "@babel/preset-env",
+                  {
+                    corejs: { version: "3.9", proposals: true },
+                    debug: process.env.BABEL_DEBUG !== undefined,
+                    useBuiltIns: "usage",
+                    targets: { esmodules: true },
+                    exclude: ["@babel/plugin-transform-template-literals"],
+                    bugfixes: true,
+                  },
+                ]),
                 ["@babel/typescript", { onlyRemoveTypeImports: true }],
               ]),
-              plugins: [
-                "@babel/proposal-class-properties",
-                "@babel/proposal-object-rest-spread",
-              ],
+              plugins: ["@babel/proposal-object-rest-spread"],
               parserOpts: {
                 strictMode: true,
               },
-            },
-          },
-        ],
-      },
-      {
-        test: /\.svg$/,
-        use: [
-          {
-            loader: require.resolve("html-loader"),
-            options: {
-              attributes: false,
-              minimize: false,
             },
           },
         ],
@@ -122,11 +102,7 @@ const configuration: Configuration = {
           MiniCssExtractPlugin.loader,
           {
             loader: require.resolve("css-loader"),
-            options: {
-              importLoaders: 2,
-              sourceMap: prod,
-              modules: false,
-            },
+            options: { importLoaders: 2, modules: false },
           },
           { loader: require.resolve("postcss-loader") },
           {
@@ -164,13 +140,11 @@ const configuration: Configuration = {
     splitChunks: {
       automaticNameDelimiter: "~",
     },
+    runtimeChunk: "single",
   },
   resolve: {
     extensions: [".js", ".ts"],
     symlinks: false,
-    alias: {
-      Feather: relToNode("feather-icons", "dist", "icons"),
-    },
   },
   node: false,
   stats: {
@@ -179,6 +153,7 @@ const configuration: Configuration = {
     excludeAssets: [/fonts[\\/]spectral-/, /\.map$/, /\.LICENSE\.txt$/],
     publicPath: true,
     cachedAssets: true,
+    hash: true,
   },
   recordsPath: relToSrc(`webpack-records-${prodOr("prod", "dev")}.json`),
   cache: {
