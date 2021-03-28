@@ -1,8 +1,9 @@
+from __future__ import annotations
+
 from werkzeug.routing import BaseConverter, ValidationError
 
-from ._types import Dimension
+from .constants import RAND_COLOR
 
-RAND_COLOR = "rand".casefold()
 COLOR_REGEX = r"(?:(?:[A-Fa-f0-9]{3}){1,2})"
 RAND_REGEX = f"(?i:{RAND_COLOR})"
 
@@ -10,7 +11,7 @@ RAND_REGEX = f"(?i:{RAND_COLOR})"
 class DimensionConverter(BaseConverter):
     regex = r"(?:\d+(?:x\d+)?)"
 
-    def to_python(self, value: str) -> Dimension:
+    def to_python(self, value: str) -> tuple[int, int]:
         parts = value.split("x")
         if len(parts) == 1:
             parts = parts * 2

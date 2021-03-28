@@ -61,7 +61,7 @@ def get_context() -> dict:
     apache_license = url_for("static", filename="licenses/apache.txt")
 
     return {
-        "rules": ["api/<size>/" + r + "/" for r in rules],
+        "rules": [r.join(["api/<size>/", "/"]) for r in rules],
         "img_url": img_url,
         "img_query": img_query,
         "width": width,

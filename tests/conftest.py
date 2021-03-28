@@ -8,8 +8,13 @@ from loguru import logger
 from marshmallow.validate import OneOf
 
 if TYPE_CHECKING:
+    from types import ModuleType
+
     from _pytest.config import Config
     from _pytest.tmpdir import TempPathFactory
+    from flask.testing import FlaskClient
+
+    from holdmypics import Holdmypics
 
 MAX_LOG_SIZE = 3 * (1024 ** 2)
 PROFILES = {
@@ -48,25 +53,27 @@ def pytest_configure(config: "Config"):
 
 
 @pytest.fixture(scope="session", name="config")
-def config_fixture(tmp_path_factory: "TempPathFactory"):
+def config_fixture(tmp_path_factory: "TempPathFactory") -> "ModuleType":
     import config as _config
 
     image_dir = tmp_path_factory.mktemp("holdmypics-images")
     logger.info("Image dir: {0}", image_dir)
     test_config = {
         "DEBUG": False,
-        "TESTING": True,
-        "SAVED_IMAGES_MAX_NUM": 250,
+        "SAVED_IMAGES_MAX_SIZE": 1024 * 10,
         "LOG_FILE_NAME": "holdmypics-test",
         "SAVED_IMAGES_CACHE_DIR": image_dir,
     }
     _config.__dict__.update(test_config)
-
+    for key, value in test_config.items():
+        assert key in _config.__dict__
+        _config.__dict__[key] = value
+    _config.__dict__["TESTING"] = True
     return _config
 
 
 @pytest.fixture()
-def app(config):
+def app(config) -> "Holdmypics":
     from holdmypics import create_app
 
     app = create_app(config)
@@ -75,6 +82,6 @@ def app(config):
 
 
 @pytest.fixture()
-def client(app):
+def client(app: "Holdmypics") -> "FlaskClient":
     with app.test_client() as client:
         yield client

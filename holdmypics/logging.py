@@ -1,18 +1,39 @@
-import os
+from __future__ import annotations
+
 import sys
 from logging.config import dictConfig
 from pathlib import Path
 from typing import Optional
 
+import loguru
 from flask import Request, Response, request
 from loguru import logger
 
 req: Request = request
 
-MAX_LOG_SIZE = 3 * (1024 ** 2)
+MAX_LOG_SIZE = 1 * (1024 ** 2)
 
 
-def config_logging(name: str, file_name: str, log_dir: Optional[Path], log_level: str):
+def file_filter(record: loguru.Record) -> bool:
+    return "log_request" not in record["function"]
+
+
+def make_file_handler(log_dir: Path, file_name: str, fmt: str) -> dict:
+    log_file = log_dir.joinpath(file_name).with_suffix(".log")
+    return {
+        "sink": log_file,
+        "rotation": MAX_LOG_SIZE,
+        "level": "DEBUG",
+        "compression": "tar.gz",
+        "retention": 5,
+        "filter": file_filter,
+        "format": fmt,
+    }
+
+
+def config_logging(
+    name: str, file_name: str, log_dir: Optional[Path], log_level: str
+) -> None:
     dictConfig({"version": 1})
     try:
         logger.remove(0)
@@ -27,23 +48,13 @@ def config_logging(name: str, file_name: str, log_dir: Optional[Path], log_level
     fmt = " | ".join(fmt_parts)
     handlers = [{"sink": sys.stderr, "format": fmt, "level": log_level}]
     if log_dir is not None:
-        log_dir = Path(os.path.realpath(log_dir))
+        log_dir = Path(log_dir).resolve()
         if log_dir.is_dir():
-            log_file = log_dir.joinpath(".".join([file_name, "log"]))
-            handlers.append(
-                {
-                    "sink": log_file,
-                    "rotation": MAX_LOG_SIZE,
-                    "level": "DEBUG",
-                    "filter": {name: "DEBUG", "plugin": "DEBUG", "tests": "DEBUG"},
-                    "compression": "tar.gz",
-                    "retention": 5,
-                }
-            )
+            handlers.append(make_file_handler(log_dir, file_name, fmt))
     logger.configure(handlers=handlers)
 
 
-def log_request(res: Response):
+def log_request(res: Response) -> None:
     code = res.status_code
     level = "WARNING" if code > 399 else "INFO"
     path = req.path

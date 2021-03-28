@@ -3,6 +3,7 @@ from __future__ import annotations
 import imghdr
 import io
 import os
+from types import ModuleType
 from typing import Optional
 from urllib.parse import urlencode
 
@@ -25,7 +26,22 @@ except ImportError:
     pytesseract = None
 
 SKIP_INDEX = os.environ.get("TESTS_SKIP_INDEX", None) is not None
-IMG_FORMATS = ["png", "webp", "jpeg", "gif"]
+IMG_FORMATS = ("png", "webp", "jpeg", "gif")
+
+dim_strategy = st.integers(min_value=32, max_value=8192)
+size_strategy = st.tuples(dim_strategy, dim_strategy)
+color_strategy = st.from_regex(COLOR_REGEX, fullmatch=True)
+opt_color_strategy = st.one_of(st.none(), color_strategy)
+fmt_strategy = st.sampled_from(IMG_FORMATS)
+alpha_strategy = st.one_of(
+    st.none(),
+    st.floats(min_value=0.0, max_value=1.0, allow_nan=False, allow_infinity=False),
+)
+text_strategy = st.one_of(st.none(), st.text(max_size=255))
+dpi_strategy = st.one_of(st.none(), st.integers(min_value=72, max_value=488))
+args_strategy = st.fixed_dictionaries(
+    {"text": text_strategy, "alpha": alpha_strategy, "dpi": dpi_strategy}
+)
 
 
 def make_route(
@@ -43,21 +59,6 @@ def test_index(client):
     assert res.status_code == 200
 
 
-dim_strategy = st.integers(min_value=32, max_value=8192)
-size_strategy = st.tuples(dim_strategy, dim_strategy)
-color_strategy = st.from_regex(COLOR_REGEX, fullmatch=True)
-opt_color_strategy = st.one_of(st.none(), color_strategy)
-alpha_strategy = st.one_of(
-    st.none(),
-    st.floats(min_value=0.0, max_value=1.0, allow_nan=False, allow_infinity=False),
-)
-text_strategy = st.one_of(st.none(), st.text(max_size=255))
-dpi_strategy = st.one_of(st.none(), st.integers(min_value=72, max_value=488))
-args_strategy = st.fixed_dictionaries(
-    {"text": text_strategy, "alpha": alpha_strategy, "dpi": dpi_strategy}
-)
-
-
 def test_favicon(client: FlaskClient):
     url = "/favicon.ico"
     res: Response = client.get(url)
@@ -67,13 +68,13 @@ def test_favicon(client: FlaskClient):
 
 @given(
     size=size_strategy,
-    image_format=st.sampled_from(IMG_FORMATS),
+    image_format=fmt_strategy,
     fg_color=color_strategy,
     bg_color=color_strategy,
     args=args_strategy,
 )
 def test_create_images_using_function(
-    config,
+    config: ModuleType,
     size: tuple[int, int],
     image_format: str,
     fg_color: str,
@@ -81,8 +82,6 @@ def test_create_images_using_function(
     args: dict,
 ):
     app = create_app(config)
-    logger.info("fg color: {}, bg color: {}", fg_color, bg_color)
-
     with app.test_request_context():
         img_args = ImageArgs.from_request(valfilter(bool, args))
         img = GeneratedImage(size, bg_color, fg_color, image_format, img_args)
@@ -96,13 +95,13 @@ def test_create_images_using_function(
 
 @given(
     size=size_strategy,
-    image_format=st.sampled_from(IMG_FORMATS),
+    image_format=fmt_strategy,
     fg_color=opt_color_strategy,
     bg_color=opt_color_strategy,
     args=args_strategy,
 )
 def test_create_images_using_client(
-    config,
+    config: ModuleType,
     size: tuple[int, int],
     image_format: str,
     fg_color: Optional[str],

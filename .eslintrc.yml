@@ -8,9 +8,7 @@ plugins: ["@typescript-eslint", prettier, import]
 parser: "@typescript-eslint/parser"
 rules:
   class-methods-use-this: 0
-  complexity:
-    - warn
-    - max: 24
+  complexity: [warn, { max: 24 }]
   eqeqeq: error
   lines-between-class-members:
     - error
@@ -31,11 +29,7 @@ rules:
   sort-imports:
     - error
     - ignoreDeclarationSort: true
-      memberSyntaxSortOrder:
-        - none
-        - all
-        - single
-        - multiple
+      memberSyntaxSortOrder: [none, all, single, multiple]
   template-curly-spacing: error
   import/dynamic-import-chunkname: 2
   import/order:
@@ -55,21 +49,17 @@ settings:
   import/extensions: [.js, .ts, .jsx, .tsx]
   import/ignore:
     - \.(scss|css)$
-    - autoprefixer
-  import/parsers:
-    "@typescript-eslint/parser": [.ts]
+  import/parsers: { "@typescript-eslint/parser": [.ts] }
   import/resolver:
     webpack: { config: "./webpack.config.ts" }
     typescript:
       alwaysTryTypes: true
-      project:
-        - src/tsconfig.json
-        - tsconfig.json
+      project: [src/tsconfig.json, tsconfig.json]
 overrides:
   - files: [webpack.config.ts, postcss.config.js]
     env: { node: true, browser: false }
     settings:
-      import/core-modules: [os, path, process, fs]
+      import/core-modules: [os, path, process, fs, crypto, util]
 env:
   es6: true
 root: true

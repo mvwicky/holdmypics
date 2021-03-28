@@ -19,7 +19,7 @@ from PIL import features
 
 from .. import redisw
 from .._types import Dimension, ResponseType
-from ..constants import COUNT_KEY, img_formats, NO_CACHE
+from ..constants import COUNT_KEY, NO_CACHE, img_formats
 from ..fonts import fonts
 from ..utils import make_rules
 from . import bp

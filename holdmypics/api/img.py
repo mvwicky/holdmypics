@@ -5,18 +5,16 @@ from collections.abc import Callable
 from typing import Any, ClassVar
 
 import attr
-from humanize import naturalsize
 from loguru import logger
 from PIL import Image
 
 from .. import redisw
-from ..constants import COUNT_KEY
-from ..converters import RAND_COLOR
+from ..constants import COUNT_KEY, RAND_COLOR
+from ..utils import natsize
 from .args import ImageArgs
-from .files import files
+from .files import files, get_size
 from .utils import TextArgs, draw_text, get_color, normalize_fmt, random_color
 
-MODE = "RGBA"
 OPT_KW: dict[str, Callable[[ImageArgs], dict[str, Any]]] = {
     "jpeg": lambda args: {"optimize": True, "dpi": (args.dpi, args.dpi)},
     "png": lambda args: {"optimize": True, "dpi": (args.dpi, args.dpi)},
@@ -67,14 +65,14 @@ class GeneratedImage(object):
         )
         if os.path.isfile(path):
             os.utime(path)
-            logger.debug("Already existed at {0}", path)
+            logger.debug('Already existed: "{0}"', os.path.basename(path))
             return path
         else:
             im = self.make()
             save_kw = self.get_save_kw()
             im.save(path, **save_kw)
             im.close()
-            sz = naturalsize(os.path.getsize(path), format="%.3f")
-            logger.info('Created "{0}" ({1})', path, sz)
+            sz = natsize(get_size(path), fmt="{0:.1f}")
+            logger.info('Created "{0}" ({1})', os.path.basename(path), sz)
             redisw.client.incr(COUNT_KEY)
         return path

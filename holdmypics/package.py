@@ -7,8 +7,9 @@ from pathlib import Path
 from typing import Optional
 
 import attr
-from humanize import naturalsize
 from loguru import logger
+
+from .utils import natsize
 
 CWD: Path = Path.cwd()
 
@@ -79,6 +80,6 @@ class Package(object):
         else:
             logger.info("{0.name} unchanged.", file)
         rel = os.path.relpath(file, self.root_dir)
-        sz = naturalsize(os.path.getsize(file))
+        sz = natsize(os.path.getsize(file))
         logger.success("Froze requirements to {0} ({1})", rel, sz)
         return write

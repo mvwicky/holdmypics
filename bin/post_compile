@@ -16,4 +16,5 @@ if [[ ! -f "./Procfile" ]]; then
   exit 1
 fi
 
+output "Compressing static files"
 python -m whitenoise.compress static/dist

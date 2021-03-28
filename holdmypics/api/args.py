@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Optional
+from typing import Any, Optional
 
 import attr
 import marshmallow as ma
 from flask import request
+from marshmallow.validate import Range
 from werkzeug.datastructures import ImmutableMultiDict
 
 from .words import words
@@ -21,13 +22,13 @@ class ImageArgsSchema(ma.Schema):
     text = ma.fields.String(missing=None)
     font_name = ma.fields.String(missing="overpass")
     dpi = ma.fields.Integer(missing=72)
-    alpha = ma.fields.Float(missing=1.0)
+    alpha = ma.fields.Float(missing=1.0, validate=[Range(0.0, 1.0)])
     seed = ma.fields.String(missing=None)
     debug = ma.fields.Boolean(missing=False, truthy=truthy)
     random_text = ma.fields.Boolean(missing=False, truthy=truthy)
 
     @ma.post_load
-    def make_args(self, data, **kwargs):
+    def make_args(self, data: Mapping[str, Any], **kwargs: Any) -> "ImageArgs":
         return ImageArgs(**data)
 
 

@@ -30,8 +30,10 @@ SEND_FILE_MAX_AGE_DEFAULT: int = env.int(
     "SEND_FILE_MAX_AGE_DEFAULT", default=86400, validate=[Range(min=0)]
 )
 
-SAVED_IMAGES_MAX_NUM: int = env.int(
-    "SAVED_IMAGES_MAX_NUM", default=50, validate=[Range(min=0)]
+SAVED_IMAGES_MAX_SIZE: int = env.int(
+    "SAVED_IMAGES_MAX_SIZE",
+    default=int(128e6),
+    validate=[Range(min=0, min_inclusive=False)],
 )
 SAVED_IMAGES_CACHE_DIR: Path = env.path("SAVED_IMAGES_CACHE_DIR", default=_img_cache)
 
