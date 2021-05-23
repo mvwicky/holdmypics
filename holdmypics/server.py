@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import re
 import time
 from collections.abc import Sequence
 from pathlib import Path
@@ -10,7 +11,10 @@ import attr
 from flask import Blueprint, Flask
 from loguru import logger
 
+from .utils import config_value
+
 WAIT = 30
+WEB_PROC_RE = re.compile(r"^web: (?P<cmd>.+)$")
 
 
 @attr.s(slots=True, auto_attribs=True)
@@ -25,13 +29,7 @@ class Server(object):
         if self.start_yarn:
             self._start_yarn()
         if self.start_run:
-            args = [
-                "gunicorn",
-                "wsgi:application",
-                "--config",
-                "python:gunicorn_config",
-            ]
-            self._start_proc("dev_server", args)
+            self._start_server()
         n = len(self.procs)
         ts = "" if n == 1 else "es"
         logger.info("Started {0} process{1}", n, ts)
@@ -39,6 +37,20 @@ class Server(object):
     def _start_proc(self, name: str, args: Sequence[str], **kwargs):
         logger.info("Starting process `{0}`", " ".join(args))
         self.procs[name] = Popen(args, **kwargs)
+
+    def _start_server(self):
+        procfile: Path = config_value("BASE_PATH", app=self.app) / "Procfile"
+        if not procfile.is_file():
+            raise RuntimeError("Unable to find Procfile")
+        lines = procfile.read_text().splitlines()
+        cmd = None
+        for line in lines:
+            match = WEB_PROC_RE.match(line.strip())
+            if match:
+                cmd = match.group("cmd").split(" ")
+        if cmd is None:
+            raise RuntimeError("Unable to parse command from Procfile")
+        self._start_proc("dev_server", cmd)
 
     def _start_yarn(self):
         bp: Blueprint = self.app.blueprints.get("core")

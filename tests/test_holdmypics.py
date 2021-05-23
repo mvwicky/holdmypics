@@ -8,7 +8,6 @@ from typing import Optional
 from urllib.parse import urlencode
 
 import pytest
-from cytoolz import valfilter
 from flask import Response
 from flask.testing import FlaskClient
 from hypothesis import given, strategies as st
@@ -47,10 +46,10 @@ args_strategy = st.fixed_dictionaries(
 def make_route(
     sz: tuple[int, int], bg_color: str = None, fg_color: str = None, fmt: str = None
 ) -> str:
-    if not any([bg_color, fg_color, fmt]):
+    if not any((bg_color, fg_color, fmt)):
         pytest.fail("Can't make a route with just size")
     parts = ["{0}x{1}".format(*sz), bg_color, fg_color, fmt]
-    return "".join(["/api/", "/".join(filter(bool, parts)), "/"])
+    return "".join(["/api/", "/".join(filter(None, parts)), "/"])
 
 
 @pytest.mark.skipif(SKIP_INDEX, reason="Not testing client-side stuff.")
@@ -83,8 +82,8 @@ def test_create_images_using_function(
 ):
     app = create_app(config)
     with app.test_request_context():
-        img_args = ImageArgs.from_request(valfilter(bool, args))
-        img = GeneratedImage(size, bg_color, fg_color, image_format, img_args)
+        img_args = ImageArgs(**{k: v for (k, v) in args.items() if v})
+        img = GeneratedImage(size, image_format, bg_color, fg_color, img_args)
         assert img.get_save_kw()
         p = img.get_path()
         assert os.path.isfile(p)
@@ -110,7 +109,7 @@ def test_create_images_using_client(
 ):
     app = create_app(config)
     with app.test_client() as client:
-        query = args and urlencode(valfilter(bool, args))
+        query = args and urlencode({k: v for (k, v) in args.items() if v})
         url = make_route(size, bg_color, fg_color, image_format)
         if query:
             url = "?".join([url, query])
@@ -126,7 +125,7 @@ def test_create_images_using_client(
 def test_random_text(client: FlaskClient):
     url = make_route((638, 328), "cef", "555", "png")
     args = {"text": "Some Random Text", "dpi": None, "alpha": None, "random_text": True}
-    query = urlencode(valfilter(bool, args))
+    query = urlencode({k: v for (k, v) in args.items() if v})
     url = "?".join([url, query])
     res: Response = client.get(url, follow_redirects=False)
     assert res.status_code == 200

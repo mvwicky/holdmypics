@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 from environs import Env
-from hypothesis import settings
+from hypothesis import HealthCheck, settings
 from loguru import logger
 from marshmallow.validate import OneOf
 
@@ -17,9 +17,10 @@ if TYPE_CHECKING:
     from holdmypics import Holdmypics
 
 MAX_LOG_SIZE = 3 * (1024 ** 2)
+COMMON_PROFILE = {"suppress_health_check": (HealthCheck.data_too_large,)}
 PROFILES = {
-    "ci": {"max_examples": 50, "deadline": None},
-    "dev": {"max_examples": 25, "deadline": None},
+    "ci": {"max_examples": 50, "deadline": None, **COMMON_PROFILE},
+    "dev": {"max_examples": 25, "deadline": None, **COMMON_PROFILE},
 }
 
 
@@ -47,7 +48,7 @@ def pytest_configure(config: "Config"):
     for name, kwargs in PROFILES.items():  # type: str, dict
         settings.register_profile(name, **kwargs)
 
-    pr_validate = [OneOf(list(PROFILES))]
+    pr_validate = [OneOf(PROFILES)]
     profile = env("HYPOTHESIS_PROFILE", default="ci", validate=pr_validate)
     settings.load_profile(profile)
 

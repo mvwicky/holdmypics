@@ -51,8 +51,7 @@ class HashedFile(object):
         sha256 = hashlib.sha256()
         sha256.update(output_cts)
         digest = sha256.hexdigest()[:12]
-        suffix = self._orig_file.suffix
-        name = self._orig_file.stem + "." + digest + suffix
-        out_file = self._out_dir / name
+        name = ".".join((self._orig_file.stem, digest))
+        out_file = (self._out_dir / name).with_suffix(self._orig_file.suffix)
         out_file.write_bytes(output_cts)
         return out_file

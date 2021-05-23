@@ -4,8 +4,9 @@ import hashlib
 import os
 import re
 from functools import lru_cache, partial
+from itertools import chain
 from operator import itemgetter
-from typing import ClassVar, Optional
+from typing import Any, ClassVar, Optional
 
 import attr
 from loguru import logger
@@ -13,7 +14,7 @@ from loguru import logger
 from .._types import Dimension
 from ..utils import natsize
 from . import bp
-from .args import ImageArgs
+from .args import BaseImageArgs
 
 FNAME_TBL = str.maketrans({"#": "", " ": "-", ".": "", "/": "-", "\\": "-"})
 
@@ -89,17 +90,24 @@ class GeneratedFiles(object):
         return self.hash_strings(*map(repr, params))
 
     def get_file_name(
-        self, size: Dimension, bg: str, fg: str, fmt: str, args: ImageArgs
+        self,
+        size: Dimension,
+        bg: str,
+        fg: str,
+        fmt: str,
+        args: BaseImageArgs,
+        *extra: Any,
     ) -> str:
-        if args.text:
+        if getattr(args, "text", None):
             args = attr.evolve(args, text=self.hash_strings(args.text))
-        args = attr.astuple(args)
+        args = args.to_seq()
+        params = chain(["x".join(map(str, size)), bg, fg, fmt], args, extra)
         if not self.hash_file_names:
-            parts = ["x".join(map(str, size)), bg, fg] + list(args)
-            base_name = "-".join(map(str, parts)).translate(FNAME_TBL)
+            # parts = chain(["x".join(map(str, size)), bg, fg], args)
+            base_name = "-".join(map(str, params)).translate(FNAME_TBL)
             name = ".".join([base_name, fmt])
         else:
-            phash = self.params_hash(size, bg, fg, fmt, *args)
+            phash = self.params_hash(*params)
             name = ".".join([phash, fmt])
         path = os.path.join(self.images_folder, name)
         self.files.add(path)

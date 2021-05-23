@@ -24,6 +24,7 @@ pytest-cov = { version = "^2.8.1", optional = true }
 pytest-html = { version = "^3", optional = true }
 hypothesis = { version = "^6", optional = true }
 pytesseract = { version = "^0.3.4", optional = true }
+webargs = "^8.0.0"
 
 [tool.poetry.dev-dependencies]
 colorama = "^0.4.3"

@@ -1,10 +1,10 @@
 from __future__ import annotations
 
+import functools
 import random
 from string import hexdigits
 from typing import NamedTuple
 
-from cytoolz import memoize
 from loguru import logger
 from PIL import Image, ImageDraw
 from PIL.ImageFont import ImageFont
@@ -27,20 +27,18 @@ class TextArgs(NamedTuple):
     debug: bool
 
 
-font_sizes = fonts.font_sizes
-
 RAND_COLOR = "rand".casefold()
 MAX_TEXT_HEIGHT = 0.9
 
 
-@memoize
+@functools.lru_cache(maxsize=8)
 def normalize_fmt(fmt: str) -> str:
     return "jpeg" if fmt == "jpg" else fmt
 
 
 def random_color() -> str:
     """Generate a random hex string."""
-    return "".join(["{0:02x}".format(random.randrange(1 << 8)) for _ in range(3)])
+    return "".join("{0:02x}".format(random.randrange(1 << 8)) for _ in range(3))
 
 
 def px_to_pt(px: float) -> float:
@@ -70,16 +68,16 @@ def guess_size(height: int, font_name: str) -> tuple[ImageFont, int]:
     pt_size = int(px_to_pt(int(height_prime)))
     if pt_size in font:
         # If this point value is an actual font size, return it.
-        return font[pt_size], font_sizes.index(pt_size)
+        return font[pt_size], fonts.font_sizes.index(pt_size)
     s_mod = pt_size - (pt_size % 4)
     if s_mod in font:
-        return font[s_mod], font_sizes.index(s_mod)
+        return font[s_mod], fonts.font_sizes.index(s_mod)
     if pt_size > fonts.max_size:
-        return font[fonts.max_size], len(font_sizes) - 1
+        return font[fonts.max_size], len(fonts.font_sizes) - 1
     elif pt_size < fonts.min_size:
         return font[fonts.min_size], 0
-    last = font_sizes[0]
-    for i, sz in enumerate(font_sizes[1:]):
+    last = fonts.font_sizes[0]
+    for i, sz in enumerate(fonts.font_sizes[1:]):
         if last < pt_size < sz:
             return font[sz], i
     return font[sz], i
@@ -100,7 +98,7 @@ def get_font(d: ImageDraw.Draw, sz: Dimension, text: str, font_name: str) -> Fon
     tsize = d.textsize(text, font)
     while tsize >= sz and idx > 0:
         idx -= 1
-        font = face[font_sizes[idx]]
+        font = face[fonts.font_sizes[idx]]
         tsize = d.textsize(text, font)
     return FontParams(font, tsize)
 
@@ -110,7 +108,7 @@ def draw_text(im: Image.Image, args: TextArgs) -> Image.Image:
     w, h = im.size
     d = ImageDraw.Draw(im)
     font, tsize = get_font(d, (int(w * 0.9), h), args.text, args.font_name)
-    logger.info(f'Writing text "{args.text}" (size={tsize})')
+    logger.info('Writing text "{0}" (size={1})', args.text, tsize)
     tw, th = tsize
     xc = int((w - tw) / 2)
     yc = int((h - th) / 2)
@@ -122,9 +120,10 @@ def draw_text(im: Image.Image, args: TextArgs) -> Image.Image:
     return im
 
 
-@memoize
+@functools.lru_cache(maxsize=128)
 def get_color(color: str) -> str:
     color = color.lstrip("#").casefold()
-    if len(color) in {3, 6} and all(e in hexdigits for e in color):
+    if len(color) in {3, 4, 6, 8} and all(e in hexdigits for e in color):
         return "".join(["#", color])
+    logger.warning("Unable to create hex color from {0}", color)
     return color

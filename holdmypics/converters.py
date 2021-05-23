@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+from typing import Any
+
 from werkzeug.routing import BaseConverter, ValidationError
 
 from .constants import RAND_COLOR
 
-COLOR_REGEX = r"(?:(?:[A-Fa-f0-9]{3}){1,2})"
+RGB_REGEX = r"(?:(?:[A-Fa-f0-9]{3}){1,2})"
+RGBA_REGEX = r"(?:(?:[A-Fa-f0-9]{4}){1,2})"
+COLOR_REGEX = f"(?:{RGB_REGEX}|{RGBA_REGEX})"
 RAND_REGEX = f"(?i:{RAND_COLOR})"
 
 
@@ -16,13 +20,13 @@ class DimensionConverter(BaseConverter):
         if len(parts) == 1:
             parts = parts * 2
         if len(parts) != 2:
-            raise ValidationError
-        if not all(p.isnumeric() for p in parts):
-            raise ValidationError
-        x, y = parts[:2]
-        return int(x), int(y)
+            raise ValidationError("Dimension must be one or two numbers")
+        try:
+            return tuple(map(int, parts[:2]))
+        except ValueError as exc:
+            raise ValidationError() from exc
 
-    def to_url(self, parts):
+    def to_url(self, parts: Any) -> str:
         return "x".join(super(DimensionConverter, self).to_url(p) for p in parts)
 
 

@@ -1,35 +1,43 @@
+from __future__ import annotations
+
 import functools
 import re
+from collections.abc import Iterable
+from typing import Any
 from urllib.parse import urlencode
 
-from cytoolz import merge
-from flask import Markup, render_template, request, url_for
+from flask import Markup, current_app, render_template, request, url_for
+from werkzeug.routing import Map, Rule
 
-from .. import redisw
 from .._types import ResponseType
-from ..constants import COUNT_KEY, img_formats
+from ..constants import DEFAULT_FONT, IMG_FORMATS
 from ..fonts import fonts
-from ..utils import config_value, make_rules
+from ..utils import config_value, get_count
 from . import bp
 
-RULE_RE = re.compile(r"(?:col:|any)")
+RULE_RE = re.compile(r"(?:(?:dim|col):|any)")
 ROBOTS = """User-agent: *
 Disallow: /api/"""
 
 
-@functools.lru_cache(maxsize=2)
-def get_context() -> dict:
-    paths = (p for (p, _) in make_rules())
-    rules = [RULE_RE.sub("", p) for p in paths]
+def get_rules() -> list[str]:
+    url_map: Map = current_app.url_map
+    rules_iter: Iterable[Rule] = url_map.iter_rules(endpoint="api.image_route")
+    rules = [RULE_RE.sub("", r.rule) for r in rules_iter]
+    return rules
 
-    width, height = 638, 328
+
+@functools.lru_cache(maxsize=2)
+def get_context() -> dict[str, Any]:
+    width = config_value("INDEX_DEFAULT_WIDTH")
+    height = config_value("INDEX_DEFAULT_HEIGHT")
     max_width = config_value("INDEX_IMG_MAX_WIDTH")
     max_height = config_value("INDEX_IMG_MAX_HEIGHT")
     bg_color = config_value("INDEX_DEFAULT_BG", "cef")
     fg_color = config_value("INDEX_DEFAULT_FG", "555")
     fmt = config_value("INDEX_DEFAULT_FORMAT", "png")
     text = config_value("INDEX_TEXT")
-    font = "overpass"
+    font = DEFAULT_FONT
     img_url = url_for(
         "api.image_route",
         size=(width, height),
@@ -50,7 +58,7 @@ def get_context() -> dict:
     sel_fields = {
         "fmt": {
             "value": fmt,
-            "options": [(f, f) for f in img_formats],
+            "options": [(f, f) for f in IMG_FORMATS],
             "label": "Format",
             "help_text": fmt_help,
         },
@@ -61,7 +69,7 @@ def get_context() -> dict:
     apache_license = url_for("static", filename="licenses/apache.txt")
 
     return {
-        "rules": [r.join(["api/<size>/", "/"]) for r in rules],
+        "rules": get_rules(),
         "img_url": img_url,
         "img_query": img_query,
         "width": width,
@@ -71,7 +79,7 @@ def get_context() -> dict:
         "fmt": fmt,
         "text": text,
         "font_names": font_names,
-        "img_formats": img_formats,
+        "img_formats": IMG_FORMATS,
         "font": font,
         "seed": None,
         "color_pattern": color_pattern,
@@ -90,15 +98,7 @@ def get_context() -> dict:
 @bp.route("/")
 def index() -> ResponseType:
     get_context.cache_clear()
-    count = redisw.client.get(COUNT_KEY)
-    if count is not None:
-        try:
-            count = int(count.decode())
-        except ValueError:
-            count = 0
-    else:
-        count = 0
-    context = merge(get_context(), {"count": f"{count:,}"})
+    context = {**get_context(), "count": f"{get_count():,}"}
     accept = request.accept_mimetypes
     if accept.accept_json and not accept.accept_html:
         return context

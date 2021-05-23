@@ -1,33 +1,29 @@
 from __future__ import annotations
 
 import json
+import shlex
 import subprocess
 from collections.abc import Callable
 from pathlib import Path
-from subprocess import DEVNULL
 from typing import Any
 
 import click
 import semver
-import tomlkit as toml
-from cytoolz import get_in, merge
 from flask import Flask
 from loguru import logger
 from semver import VersionInfo
 
-SEMVER_BUMPS = {
-    "major": VersionInfo.bump_major,
-    "minor": VersionInfo.bump_minor,
-    "patch": VersionInfo.bump_patch,
-    "prerelease": VersionInfo.bump_prerelease,
-    "build": VersionInfo.bump_build,
+SEMVER_LEVELS = ("major", "minor", "patch", "prerelease", "build")
+SEMVER_BUMPS: dict[str, Callable[[VersionInfo], Any]] = {
+    level: getattr(VersionInfo, f"bump_{level}") for level in SEMVER_LEVELS
 }
-SEMVER_LEVELS = list(SEMVER_BUMPS)
 
 
-def get_bump_fn(level: str) -> Callable[[VersionInfo], Any]:
-    fn_name = "bump_{0}".format(level)
-    return getattr(VersionInfo, fn_name)
+def run(*args: str, **kwargs: Any) -> subprocess.CompletedProcess:
+    if not kwargs.pop("no_echo", False):
+        click.echo(shlex.join(args))
+    kwargs.setdefault("check", True)
+    return subprocess.run(args, **kwargs)
 
 
 def register(app: Flask):  # noqa: C901
@@ -91,19 +87,14 @@ def register(app: Flask):  # noqa: C901
         from .package import Package
 
         package: Package = Package.find_root()
-        proj = package.root_dir / "pyproject.toml"
-        pkg = package.root_dir / "package.json"
-
-        proj_data = toml.parse(proj.read_text())
-
-        poetry: dict = get_in(["tool", "poetry"], proj_data)
-        version = semver.parse_version_info(poetry["version"])
+        version_cmd = run(
+            "poetry", "version", "--short", text=True, capture_output=True
+        )
+        version = semver.parse_version_info(version_cmd.stdout.strip())
         if bump:
-            f = SEMVER_BUMPS[level]
             logger.info("Bumping {0}.", level)
-            version = str(f(version))
-            proj_data["tool"]["poetry"]["version"] = version
-            proj.write_text(toml.dumps(proj_data))
+            version = str(SEMVER_BUMPS[level](version))
+            run("poetry", "version", version)
             logger.success("New version: {0}", version)
         else:
             version = str(version)
@@ -116,26 +107,33 @@ def register(app: Flask):  # noqa: C901
         else:
             logger.info("{0} up to date.", __version__.__name__)
 
+        pkg = package.root_dir / "package.json"
         if pkg.is_file():
             pkg_data = json.loads(pkg.read_text())
             if pkg_data["version"] != version:
                 logger.info("package.json out of date.")
-                pkg.write_text(json.dumps(merge(pkg_data, {"version": version})))
-                args = ["yarn", "run", "prettier", "--write", str(pkg)]
-                subprocess.run(args, stdout=DEVNULL, stderr=DEVNULL, check=True)
+                run(
+                    "yarn",
+                    "version",
+                    "--no-git-tag-version",
+                    "--no-commit-hooks",
+                    "--new-version",
+                    version,
+                    check=True,
+                )
             else:
                 logger.info("package.json up to date.")
         else:
             logger.warning("No package.json found.")
 
     @app.cli.command()
-    @click.option("--run/--no-run", default=True, help="Don't start the server.")
+    @click.option("--serve/--no-serve", default=True, help="Don't start the server.")
     @click.option("--yarn/--no-yarn", default=True, help="Don't start yarn")
-    def serve(run: bool, yarn: bool):
+    def serve(serve: bool, yarn: bool):
         """Run dev server and build client bundles."""
         from .server import Server
 
-        server = Server(app, start_run=run, start_yarn=yarn)
+        server = Server(app, start_run=serve, start_yarn=yarn)
         server.start()
         server.loop()
 
