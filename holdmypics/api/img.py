@@ -6,13 +6,14 @@ import attr
 from loguru import logger
 from PIL import Image
 
+from .args import ImageArgs
 from .base import BaseGeneratedImage
 from .files import files
 from .utils import TextArgs, draw_text
 
 
 @attr.s(slots=True, auto_attribs=True)
-class GeneratedImage(BaseGeneratedImage):
+class GeneratedImage(BaseGeneratedImage[ImageArgs]):
     def make(self) -> Image.Image:
         im = Image.new(self.mode, self.size, self.bg_color)
         args = self.args

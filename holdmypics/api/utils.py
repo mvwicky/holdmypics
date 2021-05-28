@@ -123,7 +123,19 @@ def draw_text(im: Image.Image, args: TextArgs) -> Image.Image:
 @functools.lru_cache(maxsize=128)
 def get_color(color: str) -> str:
     color = color.lstrip("#").casefold()
-    if len(color) in {3, 4, 6, 8} and all(e in hexdigits for e in color):
+    if not all(e in hexdigits for e in color):
+        logger.warning("Unable to create hex color from `{0}`", color)
+        return color
+    n = len(color)
+    if n in (3, 4):
+        color = "".join(c * 2 for c in color)
+    if len(color) in {3, 4, 6, 8}:
         return "".join(["#", color])
     logger.warning("Unable to create hex color from {0}", color)
     return color
+
+
+def resolve_color(col: str) -> str:
+    col = col.casefold()
+    col = col if col != RAND_COLOR else random_color()
+    return get_color(col)

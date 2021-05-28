@@ -2,42 +2,38 @@ from __future__ import annotations
 
 import os
 from collections.abc import Callable
-from typing import Any, ClassVar
+from typing import Any, ClassVar, Generic, TypeVar
 
 import attr
 from loguru import logger
 from PIL import Image
 
 from .. import redisw
-from ..constants import COUNT_KEY, RAND_COLOR
+from ..constants import COUNT_KEY
 from ..utils import natsize
 from .args import BaseImageArgs
 from .files import get_size
-from .utils import get_color, normalize_fmt, random_color
+from .utils import normalize_fmt, resolve_color
+
+_A = TypeVar("_A", bound=BaseImageArgs)
 
 OPT_KW: dict[str, Callable[[BaseImageArgs], dict[str, Any]]] = {
     "jpeg": lambda args: {"optimize": True, "dpi": (args.dpi, args.dpi)},
     "png": lambda args: {"optimize": True, "dpi": (args.dpi, args.dpi)},
-    "webp": lambda _: {"quality": 100, "method": 6},
+    "webp": lambda _: {"quality": 100, "method": 6, "lossless": True},
     "gif": lambda _: {"optimize": True},
 }
 
 
-def color_converter(col: str) -> str:
-    col = col.casefold()
-    col = col if col != RAND_COLOR else random_color()
-    return get_color(col)
-
-
 @attr.s(slots=True, auto_attribs=True)
-class BaseGeneratedImage(object):
+class BaseGeneratedImage(Generic[_A]):
     mode: ClassVar[str] = "RGBA"
 
     size: tuple[int, int]
     fmt: str = attr.ib(converter=normalize_fmt)
-    bg_color: str = attr.ib(converter=color_converter)
-    fg_color: str = attr.ib(converter=color_converter)
-    args: BaseImageArgs
+    bg_color: str = attr.ib(converter=resolve_color)
+    fg_color: str = attr.ib(converter=resolve_color)
+    args: _A
 
     def get_save_kw(self) -> dict[str, Any]:
         kw_func = OPT_KW.get(self.fmt, None)

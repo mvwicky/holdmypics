@@ -95,12 +95,12 @@ isort: $(SENTINEL_DIR) $(ISORT_SENTINEL)
 flake8: $(SENTINEL_DIR) $(FLAKE8_SENTINEL)
 
 $(ISORT_SENTINEL): $(LS_PYTHON)
-	@echo "Running isort on $(words $?) files"
+	@echo "Running isort on $(words $?) file(s)"
 	isort --check-only $?
 	date > $@
 
 $(FLAKE8_SENTINEL): $(LS_PYTHON)
-	@echo "Running flake8 on $(words $?) files"
+	@echo "Running flake8 on $(words $?) file(s)"
 	flake8 $?
 	date > $@
 

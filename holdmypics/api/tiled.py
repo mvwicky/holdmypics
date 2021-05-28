@@ -8,6 +8,7 @@ import attr
 from loguru import logger
 from PIL import Image, ImageDraw
 
+from .args import TiledImageArgs
 from .base import BaseGeneratedImage
 from .files import files
 
@@ -17,7 +18,7 @@ COLORS = cycle(
 
 
 @attr.s(slots=True, auto_attribs=True)
-class GeneratedTiledImage(BaseGeneratedImage):
+class GeneratedTiledImage(BaseGeneratedImage[TiledImageArgs]):
     cols: int
     rows: int
 
@@ -28,21 +29,28 @@ class GeneratedTiledImage(BaseGeneratedImage):
         width, height = self.size
         t_width = math.ceil(width / self.cols)
         t_height = math.ceil(height / self.rows)
+        colors = cycle(self.args.colors) if self.args.colors else COLORS
         for i in range(self.rows):
             y1 = i * t_height
             y2 = y1 + t_height
             for j in range(self.cols):
                 x1 = j * t_width
                 x2 = x1 + t_width
-                d.rectangle(((x1, y1), (x2, y2)), next(COLORS))
-        out = Image.alpha_composite(base, draw_im)
+                d.rectangle(((x1, y1), (x2, y2)), next(colors))
+        base.alpha_composite(draw_im)
         if self.fmt == "jpeg":
-            out = out.convert("RGB")
-        return out
+            base = base.convert("RGB")
+        return base
 
     def get_path(self) -> str:
         path = files.get_file_name(
-            self.size, self.bg_color, self.fg_color, self.fmt, self.args
+            self.size,
+            self.bg_color,
+            self.fg_color,
+            self.fmt,
+            self.args,
+            self.cols,
+            self.rows,
         )
         if os.path.isfile(path):
             os.utime(path)

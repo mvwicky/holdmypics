@@ -103,7 +103,6 @@ class GeneratedFiles(object):
         args = args.to_seq()
         params = chain(["x".join(map(str, size)), bg, fg, fmt], args, extra)
         if not self.hash_file_names:
-            # parts = chain(["x".join(map(str, size)), bg, fg], args)
             base_name = "-".join(map(str, params)).translate(FNAME_TBL)
             name = ".".join([base_name, fmt])
         else:

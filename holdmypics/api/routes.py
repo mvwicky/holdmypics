@@ -74,6 +74,11 @@ def check_format(fmt: str) -> str:
     return fmt
 
 
+def get_send_file_kwargs(path: str) -> dict[str, Any]:
+    mime = mimetypes.guess_type(path)[0]
+    return {"mimetype": mime, "etag": not current_app.debug, "conditional": True}
+
+
 @bp.route("/count/")
 def count_route():
     return {"count": get_count()}
@@ -85,9 +90,8 @@ def image_route(
 ) -> ResponseType:
     fmt = check_format(fmt)
     args = ImageArgs.from_request().real_args()
-    font_name = args.font_name
-    if font_name not in fonts.font_names:
-        return font_redirect(font_name)
+    if args.font_name not in fonts.font_names:
+        return font_redirect(args.font_name)
 
     bg_lower, fg_lower = map(str.casefold, [bg_color, fg_color])
     if RAND_COLOR in {bg_lower, fg_lower}:
@@ -102,11 +106,7 @@ def image_route(
     if files.need_to_clean:
         after_this_request(do_cleanup)
 
-    kw = {
-        "mimetype": mimetypes.guess_type(path)[0],
-        "add_etags": not current_app.debug,
-        "conditional": True,
-    }
+    kw = get_send_file_kwargs(path)
     res: Response = send_file(path, **kw)  # type: ignore
     if args.random_text or RAND_COLOR in {bg_lower, fg_lower}:
         res.headers["Cache-Control"] = NO_CACHE
@@ -137,15 +137,12 @@ def text_route() -> str:
 def tiled_route(size: tuple[int, int], cols: int, rows: int, fmt: str) -> str:
     fmt = check_format(fmt)
     args = TiledImageArgs.from_request()
-    img = GeneratedTiledImage(size, fmt, "000", "000", args, cols, rows)
+    img = GeneratedTiledImage(size, fmt, "0000", "0000", args, cols, rows)
     path = img.get_path()
     if files.need_to_clean:
         after_this_request(do_cleanup)
-    kw = {
-        "mimetype": mimetypes.guess_type(path)[0],
-        "add_etags": not current_app.debug,
-        "conditional": True,
-    }
+
+    kw = get_send_file_kwargs(path)
     res: Response = send_file(path, **kw)  # type: ignore
     res.headers["Cache-Control"] = NO_CACHE
     return res

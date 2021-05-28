@@ -4,7 +4,7 @@ import os
 import subprocess
 from collections.abc import Sequence
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 import attr
 from loguru import logger
@@ -35,27 +35,26 @@ class Package(object):
     _lock_file: Optional[Path] = attr.ib(default=None, init=False, repr=False)
 
     @classmethod
-    def find_root(cls):
+    def find_root(cls) -> "Package":
         pyproject = find_pyproject()
         return cls(root_dir=pyproject.parent)
 
     @property
-    def lock_file(self):
+    def lock_file(self) -> Path:
         if self._lock_file is None:
             self._lock_file = self.root_dir / "poetry.lock"
         return self._lock_file
 
-    def req_file(self, dev: bool):
+    def req_file(self, dev: bool) -> Path:
         name = "".join(["requirements", "-dev" if dev else "", ".txt"])
         return self.root_dir / name
 
-    def sh(self, args: Sequence[str], **kwargs) -> subprocess.CompletedProcess:
+    def sh(self, args: Sequence[str], **kwargs: Any) -> subprocess.CompletedProcess:
         cmd = args
         if not isinstance(cmd, str) and isinstance(cmd, Sequence):
             cmd = " ".join(cmd)
-        logger.info("Running command {0}", cmd)
-        kwargs.setdefault("check", True)
-        kwargs.setdefault("cwd", str(self.root_dir))
+        logger.info("Running command `{0}`", cmd)
+        kwargs = {"check": True, "cwd": self.root_dir, **kwargs}
         return subprocess.run(args, **kwargs)
 
     def export(self, dev: bool, no_hashes: bool) -> str:
@@ -64,7 +63,7 @@ class Package(object):
             args.extend(["--dev", "-E", "tests"])
         if no_hashes:
             args.append("--without-hashes")
-        cmd = self.sh(args, stdout=subprocess.PIPE, text=True)
+        cmd = self.sh(args, capture_output=True, text=True)
         return cmd.stdout
 
     def freeze(self, dev: bool = False, no_hashes: bool = False) -> bool:

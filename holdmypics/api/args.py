@@ -1,15 +1,17 @@
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from typing import Any, Optional
 
 import attr
 import marshmallow as ma
 from flask import request
-from marshmallow.validate import Range
+from marshmallow.validate import Range, Regexp
 from webargs.flaskparser import parser
 
 from ..constants import DEFAULT_FONT
+from ..converters import ColorConverter
+from .utils import resolve_color
 from .words import words
 
 truthy = set()
@@ -68,7 +70,9 @@ class ImageArgs(BaseImageArgs):
 
 
 class TiledImageArgsSchema(BaseImageArgsSchema):
-    colors = ma.fields.List(ma.fields.String(), missing=list)
+    colors = ma.fields.List(
+        ma.fields.String(validate=[Regexp(ColorConverter.regex)]), missing=list
+    )
     alpha = ma.fields.Float(missing=1.0, validate=[Range(0.0, 1.0)])
 
     @ma.post_load
@@ -76,9 +80,15 @@ class TiledImageArgsSchema(BaseImageArgsSchema):
         return TiledImageArgs(**data)
 
 
+def color_converter(inp: Any) -> Any:
+    if not isinstance(inp, str) and isinstance(inp, Sequence):
+        inp = [resolve_color(e) for e in inp]
+    return inp
+
+
 @attr.s(slots=True, auto_attribs=True, frozen=True)
 class TiledImageArgs(BaseImageArgs):
-    colors: list[str] = attr.ib(factory=list)
+    colors: list[str] = attr.ib(factory=list, converter=color_converter)
     alpha: float = attr.ib(default=1.0, converter=clamp_alpha)
 
     text: None = attr.ib(default=None, init=False)

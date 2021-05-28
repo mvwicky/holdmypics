@@ -20,7 +20,7 @@ WEB_PROC_RE = re.compile(r"^web: (?P<cmd>.+)$")
 @attr.s(slots=True, auto_attribs=True)
 class Server(object):
     app: Flask
-    start_run: bool = True
+    start_server: bool = True
     start_yarn: bool = True
 
     procs: dict[str, Popen] = attr.ib(init=False, factory=dict)
@@ -28,7 +28,7 @@ class Server(object):
     def start(self):
         if self.start_yarn:
             self._start_yarn()
-        if self.start_run:
+        if self.start_server:
             self._start_server()
         n = len(self.procs)
         ts = "" if n == 1 else "es"

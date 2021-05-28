@@ -123,6 +123,7 @@ def register(app: Flask):  # noqa: C901
                 )
             else:
                 logger.info("package.json up to date.")
+            assert json.loads(pkg.read_text())["version"] == version
         else:
             logger.warning("No package.json found.")
 
@@ -133,7 +134,7 @@ def register(app: Flask):  # noqa: C901
         """Run dev server and build client bundles."""
         from .server import Server
 
-        server = Server(app, start_run=serve, start_yarn=yarn)
+        server = Server(app, start_server=serve, start_yarn=yarn)
         server.start()
         server.loop()
 
