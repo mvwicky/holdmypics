@@ -10,9 +10,8 @@ from PIL import Image
 
 from .. import redisw
 from ..constants import COUNT_KEY
-from ..utils import natsize
+from ..utils import get_size, natsize
 from .args import BaseImageArgs
-from .files import get_size
 from .utils import normalize_fmt, resolve_color
 
 _A = TypeVar("_A", bound=BaseImageArgs)

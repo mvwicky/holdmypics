@@ -9,6 +9,8 @@ import loguru
 from flask import Request, Response, request
 from loguru import logger
 
+from .utils import get_size, natsize
+
 req: Request = request
 
 MAX_LOG_SIZE = 1 * (1024 ** 2)
@@ -63,6 +65,14 @@ def log_request(res: Response) -> None:
     addrs: str = req.headers.get("X-Forwarded-For", req.remote_addr)
     addr = addrs.split(",")[-1].strip()
     content_length = res.headers.get("Content-Length", 0, type=int)
-    msg = "{0:7} {1:3d} {2} content-length={3:,} addr={4}"
-    args = [req.method, res.status_code, path, content_length, addr]
+    msg = "{0:7} {1:3d} {2} content-length={3} addr={4}"
+    args = [req.method, res.status_code, path, natsize(content_length), addr]
     logger.log(level, msg, *args)
+
+
+def log_static_file(path: str, url: str) -> None:
+    try:
+        size = natsize(get_size(path))
+    except Exception:
+        size = "<unknown>"
+    logger.info("Static File {0} size={1}", url, size)

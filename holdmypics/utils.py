@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import math
+import os
+from functools import lru_cache
 from typing import Optional, TypeVar, Union
 
 from flask import Flask, current_app
 
-from . import redisw
 from .constants import (
     COUNT_KEY,
     IMG_FORMATS_STR,
@@ -77,6 +78,8 @@ def natsize(num: Union[float, int], fmt: str = "{0:.2f}") -> str:
 
 
 def get_count() -> int:
+    from . import redisw
+
     count = redisw.client.get(COUNT_KEY)
     if count is not None:
         try:
@@ -84,3 +87,8 @@ def get_count() -> int:
         except ValueError:
             return 0
     return 0
+
+
+@lru_cache(maxsize=128)
+def get_size(path: str) -> int:
+    return os.path.getsize(path)

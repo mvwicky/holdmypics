@@ -57,20 +57,20 @@ class Package(object):
         kwargs = {"check": True, "cwd": self.root_dir, **kwargs}
         return subprocess.run(args, **kwargs)
 
-    def export(self, dev: bool, no_hashes: bool) -> str:
+    def export(self, dev: bool, hashes: bool) -> str:
         args = ["poetry", "export", "--format", "requirements.txt"]
         if dev:
             args.extend(["--dev", "-E", "tests"])
-        if no_hashes:
+        if not hashes:
             args.append("--without-hashes")
         cmd = self.sh(args, capture_output=True, text=True)
         return cmd.stdout
 
-    def freeze(self, dev: bool = False, no_hashes: bool = False) -> bool:
+    def freeze(self, dev: bool = False, hashes: bool = True) -> bool:
         if not self.lock_file.is_file():
             self.sh(["poetry", "lock"])
 
-        req_cts = self.export(dev, no_hashes)
+        req_cts = self.export(dev, hashes)
         file = self.req_file(dev)
         write = not file.is_file() or req_cts != file.read_text()
         if write:

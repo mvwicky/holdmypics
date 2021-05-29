@@ -56,6 +56,19 @@
       }
     }
   ],
+  "mini-css-extract-plugin /Users/michael/GitHub/holdmypics/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./src/css/main.css": [
+    {
+      "chunks": {
+        "byName": {},
+        "bySource": {},
+        "usedIds": []
+      },
+      "modules": {
+        "byIdentifier": {},
+        "usedIds": []
+      }
+    }
+  ],
   "modules": {
     "byIdentifier": {},
     "usedIds": []

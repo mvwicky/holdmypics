@@ -12,7 +12,7 @@ from whitenoise import WhiteNoise
 
 import config
 from .converters import ColorConverter, DimensionConverter
-from .logging import config_logging, log_request
+from .logging import config_logging, log_request, log_static_file
 from .wrapped_redis import WrappedRedis
 
 if TYPE_CHECKING:
@@ -25,24 +25,23 @@ HERE: Path = Path(__file__).resolve().parent
 CACHE_CONTROL_MAX = "max-age=315360000, public, immutable"
 PY_VERSION = ".".join(map(str, sys.version_info[:3]))
 
-exts = ["woff", "woff2", "js", "css"]
-exts_rev = ["".join((e[::-1], ".")) for e in exts]
-exts_group = "|".join(exts_rev)
-EXT_RE = re.compile("^(?:{0})".format(exts_group))
+_exts = ("woff", "woff2", "js", "css")
+_exts_group = "|".join("".join((e[::-1], ".")) for e in _exts)
+EXT_RE = re.compile("^(?:{0})".format(_exts_group))
 
 
 @lru_cache(maxsize=2)
 def get_powered_by(inc_whitenoise: bool) -> str:
-    python_version = "/".join(["Python", PY_VERSION])
-    flask_version = "/".join(["Flask", version("flask")])
+    python_version = "/".join(("Python", PY_VERSION))
+    flask_version = "/".join(("Flask", version("flask")))
     parts = [python_version, flask_version]
     if inc_whitenoise:
-        parts.append("/".join(["Whitenoise", version("whitenoise")]))
+        parts.append("/".join(("Whitenoise", version("whitenoise"))))
     return ", ".join(parts)
 
 
 def wn_add_headers(version: str, headers: "Headers", path: str, url: str):
-    logger.info("Serving static file: {0}", url)
+    log_static_file(path, url)
     headers["X-Powered-By"] = get_powered_by(True)
     headers["X-Version"] = version
 

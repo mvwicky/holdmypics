@@ -17,6 +17,7 @@ SEMVER_LEVELS = ("major", "minor", "patch", "prerelease", "build")
 SEMVER_BUMPS: dict[str, Callable[[VersionInfo], Any]] = {
     level: getattr(VersionInfo, f"bump_{level}") for level in SEMVER_LEVELS
 }
+CTX_SETTINGS = {"max_content_width": 130}
 
 
 def run(*args: str, **kwargs: Any) -> subprocess.CompletedProcess:
@@ -26,14 +27,10 @@ def run(*args: str, **kwargs: Any) -> subprocess.CompletedProcess:
     return subprocess.run(args, **kwargs)
 
 
-def register(app: Flask):  # noqa: C901
-    base_path = app.config.get("BASE_PATH")
-    cfg_path = base_path / "config"
-    dev_dir = str(cfg_path / "dev")
-    prod_dir = str(cfg_path / "prod")
-    default_template = str(cfg_path / "Dockerfile.template")
+def register(app: Flask):
+    cfg_path = app.config.get("BASE_PATH") / "config"
 
-    @app.cli.command()
+    @app.cli.command(context_settings=CTX_SETTINGS)
     @click.option(
         "--both/--not-both",
         "-b/ ",
@@ -51,6 +48,7 @@ def register(app: Flask):  # noqa: C901
         "--hashes/--no-hashes",
         default=True,
         help="Create lock file without file hashes.",
+        show_default=True,
     )
     def freeze(both: bool, dev: bool, hashes: bool):
         """Create a requirements.txt file."""
@@ -59,12 +57,12 @@ def register(app: Flask):  # noqa: C901
         package: Package = Package.find_root()
         if both:
             logger.info("Freezing both requirement types.")
-            package.freeze(False, not hashes)
-            package.freeze(True, not hashes)
+            package.freeze(False, hashes)
+            package.freeze(True, hashes)
         else:
-            package.freeze(dev, not hashes)
+            package.freeze(dev, hashes)
 
-    @app.cli.command()
+    @app.cli.command(context_settings=CTX_SETTINGS)
     @click.option(
         "--bump/--no-bump",
         "-b/ ",
@@ -119,7 +117,6 @@ def register(app: Flask):  # noqa: C901
                     "--no-commit-hooks",
                     "--new-version",
                     version,
-                    check=True,
                 )
             else:
                 logger.info("package.json up to date.")
@@ -127,9 +124,9 @@ def register(app: Flask):  # noqa: C901
         else:
             logger.warning("No package.json found.")
 
-    @app.cli.command()
-    @click.option("--serve/--no-serve", default=True, help="Don't start the server.")
-    @click.option("--yarn/--no-yarn", default=True, help="Don't start yarn")
+    @app.cli.command(context_settings=CTX_SETTINGS)
+    @click.option("--serve/--no-serve", default=True, help="Start the server.")
+    @click.option("--yarn/--no-yarn", default=True, help="Start yarn")
     def serve(serve: bool, yarn: bool):
         """Run dev server and build client bundles."""
         from .server import Server
@@ -138,24 +135,24 @@ def register(app: Flask):  # noqa: C901
         server.start()
         server.loop()
 
-    @app.cli.command()
+    @app.cli.command(context_settings=CTX_SETTINGS)
     @click.argument(
         "template",
-        type=click.Path(exists=True, dir_okay=False),
-        default=default_template,
+        type=click.Path(exists=True, dir_okay=False, path_type=Path),
+        default=cfg_path / "Dockerfile.template",
     )
     @click.option(
         "--dev-output",
         "-d",
-        type=click.Path(),
-        default=dev_dir,
+        type=click.Path(path_type=Path, file_okay=False),
+        default=cfg_path / "dev",
         help="The location of the development Dockerfile",
     )
     @click.option(
         "--prod-output",
         "-p",
         type=click.Path(),
-        default=prod_dir,
+        default=cfg_path / "prod",
         help="The location of the production Dockerfile",
     )
     @click.option(

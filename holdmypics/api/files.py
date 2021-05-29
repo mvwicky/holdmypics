@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 import os
 import re
-from functools import lru_cache, partial
+from functools import partial
 from itertools import chain
 from operator import itemgetter
 from typing import Any, ClassVar, Optional
@@ -12,18 +12,13 @@ import attr
 from loguru import logger
 
 from .._types import Dimension
-from ..utils import natsize
+from ..utils import get_size, natsize
 from . import bp
 from .args import BaseImageArgs
 
 FNAME_TBL = str.maketrans({"#": "", " ": "-", ".": "", "/": "-", "\\": "-"})
 
 no_init = partial(attr.ib, init=False)
-
-
-@lru_cache(maxsize=128)
-def get_size(path: str) -> int:
-    return os.path.getsize(path)
 
 
 @attr.s(slots=True, auto_attribs=True, repr=False)

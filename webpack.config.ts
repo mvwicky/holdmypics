@@ -1,5 +1,6 @@
 import { join, resolve } from "path";
 
+import { ESBuildMinifyPlugin } from "esbuild-loader";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import TerserPlugin from "terser-webpack-plugin";
@@ -27,7 +28,6 @@ const relToSrc = (...args: string[]) => relToRoot("src", ...args);
 
 const [hashFunction, hashDigestLength] = ["md5", 28];
 
-const templatesDir = relToRoot("holdmypics", "core", "templates");
 const outPath = relToRoot("static", "dist");
 
 const mode = prodOr("production", "development");
@@ -51,7 +51,7 @@ const configuration: Configuration = {
       chunkFilename: `[name]${contenthash}.css`,
     }),
     new HtmlWebpackPlugin({
-      filename: join(templatesDir, "base-out.html"),
+      filename: relToRoot("holdmypics", "core", "templates", "base-out.html"),
       minify: false,
       inject: false,
       meta: {},
@@ -69,6 +69,14 @@ const configuration: Configuration = {
         exclude: [/node_modules/],
         use: [
           {
+            loader: require.resolve("esbuild-loader"),
+            options: {
+              loader: "ts",
+              target: "es2015",
+              tsconfigRaw: require("./src/tsconfig.json"),
+            },
+          },
+          /*{
             loader: require.resolve("babel-loader"),
             options: {
               cacheDirectory: false,
@@ -77,7 +85,7 @@ const configuration: Configuration = {
                 ifProd([
                   "@babel/preset-env",
                   {
-                    corejs: { version: "3.9", proposals: true },
+                    corejs: { version: "3.13", proposals: true },
                     debug: process.env.BABEL_DEBUG !== undefined,
                     useBuiltIns: "usage",
                     targets: { esmodules: true },
@@ -92,11 +100,11 @@ const configuration: Configuration = {
                 strictMode: true,
               },
             },
-          },
+          },*/
         ],
       },
       {
-        test: /\.(s?css)$/,
+        test: /\.(scss)$/,
         include: [relToSrc("scss")],
         use: [
           MiniCssExtractPlugin.loader,
@@ -112,6 +120,18 @@ const configuration: Configuration = {
         ],
       },
       {
+        test: /\.(css)$/,
+        include: [relToSrc("css")],
+        use: [
+          MiniCssExtractPlugin.loader,
+          {
+            loader: require.resolve("css-loader"),
+            options: { importLoaders: 2, modules: false },
+          },
+          { loader: require.resolve("postcss-loader") },
+        ],
+      },
+      {
         test: /\.(woff2?)$/,
         include: [relToSrc("scss")],
         type: "asset/resource",
@@ -124,23 +144,23 @@ const configuration: Configuration = {
   optimization: {
     minimizer: compact([
       ifProd(
-        new TerserPlugin({
-          terserOptions: {
-            compress: {
-              drop_console: false,
-              drop_debugger: true,
-              global_defs: {
-                PRODUCTION: true,
-              },
-            },
-          },
-        })
+        new ESBuildMinifyPlugin({ target: "es2015" })
+        // new TerserPlugin({
+        //   terserOptions: {
+        //     compress: {
+        //       drop_console: false,
+        //       drop_debugger: true,
+        //       global_defs: {
+        //         PRODUCTION: true,
+        //       },
+        //     },
+        //   },
+        // })
       ),
     ]),
     splitChunks: {
       automaticNameDelimiter: "~",
     },
-    runtimeChunk: "single",
   },
   resolve: {
     extensions: [".js", ".ts"],
