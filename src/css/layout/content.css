@@ -1,0 +1,5 @@
+@layer components {
+  .row {
+    @apply flex flex-row justify-center w-full;
+  }
+}

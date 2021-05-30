@@ -56,7 +56,7 @@ settings:
       alwaysTryTypes: true
       project: [src/tsconfig.json, tsconfig.json]
 overrides:
-  - files: [webpack.config.ts, postcss.config.js]
+  - files: [webpack.config.ts, postcss.config.js, tailwind.config.js]
     env: { node: true, browser: false }
     settings:
       import/core-modules: [os, path, process, fs, crypto, util]

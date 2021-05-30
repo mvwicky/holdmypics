@@ -1,0 +1,59 @@
+@layer components {
+  input,
+  select {
+    border-radius: 2px;
+    box-shadow: var(--validity-shadow, none);
+
+    @apply border border-blue-700;
+  }
+
+  input:invalid,
+  select:invalid {
+    --validity-color: rgba(240, 0, 0, 0.8);
+    --validity-shadow: 0 0 5px 1px var(--validity-color);
+  }
+
+  input[type="text"]:disabled,
+  input[type="text"].disabled {
+    @apply bg-gray-300 text-gray-100;
+  }
+
+  .input-group {
+    @apply flex flex-col;
+  }
+
+  .text-input {
+    @apply flex items-center justify-between;
+
+    flex-basis: 50%;
+  }
+
+  /* #randomText {
+    @apply flex-grow-0 my-0 mx-auto;
+  } */
+
+  .form-group {
+    @apply flex flex-col flex-wrap justify-between md:flex-row;
+  }
+
+  .form-group label {
+    @apply flex-grow-0 mb-1 md:mb-0;
+  }
+
+  .form-group > input,
+  .form-group > .input-group {
+    flex-basis: 100%;
+    @apply flex-grow-0 md:flex-wrap;
+  }
+  @screen md {
+    .form-group > input,
+    .form-group > .input-group {
+      flex-basis: 50%;
+    }
+  }
+
+  .help-text {
+    color: #000000;
+    font-weight: 200;
+  }
+}

@@ -1,21 +1,11 @@
-const { join } = require("path");
+const postcssImport = require("postcss-import");
+const tailwindCSS = require("tailwindcss");
 
-const autoprefixer = require("autoprefixer");
-
-const plugins = [autoprefixer({ flexbox: "no-2009" })];
+const plugins = [postcssImport, tailwindCSS];
 
 if (process.env.NODE_ENV === "production") {
-  const purgeCSS = require("@fullhuman/postcss-purgecss");
-  const csso = require("postcss-csso");
-
-  const content = ["jinja", "html"].map((ext) =>
-    join(".", "holdmypics", "**", `*.${ext}`)
-  );
-  plugins.push(purgeCSS({ content, rejected: true }), csso({}));
-  if (process.env.SHOW_PURGED_CLASSES !== undefined) {
-    const reporter = require("postcss-reporter");
-    plugins.push(reporter({ filter: (msg) => /purgecss/.test(msg.plugin) }));
-  }
+  const autoprefixer = require("autoprefixer");
+  plugins.push(autoprefixer({ flexbox: "no-2009" }));
 }
 
 module.exports = { plugins };

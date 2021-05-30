@@ -13,71 +13,69 @@
 {%- endmacro %}
 
 {% block content %}
-<div class="wrapper">
-<main class="content">
-  <div class="row justify-content-center text-row">
-    <h1>{{ title }}</h1>
-  </div>
-  <div class="row justify-content-center text-row">
-    <p>
-      Ever needed to create some placeholder images? Here's an easy way to do that.
-    </p>
-  </div>
-
-  <div class="row justify-content-center text-row">
-    <h3><a href="https://app.holdmypics.com">Check out the new front end.</a></h3>
-  </div>
-
-  <div class="row justify-content-center text-row">
-    <h2>
-      <span id="img-count">~{{ count }}</span> Images Created
-    </h2>
-  </div>
-
-  {% set image_url = img_url ~ "?" ~ img_query %}
-  <div class="row justify-content-center mb-5">
-    <img
-      id="example-image"
-      src="{{ image_url }}"
-      alt="Example image."
-      loading="lazy"
-      width="{{ img_dim.0 }}"
-      height="{{ img_dim.1 }}"
-    />
-  </div>
-
-  <div class="row align-items-center justify-content-center endpoint-container">
-    <code id="endpoint">
-      <a id="endpoint-url" href="{{ image_url }}" target="_blank" rel="noreferrer noopener" data-cy="endpoint-url">
-        {{ image_url|escape }}
-      </a>
-    </code>
-  </div>
-
-  <div class="row justify-content-center align-items-center mb-6">
-    <button
-      id="copy-button"
-      data-clipboard-text="{{ image_url }}"
-      aria-label="Copied to clipboard!"
-      disabled
-      title="Copy image URL to clipboard."
-    >
-      <i data-feather="copy" title="Copy to clipboard."></i>
-      <i data-feather="check" title="Copied"></i>
-    </button>
-  </div>
-  {#
-  <div class="image-container mb-3"></div>
-  <div class="row d-none">
-    <div class="form-group">
-      <label for="expand-form">Expand Form</label>
-      <input id="expand-form" type="checkbox" />
+<div class="wrapper space-y-5">
+  <header class="index-section py-4 space-y-5">
+    <div class="row text-row">
+      <h1>{{ title }}</h1>
     </div>
-  </div>
-  #}
+    <div class="row text-row">
+      <p>Ever needed to create some placeholder images? Here's an easy way to do that.</p>
+    </div>
 
-  <div>
-    <form id="params-form" action="">
+    <div class="row text-row">
+      <h2><span id="img-count">~{{ count }}</span> Images Created</h2>
+    </div>
+
+    <div class="row text-row pt-3">
+      <h3 class="text-2xl"><a href="https://app.holdmypics.com">Check out the new front end.</a></h3>
+    </div>
+
+  </header>
+  <main class="index-section content py-4 space-y-4">
+    {% set image_url = img_url ~ "?" ~ img_query %}
+    <div class="row">
+      <img
+        id="example-image"
+        class="h-auto max-h-screen max-w-full"
+        src="{{ image_url }}"
+        alt="Example image."
+        loading="lazy"
+        width="{{ img_dim.0 }}"
+        height="{{ img_dim.1 }}"
+      />
+    </div>
+
+    <div class="endpoint-container flex-col md:flex-row row items-center px-4 md:px-7">
+      <code class="mb-2 md:mb-0 hover:underline" id="endpoint">
+        <a id="endpoint-url" href="{{ image_url }}" target="_blank" rel="noreferrer noopener" data-cy="endpoint-url">
+          {{ image_url|escape }}
+        </a>
+      </code>
+    </div>
+
+    <div class="row items-center mb-6">
+      <button
+        id="copy-button"
+        data-clipboard-text="{{ image_url }}"
+        aria-label="Copied to clipboard!"
+        disabled
+        title="Copy image URL to clipboard."
+      >
+        <i data-feather="copy" title="Copy to clipboard."></i>
+        <i data-feather="check" title="Copied"></i>
+      </button>
+    </div>
+    {#
+    <div class="image-container mb-3"></div>
+    <div class="row d-none">
+      <div class="form-group">
+        <label for="expand-form">Expand Form</label>
+        <input id="expand-form" type="checkbox" />
+      </div>
+    </div>
+    #}
+
+    <form class="border border-gray-300 p-3 space-y-3 md:px-5 md:py-4" id="params-form" action="">
       <div class="form-group">
         <label for="width">Width</label>
         <div class="input-group">
@@ -96,14 +94,14 @@
         <label for="bg">Background Color</label>
         <div class="input-group">
           <input id="bg" type="text" value="{{ bg_color }}" pattern="{{ color_pattern }}" data-cy="bg" />
-          <small class="help-text">Three or six hex digits.</small>
+          <small class="help-text">Three, four, six, or eight hex digits.</small>
         </div>
       </div>
       <div class="form-group">
         <label for="fg">Text Color</label>
         <div class="input-group">
           <input id="fg" type="text" value="{{ fg_color }}" pattern="{{ color_pattern }}" data-cy="fg" />
-          <small class="help-text">Three or six hex digits.</small>
+          <small class="help-text">Three, four, six, or eight hex digits.</small>
         </div>
       </div>
       <div class="form-group">
@@ -135,60 +133,61 @@
         <div class="input-group flex-nowrap">
           <div class="text-input">
             <input class="query" id="imageText" type="text" value="{{ text }}" maxlength="30" data-cy="imageText" />
-            <input class="query check-check" type="checkbox" name="randomText" id="randomText" title="Randomize text." data-cy="randomText" />
+            <input class="query check-check flex-grow-0 my-0 mx-auto" type="checkbox" name="randomText" id="randomText" title="Randomize text." data-cy="randomText" />
           </div>
 
           <small class="help-text ml-auto">Randomize text.</small>
         </div>
       </div>
-      <div class="form-group d-none">
+      <div class="form-group hidden">
         <label for="seed">Seed</label>
         <input id="seed" type="text" />
       </div>
     </form>
-  </div>
-
-  {# <div id="color-picker"></div> #}
-
-  <section id="routes">
-    <h3>Routes</h3>
-    {% for rule in rules %}
-    <p>
-      <code>{{ rule | e }}</code>
-    </p>
-    {% endfor %}
-    <div class="size-explanation">
-      <small>
-        Where <code>&lt;size&gt;</code> is either the width and height of a rectangular image
-        (<code>width&times;height</code>) or the length of each side of a square image (<code>side</code>), in pixels.
-        <p>
-          <code class="rule">&lt;size&gt;&nbsp;=&nbsp;width&times;height&nbsp;</code>
-          <code class="rule">&lt;size&gt;&nbsp;=&nbsp;side</code>
-        </p>
-      </small>
-    </div>
-  </section>
-</main>
-<footer>
-  <div class="footer-group">
-    <h6>Powered by {{ external("https://palletsprojects.com/p/flask/", "Flask") }}</h6>
-    <h6>And {{ external("https://www.heroku.com/", "Heroku") }}</h6>
-  </div>
-  <div class="footer-group">
     <div>
-      Fira Mono, Fira Sans, Overpass, and Spectral are licensed under the
-      <a href="{{ ofl_license }}">Open Font License</a>.
     </div>
-    <div>Roboto is licensed under the <a href="{{ apache_license }}">Apache License</a>.</div>
-  </div>
-  {% set tag = "v" ~ version %}
-  {% set github_url = "https://github.com/mvwicky/holdmypics/tree/" ~ tag %}
-  <div class="footer-group">
-    <h6>Created by Michael Van Wickle</h6>
-    <h6>
-      Version: <code>{{ external(github_url, version) }}</code>
-    </h6>
-  </div>
-</footer>
+
+    {# <div id="color-picker"></div> #}
+
+    <section class="pt-3" id="routes">
+      <h3 class="mb-2">Routes</h3>
+      {% for rule in rules %}
+      <p>
+        <code>{{ rule | e }}</code>
+      </p>
+      {% endfor %}
+      <div class="size-explanation">
+        <small>
+          Where <code>&lt;size&gt;</code> is either the width and height of a rectangular image
+          (<code>width&times;height</code>) or the length of each side of a square image (<code>side</code>), in pixels.
+          <p>
+            <code class="rule">&lt;size&gt;&nbsp;=&nbsp;width&times;height&nbsp;</code>
+            <code class="rule">&lt;size&gt;&nbsp;=&nbsp;side</code>
+          </p>
+        </small>
+      </div>
+    </section>
+  </main>
+  <footer>
+    <div class="footer-group">
+      <h6>Powered by {{ external("https://palletsprojects.com/p/flask/", "Flask") }}</h6>
+      <h6>And {{ external("https://www.heroku.com/", "Heroku") }}</h6>
+    </div>
+    <div class="footer-group">
+      <div>
+        Fira Mono, Fira Sans, Overpass, and Spectral are licensed under the
+        <a href="{{ ofl_license }}">Open Font License</a>.
+      </div>
+      <div>Roboto is licensed under the <a href="{{ apache_license }}">Apache License</a>.</div>
+    </div>
+    {% set tag = "v" ~ version %}
+    {% set github_url = "https://github.com/mvwicky/holdmypics/tree/" ~ tag %}
+    <div class="footer-group">
+      <h6>Created by Michael Van Wickle</h6>
+      <h6>
+        Version: <code>{{ external(github_url, version) }}</code>
+      </h6>
+    </div>
+  </footer>
 </div>
 {% endblock content %}

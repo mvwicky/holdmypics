@@ -1,0 +1,44 @@
+@font-face {
+  font-display: fallback;
+  font-family: "Spectral";
+  font-style: normal;
+  font-weight: 400;
+  src: url(./theme/fonts/spectral/spectral-v6-regular.woff2) format("woff2"),
+    url(./theme/fonts/spectral/spectral-v6-regular.woff) format("woff");
+}
+
+@font-face {
+  font-display: fallback;
+  font-family: "Spectral";
+  font-style: normal;
+  font-weight: 700;
+  src: url(./theme/fonts/spectral/spectral-v6-700.woff2) format("woff2"),
+    url(./theme/fonts/spectral/spectral-v6-700.woff) format("woff");
+}
+
+@font-face {
+  font-display: fallback;
+  font-family: "Spectral";
+  font-style: italic;
+  font-weight: 400;
+  src: url(./theme/fonts/spectral/spectral-v6-italic.woff2) format("woff2"),
+    url(./theme/fonts/spectral/spectral-v6-italic.woff) format("woff");
+}
+
+@font-face {
+  font-display: fallback;
+  font-family: "Spectral";
+  font-style: normal;
+  font-weight: 200;
+  src: url(./theme/fonts/spectral/spectral-v6-200.woff2) format("woff2"),
+    url(./theme/fonts/spectral/spectral-v6-200.woff) format("woff");
+}
+
+@font-face {
+  font-display: fallback;
+  font-family: "Fira Mono";
+  font-style: normal;
+  font-weight: 400;
+  src: url(./theme/fonts/fira-mono/fira-mono-v8-regular.woff2) format("woff2"),
+    url(./theme/fonts/fira-mono/fira-mono-v8-regular.woff) format("woff");
+}

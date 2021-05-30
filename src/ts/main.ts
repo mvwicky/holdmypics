@@ -1,4 +1,4 @@
-import "../scss/main.scss";
+import "../css/main.css";
 
 import { rIC } from "./dom/idle";
 import { assertIsTag } from "./helpers/assert-is-tag";
@@ -13,14 +13,10 @@ function getClipboard() {
 }
 
 function getRand() {
-  return import(
-    /* webpackChunkName: "random-text" */
-    /* webpackMode: "eager" */
-    "./random-text"
-  );
+  return import(/* webpackChunkName: "random-text" */ "./random-text");
 }
 
-const ARGS: readonly string[] = [
+const ARGS = [
   "width",
   "height",
   "bg",
@@ -28,7 +24,7 @@ const ARGS: readonly string[] = [
   "fmt",
   "imageText",
   "font",
-];
+] as const;
 
 function isEndpointArgs(
   input: Record<string, string> | null
@@ -37,19 +33,10 @@ function isEndpointArgs(
 }
 
 function makeEndpoint(args: MakeEndpointArgs) {
-  const {
-    width,
-    height,
-    bg,
-    fg,
-    fmt,
-    imageText,
-    font,
-    seed,
-    randomText,
-  } = args;
+  const { width, height, bg, fg, fmt, imageText, font, seed, randomText } =
+    args;
   const path = `/api/${width}x${height}/${bg}/${fg}/${fmt}/`;
-  const url = new URL(path, window.location.href);
+  const url = new URL(path, self.location.href);
   url.search = "";
   if (imageText) {
     url.searchParams.append("text", imageText);
@@ -101,9 +88,10 @@ function inputCallback(args: InputCallbackArgs) {
   if (isEndpointArgs(params)) {
     log(`Good parameters`);
     const url = makeEndpoint(params);
-    args.endpoint.textContent = url.pathname + url.search;
+    const fullPath = url.pathname + url.search;
+    args.endpoint.textContent = fullPath;
     if (elemIsTag("a", args.endpoint)) {
-      args.endpoint.href = url.pathname + url.search;
+      args.endpoint.href = fullPath;
     }
     args.btn.dataset.clipboardText = url.href;
     if (!["width", "height"].includes(args.id)) {
@@ -113,6 +101,7 @@ function inputCallback(args: InputCallbackArgs) {
 }
 
 async function main(this: Document) {
+  this.removeEventListener("DOMContentLoaded", main);
   const exampleImage = this.getElementById("example-image");
   if (!elemIsTag("img", exampleImage)) {
     return;
@@ -135,12 +124,12 @@ async function main(this: Document) {
   const initialParams = gatherParams(form);
   if (isEndpointArgs(initialParams)) {
     rIC(() => (btn.dataset.clipboardText = makeEndpoint(initialParams).href), {
-      timeout: 3000,
+      timeout: 1000,
     });
   }
 
-  const elements = form.elements;
-  const numElements = form.elements.length;
+  const { elements } = form;
+  const numElements = elements.length;
   for (let i = 0; i < numElements; i++) {
     const args: InputCallbackArgs = {
       form,
@@ -149,7 +138,7 @@ async function main(this: Document) {
       image: exampleImage,
       id: elements[i].id,
     };
-    const cb = debounce(inputCallback.bind(null, args), 750);
+    const cb = debounce(inputCallback.bind(null, args), 500);
     elements[i].addEventListener("input", cb);
   }
 
@@ -161,7 +150,7 @@ function initIcons(btn: HTMLButtonElement) {
     const copyIconEl = btn.querySelector<HTMLElement>(".feather-copy");
     const checkIconEl = btn.querySelector<HTMLElement>(".feather-check");
     if (copyIconEl && checkIconEl) {
-      log("Everything seems to exist.");
+      log("Check and copy icons exist.");
     }
     afterFeather(btn);
   });
@@ -169,20 +158,23 @@ function initIcons(btn: HTMLButtonElement) {
 
 async function afterFeather(copyBtn: HTMLButtonElement) {
   const { default: Clipboard } = await getClipboard();
-  rIC(
-    () => {
-      copyBtn.onanimationend = (event: AnimationEvent) => {
-        copyBtn.classList.remove("just-copied");
-      };
-      const copy = new Clipboard(copyBtn);
-      copy.on("success", () => {
-        copyBtn.classList.add("just-copied");
-      });
-      log("Check and copy icons exist.");
-      copyBtn.disabled = false;
-    },
-    { timeout: 3000 }
-  );
+  const setJustCopied = (on: boolean) => {
+    const func = on ? "add" : "remove";
+    copyBtn.classList[func]("just-copied");
+  };
+  self.setTimeout(() => {
+    const timeoutId: number | undefined = undefined;
+    copyBtn.onanimationend = (event: AnimationEvent) => {
+      self.clearTimeout(timeoutId);
+      setJustCopied(false);
+    };
+    const copy = new Clipboard(copyBtn);
+    copy.on("success", () => {
+      self.setTimeout(() => setJustCopied(false), 1500);
+      setJustCopied(true);
+    });
+    copyBtn.disabled = false;
+  });
 }
 
 (function (d: Document, global: Window) {

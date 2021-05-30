@@ -1,0 +1,93 @@
+/* purgecss start ignore */
+@layer components {
+  .feather {
+    align-self: center;
+    bottom: 1px;
+    fill: var(--feather-fill, none);
+    height: var(--feather-size, initial);
+    margin-left: 0.1em;
+    position: relative;
+    stroke: var(--feather-stroke, hsl(0, 0%, 0%));
+    vertical-align: middle;
+    width: var(--feather-size, initial);
+  }
+
+  @keyframes copied {
+    from {
+      background-position: bottom right;
+      transform: scale3d(1, 1, 1);
+    }
+    50% {
+      transform: scale3d(1.06, 1.06, 1.06);
+    }
+    to {
+      background-position: bottom left;
+      transform: scale3d(1, 1, 1);
+    }
+  }
+
+  #copy-button {
+    /* --gradient-from-color: rgba(44, 82, 130, 0.9); */
+    --gradient-from-color: theme("colors.blue.800");
+    /* --gradient-to-color: rgba(0, 100, 255, 0.3); */
+    --gradient-to-color: theme("colors.blue.900");
+    --gradient-color-stops: var(--gradient-from-color) 50%,
+      var(--gradient-to-color) 100%;
+    --feather-stroke: theme("colors.white");
+    animation-direction: normal;
+    animation-duration: 1250ms;
+    animation-fill-mode: backwards;
+    animation-timing-function: ease-in-out;
+    background-clip: padding-box;
+    background-image: linear-gradient(to right, var(--gradient-color-stops));
+    background-position: left bottom;
+    background-repeat: no-repeat;
+    background-size: 200% 100%;
+    color: var(--feather-stroke);
+
+    @apply flex items-center justify-around;
+    @apply ring-blue-200 ring-2 rounded-md cursor-pointer p-2;
+  }
+
+  #copy-button:disabled,
+  #copy-button.disabled {
+    --feather-stroke: theme("colors.gray.400");
+    cursor: default;
+  }
+
+  #copy-button:not(:disabled):hover,
+  #copy-button:not(.disabled):hover {
+    --feather-stroke: theme("colors.black");
+    --gradient-from-color: theme("colors.blue.300");
+    --gradient-to-color: theme("colors.blue.500");
+    color: var(--feather-stroke);
+
+    @apply ring-blue-500;
+  }
+
+  #copy-button::after {
+    content: "Copy to Clipboard";
+
+    @apply ml-2;
+  }
+  #copy-button .feather-check {
+    @apply hidden;
+  }
+  #copy-button .feather-copy {
+    @apply block;
+  }
+
+  #copy-button.just-copied {
+    animation-name: copied;
+  }
+  #copy-button.just-copied::after {
+    content: "Copied!";
+  }
+  #copy-button.just-copied .feather-check {
+    @apply block;
+  }
+  #copy-button.just-copied .feather-copy {
+    @apply hidden;
+  }
+}
+/* purgecss end ignore */

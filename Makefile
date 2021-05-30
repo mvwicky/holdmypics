@@ -77,6 +77,7 @@ compose:
 	$(DOCKER_COMPOSE) $(COMPOSE_ARGS)
 
 dev: NODE_ENV_VALUE=development
+dev: export TAILWIND_MODE=build
 dev: webpack
 
 prod: NODE_ENV_VALUE=production
@@ -115,9 +116,9 @@ $(ESLINT_SENTINEL): $(filter %.ts,$(LS_FILES)) $(filter %.ts,$(LS_FILES))
 	$(ESLINT) '**/*.ts' '**/*.js'
 	date > $@
 
-$(STYLELINT_SENTINEL): $(filter %.scss,$(LS_FILES))
+$(STYLELINT_SENTINEL): $(filter %.scss,$(LS_FILES)) $(filter %.css,$(LS_FILES))
 	@echo "Running stylelint on $(words $?) file(s)"
-	yarn --silent run stylelint 'src/scss/**/*.scss'
+	yarn --silent run stylelint 'src/scss/**/*.scss' 'src/css/**/*.css'
 	date > $@
 
 $(SENTINEL_DIR):

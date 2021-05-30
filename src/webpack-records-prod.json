@@ -25,15 +25,17 @@
       "clipboard": 997,
       "feather": 142,
       "main": 179,
+      "random-text": 69,
       "runtime": 229
     },
     "bySource": {
       "0 clipboard": 997,
       "0 feather": 142,
       "0 main": 179,
+      "0 random-text": 69,
       "1 main": 179
     },
-    "usedIds": [142, 179, 997]
+    "usedIds": [69, 142, 179, 997]
   },
   "mini-css-extract-plugin /Users/michael/GitHub/holdmypics/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[1].use[3]!./src/scss/main.scss": [
     {
@@ -74,6 +76,40 @@
       }
     }
   ],
+  "mini-css-extract-plugin /Users/michael/GitHub/holdmypics/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[1]!./node_modules/postcss-loader/dist/cjs.js!./src/css/main.css": [
+    {
+      "chunks": {
+        "byName": {
+          "child": 396
+        },
+        "bySource": {
+          "0 child": 396
+        },
+        "usedIds": [396]
+      },
+      "modules": {
+        "byIdentifier": {
+          "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[1]!./node_modules/postcss-loader/dist/cjs.js!./src/css/main.css": 901,
+          "./node_modules/css-loader/dist/runtime/api.js": 645,
+          "./node_modules/css-loader/dist/runtime/cssWithMappingToString.js": 15,
+          "./node_modules/css-loader/dist/runtime/getUrl.js": 667,
+          "./src/css/theme/fonts/fira-mono/fira-mono-v8-regular.woff": 225,
+          "./src/css/theme/fonts/fira-mono/fira-mono-v8-regular.woff2": 101,
+          "./src/css/theme/fonts/spectral/spectral-v6-200.woff": 475,
+          "./src/css/theme/fonts/spectral/spectral-v6-200.woff2": 460,
+          "./src/css/theme/fonts/spectral/spectral-v6-700.woff": 695,
+          "./src/css/theme/fonts/spectral/spectral-v6-700.woff2": 491,
+          "./src/css/theme/fonts/spectral/spectral-v6-italic.woff": 376,
+          "./src/css/theme/fonts/spectral/spectral-v6-italic.woff2": 621,
+          "./src/css/theme/fonts/spectral/spectral-v6-regular.woff": 702,
+          "./src/css/theme/fonts/spectral/spectral-v6-regular.woff2": 902
+        },
+        "usedIds": [
+          15, 101, 225, 376, 460, 475, 491, 621, 645, 667, 695, 702, 901, 902
+        ]
+      }
+    }
+  ],
   "mini-css-extract-plugin /Users/michael/GitHub/holdmypics/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[2].use[3]!./src/scss/main.scss": [
     {
       "chunks": {
@@ -107,6 +143,40 @@
         "usedIds": [
           15, 26, 118, 136, 167, 180, 229, 438, 440, 559, 574, 645, 667, 681,
           769, 997
+        ]
+      }
+    }
+  ],
+  "mini-css-extract-plugin /Users/michael/GitHub/holdmypics/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./src/css/main.css": [
+    {
+      "chunks": {
+        "byName": {
+          "child": 396
+        },
+        "bySource": {
+          "0 child": 396
+        },
+        "usedIds": [396]
+      },
+      "modules": {
+        "byIdentifier": {
+          "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./src/css/main.css": 24,
+          "./node_modules/css-loader/dist/runtime/api.js": 645,
+          "./node_modules/css-loader/dist/runtime/cssWithMappingToString.js": 15,
+          "./node_modules/css-loader/dist/runtime/getUrl.js": 667,
+          "./src/css/theme/fonts/fira-mono/fira-mono-v8-regular.woff": 225,
+          "./src/css/theme/fonts/fira-mono/fira-mono-v8-regular.woff2": 101,
+          "./src/css/theme/fonts/spectral/spectral-v6-200.woff": 475,
+          "./src/css/theme/fonts/spectral/spectral-v6-200.woff2": 460,
+          "./src/css/theme/fonts/spectral/spectral-v6-700.woff": 695,
+          "./src/css/theme/fonts/spectral/spectral-v6-700.woff2": 491,
+          "./src/css/theme/fonts/spectral/spectral-v6-italic.woff": 376,
+          "./src/css/theme/fonts/spectral/spectral-v6-italic.woff2": 621,
+          "./src/css/theme/fonts/spectral/spectral-v6-regular.woff": 702,
+          "./src/css/theme/fonts/spectral/spectral-v6-regular.woff2": 902
+        },
+        "usedIds": [
+          15, 24, 101, 225, 376, 460, 475, 491, 621, 645, 667, 695, 702, 902
         ]
       }
     }
@@ -235,10 +305,12 @@
       "./node_modules/core-js/modules/web.url-search-params.js": 1637,
       "./node_modules/core-js/modules/web.url.js": 285,
       "./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/helpers/elem-is-tag.ts": 731,
+      "./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/log.ts": 858,
       "./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/main.ts|4996a82f8c88f0021c4b97aad54cf0b4": 688,
+      "./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/main.ts|f892a471adc3f3f0fc3289b39aff86dd": 717,
       "./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/random-text.ts": 984,
       "./node_modules/feather-icons/dist/feather.js": 8508
     },
-    "usedIds": [688, 731, 984, 2152, 8508]
+    "usedIds": [717, 731, 858, 984, 2152, 8508]
   }
 }
