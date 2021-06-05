@@ -1,4 +1,4 @@
-FROM node:14-alpine3.12 AS client-builder
+FROM node:{{ node_version }}-alpine3.12 AS client-builder
 
 RUN mkdir /app/
 WORKDIR /app/
@@ -34,4 +34,4 @@ EXPOSE {{ port }}
 
 USER ${APP_USER}:${APP_USER}
 
-CMD ["gunicorn", "wsgi:application", "--config", "python:{{ gunicorn_config }}"]
+CMD ["gunicorn", "wsgi:application", "--config", "file:{{ gunicorn_config }}"]

@@ -6,6 +6,7 @@ import time
 from collections.abc import Sequence
 from pathlib import Path
 from subprocess import Popen, TimeoutExpired
+from typing import Any
 
 import attr
 from flask import Blueprint, Flask
@@ -34,11 +35,11 @@ class Server(object):
         ts = "" if n == 1 else "es"
         logger.info("Started {0} process{1}", n, ts)
 
-    def _start_proc(self, name: str, args: Sequence[str], **kwargs):
+    def _start_proc(self, name: str, args: Sequence[str], **kwargs: Any) -> None:
         logger.info("Starting process `{0}`", " ".join(args))
         self.procs[name] = Popen(args, **kwargs)
 
-    def _start_server(self):
+    def _start_server(self) -> None:
         procfile: Path = config_value("BASE_PATH", app=self.app) / "Procfile"
         if not procfile.is_file():
             raise RuntimeError("Unable to find Procfile")
@@ -52,15 +53,15 @@ class Server(object):
             raise RuntimeError("Unable to parse command from Procfile")
         self._start_proc("dev_server", cmd)
 
-    def _start_yarn(self):
+    def _start_yarn(self) -> None:
         bp: Blueprint = self.app.blueprints.get("core")
-        template_folder = Path(bp.root_path) / bp.template_folder
-        base_out = template_folder / "base-out.html"
+        base_out = Path(bp.root_path) / bp.template_folder / "base-out.html"
         start_mtime = 0
         if base_out.is_file():
             start_mtime = os.path.getmtime(base_out)
             logger.debug("Waiting for changes (mtime={0}).", start_mtime)
-        self._start_proc("yarn", ["yarn", "watch"])
+        env = {**os.environ, "NODE_ENV": "development", "TAILWIND_MODE": "build"}
+        self._start_proc("yarn", ["yarn", "watch"], env=env)
         self._wait_for_yarn(base_out, start_mtime)
 
     def _wait_for_yarn(self, base_tpl: Path, start_mtime: float):

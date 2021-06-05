@@ -22,12 +22,16 @@ jobs:
       - restore_cache:
           key: deps9-{{ .Branch }}-{{ checksum "poetry.lock" }}
       - run:
+          # yamllint disable rule:line-length
           command: |
-            curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
+            curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | python - -y
+            source $HOME/.poetry/env
             poetry install --no-interaction --no-dev -E tests
             yarn install --prod
+          # yamllint enable rule:line-length
       - run: |
-          poetry run pytest --no-empty-dpi
+          source $HOME/.poetry/env
+          poetry run pytest
       - save_cache:
           key: deps9-{{ .Branch }}-{{ checksum "poetry.lock" }}
           paths:

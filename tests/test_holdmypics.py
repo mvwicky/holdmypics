@@ -27,20 +27,14 @@ except ImportError:
 SKIP_INDEX = os.environ.get("TESTS_SKIP_INDEX", None) is not None
 IMG_FORMATS = ("png", "webp", "jpeg", "gif")
 
-dim_strategy = st.integers(min_value=32, max_value=8192)
+dim_strategy = st.integers(min_value=128, max_value=8192)
 size_strategy = st.tuples(dim_strategy, dim_strategy)
 color_strategy = st.from_regex(COLOR_REGEX, fullmatch=True)
 opt_color_strategy = st.one_of(st.none(), color_strategy)
 fmt_strategy = st.sampled_from(IMG_FORMATS)
-alpha_strategy = st.one_of(
-    st.none(),
-    st.floats(min_value=0.0, max_value=1.0, allow_nan=False, allow_infinity=False),
-)
 text_strategy = st.one_of(st.none(), st.text(max_size=255))
-dpi_strategy = st.one_of(st.none(), st.integers(min_value=72, max_value=488))
-args_strategy = st.fixed_dictionaries(
-    {"text": text_strategy, "alpha": alpha_strategy, "dpi": dpi_strategy}
-)
+dpi_strategy = st.one_of(st.none(), st.sampled_from((72, 300, 216, 244, 488)))
+args_strategy = st.fixed_dictionaries({"text": text_strategy, "dpi": dpi_strategy})
 
 
 def make_route(
@@ -124,7 +118,7 @@ def test_create_images_using_client(
 @pytest.mark.skipif(pytesseract is None, reason="pytesseract not installed")
 def test_random_text(client: FlaskClient):
     url = make_route((638, 328), "cef", "555", "png")
-    args = {"text": "Some Random Text", "dpi": None, "alpha": None, "random_text": True}
+    args = {"text": "Some Random Text", "dpi": None, "random_text": True}
     query = urlencode({k: v for (k, v) in args.items() if v})
     url = "?".join([url, query])
     res: Response = client.get(url, follow_redirects=False)

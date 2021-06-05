@@ -18,6 +18,13 @@
     }
   ],
   "settings": {
-    "python_interpreter": "/users/michael/.pyenv/versions/holdmypics-3.9.5/bin/python"
+    "python_interpreter": "/Users/michael/.pyenv/versions/holdmypics-3.9.5/bin/python",
+    "LSP": {
+      "LSP-pylsp": {
+        "settings": {
+          "pylsp.plugins.jedi.environment": "/Users/michael/.pyenv/versions/holdmypics-3.9.5/bin/python"
+        }
+      }
+    }
   }
 }

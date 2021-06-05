@@ -46,7 +46,7 @@ def get_context() -> dict[str, Any]:
         fmt=fmt,
     )
 
-    color_pattern = r"(([a-fA-F0-9]{3})|([a-fA-F0-9]{6}))|rand"
+    color_pattern = r"(([a-fA-F0-9]{3,4})|([a-fA-F0-9]{6,8}))|rand"
     img_query = urlencode({"text": text, "font": font})
     font_names = [(n, n.replace("-", " ").title()) for n in sorted(fonts.font_names)]
     num_fields = {"width": width, "height": height}

@@ -10,7 +10,7 @@ jobs:
   tests:
     name: Test ${{ matrix.python-version }}
     env:
-      TESTS_SKIP_INDEX: "1"
+      POETRY_VIRTUALENVS_IN_PROJECT: "true"
     runs-on: ubuntu-latest
     # container: python:3.9-slim
     strategy:
@@ -26,7 +26,8 @@ jobs:
     #       --health-timeout 5s
     #       --health-retries 5
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
@@ -38,17 +39,18 @@ jobs:
       - name: Get full python version
         shell: bash
         id: full-python-version
-        run: echo ::set-output name=version::$(python -c "import sys; print('-'.join(str(v) for v in sys.version_info))")
+        # yamllint disable-line rule:line-length
+        run: echo ::set-output name=version::$(python -c "import sys; print('-'.join(map(str, sys.version_info)))")
       - name: Install poetry
+        # yamllint disable rule:line-length
         run: |
-          curl -sSL -o get-poetry.py https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py
-          python get-poetry.py -y
-          source $HOME/.poetry/env
-          poetry config virtualenvs.in-project true
+          curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | python - -y
+        # yamllint enable rule:line-length
       - name: Set up cache
         uses: actions/cache@v2
         with:
           path: .venv
+          # yamllint disable-line rule:line-length
           key: venv-${{ runner.os }}-${{ steps.full-python-version.outputs.version }}-${{ hashFiles('**/poetry.lock') }}
       - name: Install dependencies
         run: |
@@ -56,6 +58,8 @@ jobs:
           poetry install --no-interaction --no-dev -E tests
           yarn install --prod
       - name: Run pytest
+        env:
+          TESTS_SKIP_INDEX: "1"
         run: |
           source $HOME/.poetry/env
-          poetry run pytest --no-empty-dpi
+          poetry run pytest

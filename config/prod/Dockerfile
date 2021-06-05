@@ -6,7 +6,7 @@ COPY ./package.json ./yarn.lock /app/
 
 RUN yarn install --prod
 
-FROM python:3.8.6-slim
+FROM python:3.9.5-slim
 
 ENV LC_ALL=C.UTF-8 LANG=C.UTF-8 PYTHONUNBUFFERED=1
 
@@ -31,4 +31,4 @@ RUN chown -R ${APP_USER}:${APP_USER} /app/
 
 USER ${APP_USER}:${APP_USER}
 
-CMD ["gunicorn", "wsgi:application", "--config", "python:gunicorn_config"]
+CMD ["gunicorn", "wsgi:application", "--config", "file:config/gunicorn_config.py"]

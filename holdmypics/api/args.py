@@ -14,7 +14,8 @@ from ..converters import ColorConverter
 from .utils import resolve_color
 from .words import words
 
-truthy = set()
+# truthy = set()
+truthy = ma.fields.Boolean.truthy.union({""})
 
 
 def clamp_alpha(a: float) -> float:
@@ -39,7 +40,7 @@ class BaseImageArgs(object):
 
 class ImageArgsSchema(BaseImageArgsSchema):
     text = ma.fields.String(missing=None)
-    font_name = ma.fields.String(missing=DEFAULT_FONT)
+    font_name = ma.fields.String(missing=DEFAULT_FONT, data_key="font")
     alpha = ma.fields.Float(missing=1.0, validate=[Range(0.0, 1.0)])
     random_text = ma.fields.Boolean(missing=False, truthy=truthy)
 
@@ -59,7 +60,8 @@ class ImageArgs(BaseImageArgs):
     def from_request(
         cls: type["ImageArgs"], args: Optional[Mapping[str, Any]] = None
     ) -> "ImageArgs":
-        return parser.parse(ImageArgsSchema(), request, location="query")
+        args = parser.parse(ImageArgsSchema(), request, location="query")
+        return args.real_args()
 
     def real_args(self) -> "ImageArgs":
         if not self.random_text:

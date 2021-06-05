@@ -40,7 +40,7 @@ ocr = ["pytesseract"]
 [tool.poetry.scripts]
 
 [tool.poetry.plugins."pytest11"]
-holdmyplugin = "plugin.holdmyplugin"
+holdmyplugin = "tests.holdmyplugin"
 
 [tool.isort]
 profile = "black"
