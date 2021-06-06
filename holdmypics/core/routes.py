@@ -23,8 +23,7 @@ Disallow: /api/"""
 def get_rules() -> list[str]:
     url_map: Map = current_app.url_map
     rules_iter: Iterable[Rule] = url_map.iter_rules(endpoint="api.image_route")
-    rules = [RULE_RE.sub("", r.rule) for r in rules_iter]
-    return rules
+    return [RULE_RE.sub("", r.rule) for r in rules_iter]
 
 
 @functools.lru_cache(maxsize=2)

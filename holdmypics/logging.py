@@ -6,25 +6,23 @@ from pathlib import Path
 from typing import Optional
 
 import loguru
-from flask import Request, Response, request
+from flask import Flask, Request, Response, request
 from loguru import logger
 
 from .utils import get_size, natsize
 
 req: Request = request
 
-MAX_LOG_SIZE = 1 * (1024 ** 2)
-
 
 def file_filter(record: loguru.Record) -> bool:
     return "log_request" not in record["function"]
 
 
-def make_file_handler(log_dir: Path, file_name: str, fmt: str) -> dict:
+def make_file_handler(log_dir: Path, file_name: str, fmt: str, max_size: int) -> dict:
     log_file = log_dir.joinpath(file_name).with_suffix(".log")
     return {
         "sink": log_file,
-        "rotation": MAX_LOG_SIZE,
+        "rotation": max_size,
         "level": "DEBUG",
         "compression": "tar.gz",
         "retention": 5,
@@ -33,9 +31,11 @@ def make_file_handler(log_dir: Path, file_name: str, fmt: str) -> dict:
     }
 
 
-def config_logging(
-    name: str, file_name: str, log_dir: Optional[Path], log_level: str
-) -> None:
+def config_logging(app: Flask) -> None:
+    file_name: str = app.config.get("LOG_FILE_NAME") or app.name
+    log_dir: Optional[Path] = app.config.get("LOG_DIR")
+    log_level: str = app.config.get("LOG_LEVEL")
+    max_log_size: int = app.config.get("MAX_LOG_SIZE")
     dictConfig({"version": 1})
     try:
         logger.remove(0)
@@ -52,7 +52,7 @@ def config_logging(
     if log_dir is not None:
         log_dir = Path(log_dir).resolve()
         if log_dir.is_dir():
-            handlers.append(make_file_handler(log_dir, file_name, fmt))
+            handlers.append(make_file_handler(log_dir, file_name, fmt, max_log_size))
     logger.configure(handlers=handlers)
 
 

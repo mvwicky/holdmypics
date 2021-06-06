@@ -9,7 +9,7 @@ from flask import request
 from marshmallow.validate import Range, Regexp
 from webargs.flaskparser import parser
 
-from ..constants import DEFAULT_FONT
+from ..constants import DEFAULT_DPI, DEFAULT_FONT
 from ..converters import ColorConverter
 from .utils import resolve_color
 from .words import words
@@ -23,14 +23,14 @@ def clamp_alpha(a: float) -> float:
 
 
 class BaseImageArgsSchema(ma.Schema):
-    dpi = ma.fields.Integer(missing=72)
+    dpi = ma.fields.Integer(missing=DEFAULT_DPI)
     seed = ma.fields.String(missing=None)
     debug = ma.fields.Boolean(missing=False, truthy=truthy)
 
 
 @attr.s(slots=True, auto_attribs=True, frozen=True)
 class BaseImageArgs(object):
-    dpi: int = 72
+    dpi: int = DEFAULT_DPI
     seed: Optional[str] = None
     debug: bool = False
 

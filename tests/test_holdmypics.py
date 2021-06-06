@@ -10,7 +10,7 @@ from urllib.parse import urlencode
 import pytest
 from flask import Response
 from flask.testing import FlaskClient
-from hypothesis import given, strategies as st
+from hypothesis import example, given, strategies as st
 from loguru import logger
 from PIL import Image
 
@@ -33,30 +33,32 @@ color_strategy = st.from_regex(COLOR_REGEX, fullmatch=True)
 opt_color_strategy = st.one_of(st.none(), color_strategy)
 fmt_strategy = st.sampled_from(IMG_FORMATS)
 text_strategy = st.one_of(st.none(), st.text(max_size=255))
-dpi_strategy = st.one_of(st.none(), st.sampled_from((72, 300, 216, 244, 488)))
+dpi_strategy = st.one_of(st.none(), st.sampled_from((72, 300, 144, 216, 244, 488)))
 args_strategy = st.fixed_dictionaries({"text": text_strategy, "dpi": dpi_strategy})
 
 
 def make_route(
-    sz: tuple[int, int], bg_color: str = None, fg_color: str = None, fmt: str = None
+    sz: tuple[int, int],
+    bg_color: Optional[str] = None,
+    fg_color: Optional[str] = None,
+    fmt: Optional[str] = None,
 ) -> str:
     if not any((bg_color, fg_color, fmt)):
         pytest.fail("Can't make a route with just size")
-    parts = ["{0}x{1}".format(*sz), bg_color, fg_color, fmt]
+    parts = ("{0}x{1}".format(*sz), bg_color, fg_color, fmt)
     return "".join(["/api/", "/".join(filter(None, parts)), "/"])
 
 
 @pytest.mark.skipif(SKIP_INDEX, reason="Not testing client-side stuff.")
-def test_index(client):
+def test_index(client: FlaskClient):
     res = client.get("/")
     assert res.status_code == 200
 
 
 def test_favicon(client: FlaskClient):
-    url = "/favicon.ico"
-    res: Response = client.get(url)
+    res: Response = client.get("/favicon.ico")
     assert res.status_code == 200
-    assert res.content_type in {"image/x-icon", "image/vnd.microsoft.icon"}
+    assert res.content_type in ("image/x-icon", "image/vnd.microsoft.icon")
 
 
 @given(
@@ -65,6 +67,13 @@ def test_favicon(client: FlaskClient):
     fg_color=color_strategy,
     bg_color=color_strategy,
     args=args_strategy,
+)
+@example(
+    size=(1920, 1080),
+    image_format="png",
+    fg_color="fff",
+    bg_color="000",
+    args={"text": "Some Text", "dpi": 300},
 )
 def test_create_images_using_function(
     config: ModuleType,
@@ -106,7 +115,7 @@ def test_create_images_using_client(
         query = args and urlencode({k: v for (k, v) in args.items() if v})
         url = make_route(size, bg_color, fg_color, image_format)
         if query:
-            url = "?".join([url, query])
+            url = "?".join((url, query))
         res = client.get(url, follow_redirects=False)
         assert res.status_code == 200
         img_type = imghdr.what("filename", h=res.data)
@@ -117,10 +126,10 @@ def test_create_images_using_client(
 
 @pytest.mark.skipif(pytesseract is None, reason="pytesseract not installed")
 def test_random_text(client: FlaskClient):
-    url = make_route((638, 328), "cef", "555", "png")
+    path = make_route((638, 328), "cef", "555", "png")
     args = {"text": "Some Random Text", "dpi": None, "random_text": True}
     query = urlencode({k: v for (k, v) in args.items() if v})
-    url = "?".join([url, query])
+    url = "?".join((path, query))
     res: Response = client.get(url, follow_redirects=False)
     assert res.status_code == 200
     img_type = imghdr.what("filename", h=res.data)
@@ -137,7 +146,7 @@ def test_forwarding_headers(client: FlaskClient):
     path = make_route((638, 328), "cef", "555", "png")
     args = {"text": "Some Random Text"}
     query = urlencode(args)
-    url = "?".join([path, query])
+    url = "?".join((path, query))
     forwarded = "123.45.4.2,123.45.4.2"
     res: Response = client.get(url, headers=[("X-Forwarded-For", forwarded)])
     was_forwarded = res.headers.get("X-Was-Forwarded-For", None)

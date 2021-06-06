@@ -47,6 +47,8 @@ COMPILE_OPTS?=--port 8080 -y
 COMPILE_DEPS=$(CONFIG_DIR)/Dockerfile.template holdmypics/generate.py
 COMPILE_OUT=$(CONFIG_DIR)/dev/Dockerfile $(CONFIG_DIR)/prod/Dockerfile
 
+ESLINT_DEPS=$(filter %.ts,$(LS_FILES)) $(filter %.js,$(LS_FILES)) $(filter .eslintrc.%,$(LS_FILES))
+
 .PHONY: compile compose dbuilddev dbuildprod docker docker-build run stop version-tag \
 	lint isort flake8 eslint stylelint clean-lint clean-webpack
 
@@ -114,15 +116,16 @@ $(FLAKE8_SENTINEL): $(LS_PYTHON) .flake8
 	flake8 $(filter %.py,$?)
 	date > $@
 
-$(ESLINT_SENTINEL): $(filter %.ts,$(LS_FILES)) $(filter %.ts,$(LS_FILES)) .eslintrc.yml
+$(ESLINT_SENTINEL): $(ESLINT_DEPS)
 	@echo "Running eslint. Outdated: $(words $?)"
 	$(ESLINT) '**/*.ts' '**/*.js'
 	date > $@
 
-$(STYLELINT_SENTINEL): $(filter %.scss,$(LS_FILES)) $(filter %.css,$(LS_FILES)) .stylelintrc.json
+$(STYLELINT_SENTINEL): $(filter %.css,$(LS_FILES)) $(filter .stylelintrc.%,$(LS_FILES))
 	@echo "Running stylelint. Outdated: $(words $?)"
 	yarn --silent run stylelint 'src/css/**/*.css'
 	date > $@
+	echo "$?" >> $@
 
 $(SENTINEL_DIR): $(CACHE_DIR)
 	@mkdir $@
@@ -131,7 +134,7 @@ $(CACHE_DIR):
 	@mkdir $@
 
 clean-lint:
-	$(RM_CMD) -rf $(SENTINEL_DIR)
+	$(RM_CMD) $(SENTINEL_DIR)
 
 clean-webpack:
 	$(RM_CMD) static/dist holdmypics/core/templates/base-out.html

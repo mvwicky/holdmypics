@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import json
-import shlex
-import subprocess
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any
@@ -13,18 +11,12 @@ from flask import Flask
 from loguru import logger
 from semver import VersionInfo
 
+from .cli_utils import CTX_SETTINGS, run
+
 SEMVER_LEVELS = ("major", "minor", "patch", "prerelease", "build")
 SEMVER_BUMPS: dict[str, Callable[[VersionInfo], Any]] = {
     level: getattr(VersionInfo, f"bump_{level}") for level in SEMVER_LEVELS
 }
-CTX_SETTINGS = {"max_content_width": 130}
-
-
-def run(*args: str, **kwargs: Any) -> subprocess.CompletedProcess:
-    if not kwargs.pop("no_echo", False):
-        click.echo(shlex.join(args))
-    kwargs.setdefault("check", True)
-    return subprocess.run(args, **kwargs)
 
 
 def register(app: Flask):

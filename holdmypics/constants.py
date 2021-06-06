@@ -14,6 +14,7 @@ IMG_FORMATS: tuple[str] = ("jpg", "jpeg", "gif", "png", "webp")
 IMG_FORMATS_STR = ",".join(IMG_FORMATS)
 
 DEFAULT_FONT = "overpass"
+DEFAULT_DPI = 144
 NO_CACHE = "max-age=0, no-store, must-revalidate"
 COUNT_KEY = "image_count"
 PX_PER_PT = 0.75

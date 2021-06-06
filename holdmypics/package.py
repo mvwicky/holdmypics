@@ -1,17 +1,18 @@
 from __future__ import annotations
 
 import os
-import subprocess
 from collections.abc import Sequence
 from pathlib import Path
+from subprocess import CompletedProcess
 from typing import Any, Optional
 
 import attr
 from loguru import logger
 
+from .cli_utils import run
 from .utils import natsize
 
-CWD: Path = Path.cwd()
+CWD = Path.cwd()
 
 
 def find_path_named(name: str, start: Path = CWD, file_only: bool = False) -> Path:
@@ -49,13 +50,9 @@ class Package(object):
         name = "".join(["requirements", "-dev" if dev else "", ".txt"])
         return self.root_dir / name
 
-    def sh(self, args: Sequence[str], **kwargs: Any) -> subprocess.CompletedProcess:
-        cmd = args
-        if not isinstance(cmd, str) and isinstance(cmd, Sequence):
-            cmd = " ".join(cmd)
-        logger.info("Running command `{0}`", cmd)
-        kwargs = {"check": True, "cwd": self.root_dir, **kwargs}
-        return subprocess.run(args, **kwargs)
+    def sh(self, args: Sequence[str], **kwargs: Any) -> CompletedProcess:
+        kwargs = {"cwd": self.root_dir, **kwargs}
+        return run(*args, **kwargs)
 
     def export(self, dev: bool, hashes: bool) -> str:
         args = ["poetry", "export", "--format", "requirements.txt"]

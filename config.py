@@ -20,6 +20,7 @@ REDIS_URL: Optional[str] = env("REDIS_URL", default=None)
 LOG_DIR: Optional[str] = env("LOG_DIR", default=None)
 LOG_FILE_NAME: Optional[str] = env("LOG_FILE_NAME", default=None)
 LOG_LEVEL: int = env.log_level("LOG_LEVEL", default="INFO")
+MAX_LOG_SIZE: int = env.int("MAX_LOG_SIZE", default=524288)
 MAX_AGE: int = env.int("MAX_AGE", default=86400)
 
 HSTS_SECONDS: int = env.int("HSTS_SECONDS", default=0, validate=[Range(0)])

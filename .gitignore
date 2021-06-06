@@ -1,5 +1,7 @@
 # Created by https://www.gitignore.io/api/node,ruby,macos,python,django,windows,sublimetext
 # Edit at https://www.gitignore.io/?templates=node,ruby,macos,python,django,windows,sublimetext
+
+out/
 cypress.env.json
 pytest-report/
 .staticfiles

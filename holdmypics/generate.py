@@ -13,13 +13,13 @@ import click
 from jinja2 import Environment, FileSystemLoader, Template
 
 import config
+from .cli_utils import run
 
 split = partial(str.splitlines, keepends=True)
 
 
 def diff_contents(a: str, b: str) -> SequenceMatcher:
-    a_lines, b_lines = map(split, [a, b])
-    matcher = SequenceMatcher(None, a_lines, b_lines, autojunk=True)
+    matcher = SequenceMatcher(None, *map(split, (a, b)), autojunk=True)
     return matcher
 
 
@@ -37,6 +37,7 @@ class Generator(object):
 
     _env: Optional[Environment] = attr.ib(default=None, init=False, repr=False)
     _template: Optional[Template] = attr.ib(default=None, init=False, repr=False)
+    _node_version: Optional[str] = attr.ib(default=None, init=False, repr=False)
 
     def confirm(self, file: Path, yes: bool) -> bool:
         if yes or not file.is_file():
@@ -50,6 +51,7 @@ class Generator(object):
             **self.common_context,
             "yarn_build": f"build{':dev' if dev else ''}",
             "requirements": f"requirements{'-dev' if dev else ''}.txt",
+            "node_version": self.get_node_version(),
             "dev": dev,
         }
         if port is not None:
@@ -80,7 +82,8 @@ class Generator(object):
             ratio = matcher.ratio()
             if ratio == 1.0:
                 click.secho("Nothing to do, output is the same.", fg="blue")
-                os.utime(file)
+                if not dry_run:
+                    os.utime(file)
                 return
             else:
                 click.secho(f"New file differs by {1.0 - ratio:.2%}", fg="yellow")
@@ -89,7 +92,6 @@ class Generator(object):
             click.echo("")
         if not self.confirm(file, yes or dry_run):
             raise click.ClickException("Breaking")
-
         if not dry_run:
             file.write_text(cts)
             click.secho(f"Wrote {config.rel_to_root(file)}", fg="blue")
@@ -117,3 +119,11 @@ class Generator(object):
             block_start_string="#{%",
             block_end_string="%}",
         )
+
+    def get_node_version(self) -> str:
+        if self._node_version is None:
+            cmd = run("node", "--version", capture_output=True, text=True)
+            version = cmd.stdout.strip().split(".", 1)[0].lstrip("v")
+            assert version.isnumeric()
+            self._node_version = version
+        return self._node_version

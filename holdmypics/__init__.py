@@ -4,18 +4,18 @@ import time
 from functools import lru_cache, partial
 from importlib.metadata import version
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Union
 
 from flask import Flask, Response, request, send_from_directory
 from loguru import logger
 from whitenoise import WhiteNoise
 
-import config
 from .converters import ColorConverter, DimensionConverter
 from .logging import config_logging, log_request, log_static_file
 from .wrapped_redis import WrappedRedis
 
 if TYPE_CHECKING:
+    from types import ModuleType
     from wsgiref.headers import Headers
 
 redisw = WrappedRedis()
@@ -74,6 +74,10 @@ def configure_hsts(app: Flask):
         return None
 
 
+def before_request_callback():
+    request.start_time = time.monotonic()
+
+
 def after_request_callback(
     hsts_header: Optional[str], version: str, res: Response
 ) -> Response:
@@ -103,12 +107,10 @@ class Holdmypics(Flask):
     pass
 
 
-def create_app(cfg=config) -> Holdmypics:
-    log_file_name = cfg.LOG_FILE_NAME or __name__
-    config_logging(__name__, log_file_name, cfg.LOG_DIR, cfg.LOG_LEVEL)
-
+def create_app(cfg: Union[str, "ModuleType"] = "config") -> Holdmypics:
     app = Holdmypics(__name__)
     app.config.from_object(cfg)
+    config_logging(app)
 
     HSTS_HEADER = configure_hsts(app)
 
@@ -126,23 +128,21 @@ def create_app(cfg=config) -> Holdmypics:
 
     base_path = app.config.get("BASE_PATH")
 
+    debug = app.config.get("DEBUG")
     app.wsgi_app = WhiteNoise(
         app.wsgi_app,
         autorefresh=True,
         add_headers_function=partial(wn_add_headers, __version__),
-        immutable_file_test=partial(immutable_file_test, cfg.DEBUG),
+        immutable_file_test=partial(immutable_file_test, debug),
     )
 
     app.wsgi_app.add_files(str(HERE / "static"), prefix="static/")
     app.wsgi_app.add_files(str(base_path / "static"), prefix="static/")
 
-    if cfg.DEBUG:
+    if debug:
         from werkzeug.debug import DebuggedApplication
 
         app.wsgi_app = DebuggedApplication(app.wsgi_app, evalex=True)
-
-    def _before_request_cb():
-        request.start_time = time.monotonic()
 
     def _favicon():
         return send_from_directory(app.root_path, "fav.ico")
@@ -150,7 +150,7 @@ def create_app(cfg=config) -> Holdmypics:
     def _ctx():
         return {"version": __version__}
 
-    app.before_request(_before_request_cb)
+    app.before_request(before_request_callback)
     app.after_request(partial(after_request_callback, HSTS_HEADER, __version__))
     app.add_url_rule("/favicon.ico", "favicon", _favicon)
     app.context_processor(_ctx)
