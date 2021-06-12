@@ -19,8 +19,6 @@ webargs = "^8.0.0"
 whitenoise = { version = "^5.0.1", extras = ["brotli"] }
 # Test Dependencies
 pytest = { version = "^6.0", optional = true }
-pytest-cov = { version = "^2.8.1", optional = true }
-pytest-html = { version = "^3", optional = true }
 hypothesis = { version = "^6", optional = true }
 pytesseract = { version = "^0.3.4", optional = true }
 
@@ -33,7 +31,7 @@ psutil = "^5.6.5"
 ptpython = "^3"
 
 [tool.poetry.extras]
-tests = ["pytest", "pytest-cov", "pytest-html", "hypothesis"]
+tests = ["pytest", "hypothesis"]
 ocr = ["pytesseract"]
 
 [tool.poetry.scripts]

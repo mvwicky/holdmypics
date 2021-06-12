@@ -18,10 +18,13 @@ if TYPE_CHECKING:
     from holdmypics import Holdmypics
 
 MAX_LOG_SIZE = 3 * (1024 ** 2)
-COMMON_PROFILE = {"suppress_health_check": (HealthCheck.data_too_large,)}
+COMMON_PROFILE = {
+    "suppress_health_check": (HealthCheck.data_too_large,),
+    "deadline": None,
+}
 PROFILES = {
-    "ci": {"max_examples": 50, "deadline": None, **COMMON_PROFILE},
-    "dev": {"max_examples": 25, "deadline": None, **COMMON_PROFILE},
+    "ci": {"max_examples": 50, **COMMON_PROFILE},
+    "dev": {"max_examples": 15, **COMMON_PROFILE},
 }
 
 
@@ -46,8 +49,8 @@ def pytest_configure(config: "Config"):
     env.read_env()
     configure_logging()
 
-    for name, kwargs in PROFILES.items():  # type: str, dict
-        settings.register_profile(name, **kwargs)
+    for name in PROFILES:
+        settings.register_profile(name, **PROFILES[name])
 
     profile = env("HYPOTHESIS_PROFILE", default="ci", validate=[OneOf(PROFILES)])
     settings.load_profile(profile)

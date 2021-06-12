@@ -8,7 +8,7 @@ from typing import Optional
 from urllib.parse import urlencode
 
 import pytest
-from flask import Response
+from flask import Flask, Response
 from flask.testing import FlaskClient
 from hypothesis import example, given, strategies as st
 from loguru import logger
@@ -157,18 +157,15 @@ def _sz_id(sz: tuple[int, int]) -> str:
     return "{0}x{1}".format(*sz)
 
 
-@pytest.mark.parametrize("image_format", ["png", "webp"])
+@pytest.mark.parametrize("fmt", ["png", "webp"])
 @pytest.mark.parametrize(
     "font_name", ["overpass", "fira-mono", "fira-sans", "roboto", "spectral"]
 )
 @pytest.mark.parametrize("size", [(3840, 2160), (1920, 1080), (960, 540)], ids=_sz_id)
-def test_text_with_fonts(
-    config: ModuleType, image_format: str, font_name: str, size: tuple[int, int]
-):
-    app = create_app(config)
+def test_text_with_fonts(app: Flask, fmt: str, font_name: str, size: tuple[int, int]):
     with app.test_request_context():
         img_args = ImageArgs(text=f"Text with font: {font_name}", font_name=font_name)
-        img = GeneratedImage(size, image_format, "cef", "555", img_args)
+        img = GeneratedImage(size, fmt, "cef", "555", img_args)
         assert img.get_save_kw()
         p = img.get_path()
         assert os.path.isfile(p)
