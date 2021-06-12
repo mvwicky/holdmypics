@@ -19,7 +19,7 @@ _A = TypeVar("_A", bound=BaseImageArgs)
 OPT_KW: dict[str, Callable[[BaseImageArgs], dict[str, Any]]] = {
     "jpeg": lambda args: {"optimize": True, "dpi": (args.dpi, args.dpi)},
     "png": lambda args: {"optimize": True, "dpi": (args.dpi, args.dpi)},
-    "webp": lambda _: {"quality": 100, "method": 6, "lossless": True},
+    "webp": lambda _: {"quality": 100, "method": 6, "lossless": False},
     "gif": lambda _: {"optimize": True},
 }
 

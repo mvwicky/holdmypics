@@ -2,6 +2,11 @@
 
 ## Backend
 
+- [ ] Nothing saves as `RGBA`
+- [ ] Better path parameter validation
+  - e.g., right now, we'd accept a size of `0x0` (which we shouldn't)
+- [ ] Multiline text
+  - [ ] Make the `text` parameter an array. Each element will end up on its own line.
 - [ ] More image variations
   - [ ] Tiled images
   - [ ] Images made up of random colors
@@ -13,7 +18,8 @@
 - [ ] Refactor out image creation stuff into a library
 - [ ] Write more tests. Basically download an image from every endpoint/argument combination and verify.
   - e.g., open the file w/ Pillow and make sure the colors/alpha are right
+  - [ ] Test the tiled image endpoint(s)
 
 ## Frontend
 
-- [ ] Replace `webpack` with `esbuild` (at least for the TypeScript parts)
+- [x] Replace `webpack` with `esbuild` (at least for the TypeScript parts)

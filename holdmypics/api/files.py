@@ -11,7 +11,6 @@ from typing import Any, ClassVar, Optional
 import attr
 from loguru import logger
 
-from .._types import Dimension
 from ..utils import get_size, natsize
 from . import bp
 from .args import BaseImageArgs
@@ -86,7 +85,7 @@ class GeneratedFiles(object):
 
     def get_file_name(
         self,
-        size: Dimension,
+        size: tuple[int, int],
         bg: str,
         fg: str,
         fmt: str,

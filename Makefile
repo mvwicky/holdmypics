@@ -127,11 +127,8 @@ $(STYLELINT_SENTINEL): $(filter %.css,$(LS_FILES)) $(filter .stylelintrc.%,$(LS_
 	date > $@
 	echo "$?" >> $@
 
-$(SENTINEL_DIR): $(CACHE_DIR)
-	@mkdir $@
-
-$(CACHE_DIR):
-	@mkdir $@
+$(SENTINEL_DIR):
+	mkdir $@
 
 clean-lint:
 	$(RM_CMD) $(SENTINEL_DIR)

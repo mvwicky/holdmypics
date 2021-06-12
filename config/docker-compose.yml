@@ -1,12 +1,11 @@
 ---
-version: "3.7"
 services:
-  holdmypics:
+  web:
     build:
       context: .
-      dockerfile: config/prod/Dockerfile
-    image: holdmypics-prod
-    env_file: .compose.env
+      dockerfile: "${DOCKER_WEB_DOCKERFILE:-config/prod/Dockerfile}"
+    env_file:
+      - .compose.env
     ports:
       - "4000:80"
     networks:
@@ -14,14 +13,22 @@ services:
     depends_on:
       - redis
   redis:
-    image: redis:5.0-alpine
+    image: redis:6.2.4-alpine
     ports:
       - "6379:6379"
     deploy:
+      resources:
+        limits:
+          cpus: "${DOCKER_REDIS_CPUS:-0}"
+          memory: "${DOCKER_REDIS_MEMORY:-0}"
       placement:
         constraints: [node.role == manager]
     command: redis-server --appendonly yes
     networks:
       - webnet
+    volumes:
+      - "redis:/data"
 networks:
-  webnet:
+  webnet: {}
+volumes:
+  redis: {}

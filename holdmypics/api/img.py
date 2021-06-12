@@ -16,6 +16,7 @@ from .utils import TextArgs, draw_text
 class GeneratedImage(BaseGeneratedImage[ImageArgs]):
     def make(self) -> Image.Image:
         im = Image.new(self.mode, self.size, self.bg_color)
+        # im.putalpha(Image.new("L", self.size, 255))
         args = self.args
         if args.text is not None:
             text_args = TextArgs(self.fg_color, args.text, args.font_name, args.debug)

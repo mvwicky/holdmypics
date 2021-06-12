@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
@@ -48,16 +49,21 @@ def pytest_configure(config: "Config"):
     for name, kwargs in PROFILES.items():  # type: str, dict
         settings.register_profile(name, **kwargs)
 
-    pr_validate = [OneOf(PROFILES)]
-    profile = env("HYPOTHESIS_PROFILE", default="ci", validate=pr_validate)
+    profile = env("HYPOTHESIS_PROFILE", default="ci", validate=[OneOf(PROFILES)])
     settings.load_profile(profile)
 
 
 @pytest.fixture(scope="session", name="config")
-def config_fixture(tmp_path_factory: "TempPathFactory") -> "ModuleType":
+def config_fixture(
+    tmp_path_factory: "TempPathFactory", pytestconfig: "Config"
+) -> "ModuleType":
     import config as _config
 
-    image_dir = tmp_path_factory.mktemp("holdmypics-images")
+    image_dir = pytestconfig.getoption("--image-dir", None)
+    if image_dir is not None:
+        image_dir = Path(image_dir).resolve()
+    else:
+        image_dir = tmp_path_factory.mktemp("holdmypics-images")
     logger.info("Image dir: {0}", image_dir)
     test_config = {
         "DEBUG": False,

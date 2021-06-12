@@ -31,6 +31,7 @@ def pytest_addoption(parser: "Parser"):
     group.addoption(
         "--dpis", nargs="+", default=[72], type=int, help="The dpi values to use."
     )
+    group.addoption("--image-dir", default=None, help="Saved images output directory")
     group.addoption("--no-empty-dpi", action="store_true", dest="no_empty_dpi")
     parser.addini("empty-dpi", "Add a `None` value for dpi.", type="bool", default=True)
     parser.addini("trace-mem", "Trace memory allocations.", type="bool", default=False)
