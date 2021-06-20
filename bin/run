@@ -3,4 +3,4 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-gunicorn wsgi:application --config python:gunicorn_config
+gunicorn wsgi:application

@@ -11,7 +11,7 @@ from loguru import logger
 from whitenoise import WhiteNoise
 
 from .converters import ColorConverter, DimensionConverter
-from .logging import config_logging, log_request, log_static_file
+from .log_config import config_logging, log_request, log_static_file
 from .wrapped_redis import WrappedRedis
 
 if TYPE_CHECKING:

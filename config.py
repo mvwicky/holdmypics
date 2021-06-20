@@ -69,5 +69,20 @@ INDEX_IMG_MAX_HEIGHT: int = env.int(
 HASH_IMG_FILE_NAMES: bool = env.bool("HASH_IMG_FILE_NAMES", default=not DEBUG)
 
 
+JPEG_OPTIMIZE: bool = env.bool("JPEG_OPTIMIZE", default=True)
+JPEG_QUALITY: int = env.int("JPEG_QUALITY", default=75, validate=[Range(0, 95)])
+
+PNG_OPTIMIZE: bool = env.bool("PNG_OPTIMIZE", default=True)
+PNG_COMPRESS_LEVEL: int = env.int(
+    "PNG_COMPRESS_LEVEL", default=6, validate=[Range(0, 9)]
+)
+
+WEBP_QUALITY: int = env.int("WEBP_QUALITY", default=100, validate=[Range(0, 100)])
+WEBP_METHOD: int = env.int("WEBP_METHOD", default=6, validate=[Range(0, 6)])
+WEBP_LOSSLESS: bool = env.bool("WEBP_LOSSLESS", default=False)
+
+GIF_OPTIMIZE: bool = env.bool("GIT_OPTIMIZE", default=True)
+
+
 def rel_to_root(p: os.PathLike) -> str:
     return os.path.relpath(p, BASE_PATH)

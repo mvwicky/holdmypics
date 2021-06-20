@@ -7,4 +7,4 @@ build:
   docker:
     web: config/prod/Dockerfile
 run:
-  web: gunicorn wsgi:application --config python:config/gunicorn_config
+  web: gunicorn wsgi:application

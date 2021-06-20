@@ -64,12 +64,20 @@ def font_redirect(font_name: str) -> ResponseType:
         url = urlunsplit(parts._replace(query=urlencode(query_list, doseq=True)))
         return redirect(url)
     else:
+        logger.warning("Unknown font: `{0}`", font_name)
+        abort(400)
+
+
+def check_size(size: tuple[int, int]) -> None:
+    if not all(size):
+        logger.warning("Invalid size: {0}", size)
         abort(400)
 
 
 def check_format(fmt: str) -> str:
     fmt = fmt.lower()
     if fmt not in IMG_FORMATS:
+        logger.warning("Unknown format: `{0}`", fmt)
         abort(400)
     return fmt
 
@@ -88,12 +96,13 @@ def count_route():
 def image_route(
     size: tuple[int, int], bg_color: str, fg_color: str, fmt: str
 ) -> ResponseType:
+    check_size(size)
     fmt = check_format(fmt)
     args = ImageArgs.from_request().real_args()
     if args.font_name not in fonts.font_names:
         return font_redirect(args.font_name)
 
-    bg_lower, fg_lower = map(str.casefold, [bg_color, fg_color])
+    bg_lower, fg_lower = map(str.casefold, (bg_color, fg_color))
     if RAND_COLOR in {bg_lower, fg_lower}:
         random.seed(args.seed)
         if bg_lower == RAND_COLOR:
@@ -120,6 +129,7 @@ def image_route(
 def anim_route(
     size: tuple[int, int], bg_color: str, fg_color: str, fmt: str
 ) -> Response:
+    check_size(size)
     if fmt not in ANIM_FMTS:
         abort(400)
     anim = make_anim(size, bg_color, fg_color, fmt)
@@ -135,6 +145,7 @@ def text_route() -> str:
 
 @bp.route(f"/tiled/<dim:size>/<int:cols>/<int:rows>/<any({IMG_FORMATS_STR}):fmt>/")
 def tiled_route(size: tuple[int, int], cols: int, rows: int, fmt: str) -> str:
+    check_size(size)
     fmt = check_format(fmt)
     args = TiledImageArgs.from_request()
     img = GeneratedTiledImage(size, fmt, "0000", "0000", args, cols, rows)

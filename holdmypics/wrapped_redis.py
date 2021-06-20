@@ -23,11 +23,9 @@ class WrappedRedis(object):
     client: Union[FlaskRedis, FakeRedis] = FakeRedis()
 
     def init_app(self, app: Flask) -> None:
-        self.has_redis = app.config.get("REDIS_URL", None) is not None
+        self.has_redis = bool(app.config.get("REDIS_URL"))
         if self.has_redis:
             self.client = FlaskRedis()
             self.client.init_app(app)
-            # redis_client.init_app(app)
-            # self.client = redis_client
         else:
             self.client = FakeRedis()

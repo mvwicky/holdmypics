@@ -30,7 +30,6 @@ class Font(object):
 
     def __getitem__(self, size: int) -> ImageFont:
         if size not in self._sizes:
-            logger.debug("Loading size {0} from {1}", size, self.file.name)
             self._sizes[size] = truetype(str(self.file), size=size)
         return self._sizes[size]
 

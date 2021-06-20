@@ -31,4 +31,4 @@ RUN chown -R ${APP_USER}:${APP_USER} /app/
 EXPOSE 8080
 USER ${APP_USER}:${APP_USER}
 
-CMD ["gunicorn", "wsgi:application", "--config", "file:config/gunicorn_config.py"]
+CMD ["gunicorn", "wsgi:application"]

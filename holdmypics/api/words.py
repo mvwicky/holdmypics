@@ -5,6 +5,7 @@ import random
 from functools import partial
 from pathlib import Path
 from typing import Optional
+from urllib.request import urlopen
 
 import attr
 
@@ -12,8 +13,16 @@ from ..utils import config_value
 
 none_attr = partial(attr.ib, default=None, init=False)
 
-word_path_parts = ["node_modules", "friendly-words", "generated", "words.json"]
-# https://unpkg.com/friendly-words@1.1.10/generated/words.json
+word_path_parts = ("node_modules", "friendly-words", "generated", "words.json")
+WORDS_URL = "https://unpkg.com/friendly-words@1.2.0/generated/words.json"
+
+
+def download_words(output_file: Path) -> None:
+    output_dir = output_file.parent
+    if not output_dir.is_dir():
+        output_dir.mkdir(parents=True)
+    with urlopen(WORDS_URL) as res:
+        output_file.write_bytes(res.read())
 
 
 @attr.s(auto_attribs=True, slots=True)
@@ -26,6 +35,8 @@ class Words(object):
         if self._word_file is None:
             base: Path = config_value("BASE_PATH", None)
             self._word_file = base.joinpath(*word_path_parts)
+            if not self._word_file.is_file():
+                download_words(self._word_file)
         return self._word_file
 
     @property

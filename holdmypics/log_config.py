@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+import logging
+import logging.config
 import sys
-from logging.config import dictConfig
 from pathlib import Path
 from typing import Optional
 
@@ -12,6 +13,27 @@ from loguru import logger
 from .utils import get_size, natsize
 
 req: Request = request
+
+
+class InterceptHandler(logging.Handler):
+    """Intercepts stdlib logging messages.
+
+    From:
+        loguru.readthedocs.io/en/stable/overview.html#entirely-compatible-with-standard-logging
+    """
+
+    def emit(self, record: logging.LogRecord):
+        try:
+            level = logger.level(record.levelname).name
+        except ValueError:
+            level = record.levelno
+        frame, depth = logging.currentframe(), 2
+        while frame.f_code.co_filename == logging.__file__:
+            frame = frame.f_back
+            depth += 1
+        logger.opt(depth=depth, exception=record.exc_info).log(
+            level, record.getMessage()
+        )
 
 
 def file_filter(record: loguru.Record) -> bool:
@@ -36,7 +58,15 @@ def config_logging(app: Flask) -> None:
     log_dir: Optional[Path] = app.config.get("LOG_DIR")
     log_level: str = app.config.get("LOG_LEVEL")
     max_log_size: int = app.config.get("MAX_LOG_SIZE")
-    dictConfig({"version": 1})
+    logging.config.dictConfig(
+        {
+            "version": 1,
+            "handlers": {
+                "intercept": {"class": "holdmypics.log_config.InterceptHandler"}
+            },
+            "root": {"handlers": ["intercept"], "level": "DEBUG"},
+        }
+    )
     try:
         logger.remove(0)
     except Exception:

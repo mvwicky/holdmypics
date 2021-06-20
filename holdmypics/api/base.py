@@ -5,6 +5,7 @@ from collections.abc import Callable
 from typing import Any, ClassVar, Generic, TypeVar
 
 import attr
+from flask import current_app
 from loguru import logger
 from PIL import Image
 
@@ -16,11 +17,40 @@ from .utils import normalize_fmt, resolve_color
 
 _A = TypeVar("_A", bound=BaseImageArgs)
 
-OPT_KW: dict[str, Callable[[BaseImageArgs], dict[str, Any]]] = {
-    "jpeg": lambda args: {"optimize": True, "dpi": (args.dpi, args.dpi)},
-    "png": lambda args: {"optimize": True, "dpi": (args.dpi, args.dpi)},
-    "webp": lambda _: {"quality": 100, "method": 6, "lossless": False},
-    "gif": lambda _: {"optimize": True},
+
+def _jpeg_opt_kw(args: BaseImageArgs) -> dict[str, Any]:
+    return {
+        "optimize": bool(current_app.config.get("JPEG_OPTIMIZE")),
+        "quality": current_app.config.get("JPEG_QUALITY"),
+        "dpi": (args.dpi, args.dpi),
+    }
+
+
+def _png_opt_kw(args: BaseImageArgs) -> dict[str, Any]:
+    return {
+        "optmize": bool(current_app.config.get("PNG_OPTIMIZE")),
+        "dpi": (args.dpi, args.dpi),
+        "compress_level": current_app.config.get("PNG_COMPRESS_LEVEL"),
+    }
+
+
+def _webp_opt_kw(args: BaseImageArgs) -> dict[str, Any]:
+    return {
+        "quality": current_app.config.get("WEBP_QUALITY"),
+        "method": current_app.config.get("WEBP_METHOD"),
+        "lossless": bool(current_app.config.get("WEBP_LOSSLESS")),
+    }
+
+
+def _gif_opt_kw(args: BaseImageArgs) -> dict[str, Any]:
+    return {"optmize": bool(current_app.config.get("GIF_OPTIMIZE"))}
+
+
+SAVE_KW: dict[str, Callable[[BaseImageArgs], dict[str, Any]]] = {
+    "jpeg": _jpeg_opt_kw,
+    "png": _png_opt_kw,
+    "webp": _webp_opt_kw,
+    "gif": _gif_opt_kw,
 }
 
 
@@ -35,7 +65,7 @@ class BaseGeneratedImage(Generic[_A]):
     args: _A
 
     def get_save_kw(self) -> dict[str, Any]:
-        kw_func = OPT_KW.get(self.fmt, None)
+        kw_func = SAVE_KW.get(self.fmt, None)
         return {} if kw_func is None else kw_func(self.args)
 
     def make(self) -> Image.Image:

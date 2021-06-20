@@ -9,7 +9,8 @@ from PIL import Image
 from .args import ImageArgs
 from .base import BaseGeneratedImage
 from .files import files
-from .utils import TextArgs, draw_text
+from .text import draw_text
+from .utils import TextArgs
 
 
 @attr.s(slots=True, auto_attribs=True)
