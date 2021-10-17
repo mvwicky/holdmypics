@@ -41,10 +41,9 @@ function ms(n) {
 module.exports = {
   mode: "jit",
   purge: {
-    mode: "layers",
     content: ["./holdmypics/**/*.{jinja,html}", "./config/safelist.txt"],
   },
-  darkMode: false, // or 'media' or 'class'
+  darkMode: false,
   theme: {
     extend: {},
     fontFamily: {

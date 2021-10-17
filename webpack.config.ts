@@ -25,8 +25,6 @@ function ifProd<T>(obj: T): T | undefined {
 const relToRoot = (...args: string[]) => resolve(__dirname, ...args);
 const relToSrc = (...args: string[]) => relToRoot("src", ...args);
 
-const [hashFunction, hashDigestLength] = ["md5", 28];
-
 const outPath = relToRoot("static", "dist");
 
 const mode = prodOr("production", "development");
@@ -36,14 +34,15 @@ const contenthash = prodOr(".[contenthash]", "");
 const entry = Object.fromEntries(
   Object.entries(config.entry).map(([name, e]) => [name, resolve(e)])
 );
+const templateDir = relToRoot("holdmypics", "core", "templates");
 
 const configuration: Configuration = {
   entry,
   output: {
     filename: `[name]${contenthash}.js`,
+    chunkFilename: `chunks/[name]${contenthash}.js`,
     path: outPath,
-    hashFunction,
-    hashDigestLength,
+    hashFunction: "xxhash64",
     publicPath,
   },
   devtool: prodOr("source-map", "cheap-module-source-map"),
@@ -52,9 +51,9 @@ const configuration: Configuration = {
     new MiniCssExtractPlugin({
       filename: join("css", `style.[name]${contenthash}.css`),
       chunkFilename: join("css", `[name]${contenthash}.css`),
-    }),
+    }) as any,
     new HtmlWebpackPlugin({
-      filename: relToRoot("holdmypics", "core", "templates", "base-out.html"),
+      filename: join(templateDir, "base-out.html"),
       minify: false,
       inject: false,
       meta: {},
@@ -132,6 +131,15 @@ const configuration: Configuration = {
         relToRoot("tailwind.config.js"),
       ],
     },
+  },
+  watchOptions: {
+    ignored: [
+      "**/*.py",
+      "**/node_modules",
+      outPath,
+      templateDir,
+      relToSrc("webpack-records-*.json"),
+    ],
   },
 };
 

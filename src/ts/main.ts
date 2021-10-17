@@ -9,11 +9,11 @@ import { log } from "./log";
 import type { FormInput, InputCallbackArgs, MakeEndpointArgs } from "./types";
 
 function getClipboard() {
-  return import(/* webpackChunkName: "clipboard" */ "clipboard");
+  return import("clipboard");
 }
 
 function getRand() {
-  return import(/* webpackChunkName: "random-text" */ "./random-text");
+  return import("./random-text");
 }
 
 const ARGS = [

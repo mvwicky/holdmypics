@@ -32,8 +32,7 @@ class Server(object):
         if self.start_server:
             self._start_server()
         n = len(self.procs)
-        ts = "" if n == 1 else "es"
-        logger.info("Started {0} process{1}", n, ts)
+        logger.info("Started {0} process{1}", n, "" if n == 1 else "es")
 
     def _start_proc(self, name: str, args: Sequence[str], **kwargs: Any) -> None:
         logger.info("Starting process `{0}`", " ".join(args))

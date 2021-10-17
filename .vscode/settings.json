@@ -1,5 +1,5 @@
 {
-  "python.pythonPath": "/Users/michael/.pyenv/versions/holdmypics-3.9.5/bin/python",
+  "python.pythonPath": "${workspaceFolder}/.venv/bin/python",
   "python.linting.flake8Args": ["--config=${workspaceFolder}/.flake8"],
   "python.sortImports.path": "${env:VIRTUAL_ENV}/bin/isort",
   "files.exclude": {
@@ -22,7 +22,6 @@
   "python.testing.pytestPath": "${env:VIRTUAL_ENV}/bin/pytest",
   "python.testing.pytestArgs": ["tests"],
   "python.testing.unittestEnabled": false,
-  "python.testing.nosetestsEnabled": false,
   "python.testing.pytestEnabled": true,
   "editor.tabSize": 2,
   "[python]": {
@@ -51,6 +50,8 @@
     },
     "editor.formatOnSave": true
   },
-  "cSpell.enabled": false,
-  "restructuredtext.languageServer.disabled": true
+  "[css]": {
+    "editor.codeActionsOnSave": { "source.fixAll": true }
+  },
+  "cSpell.enabled": false
 }
