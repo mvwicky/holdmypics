@@ -3,7 +3,7 @@
     @apply border border-gray-300 rounded text-center w-full text-sm p-3 space-y-3;
   }
   footer h6 {
-    @apply mt-2;
+    @apply mt-2 text-base;
   }
   footer h6:last-child {
     @apply mt-0;

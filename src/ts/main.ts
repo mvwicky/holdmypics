@@ -1,12 +1,12 @@
 import "../css/main.css";
 
 import { rIC } from "./dom/idle";
-import { assertIsTag } from "./helpers/assert-is-tag";
 import { debounce } from "./helpers/debounce";
 import { elemIsTag } from "./helpers/elem-is-tag";
 import { replaceIcons } from "./icons";
 import { log } from "./log";
 import type { FormInput, InputCallbackArgs, MakeEndpointArgs } from "./types";
+import { isEndpointArgs } from "./utils";
 
 function getClipboard() {
   return import("clipboard");
@@ -14,22 +14,6 @@ function getClipboard() {
 
 function getRand() {
   return import("./random-text");
-}
-
-const ARGS = [
-  "width",
-  "height",
-  "bg",
-  "fg",
-  "fmt",
-  "imageText",
-  "font",
-] as const;
-
-function isEndpointArgs(
-  input: Record<string, string> | null
-): input is MakeEndpointArgs {
-  return input !== null && ARGS.every((key) => key in input);
 }
 
 function makeEndpoint(args: MakeEndpointArgs) {
@@ -62,12 +46,10 @@ function isInput(e: Element): e is FormInput {
 function gatherParams(f: HTMLFormElement): Record<string, string> | null {
   const params: { [k: string]: string } = {};
   const n = f.elements.length;
-  for (let i = 0; i < n; i++) {
-    const elem = f.elements[i];
+  for (const elem of f.elements) {
     if (isInput(elem)) {
       if (elem.checkValidity()) {
-        if (elem.type === "checkbox") {
-          assertIsTag("input", elem);
+        if (elem.type === "checkbox" && elemIsTag("input", elem)) {
           params[elem.id] = elem.checked ? "on" : "";
         } else {
           const value = elem.value;
@@ -158,6 +140,7 @@ function initIcons(btn: HTMLButtonElement) {
 
 async function afterFeather(copyBtn: HTMLButtonElement) {
   const { default: Clipboard } = await getClipboard();
+  log("Loaded clipboard.");
   const setJustCopied = (on: boolean) => {
     const func = on ? "add" : "remove";
     copyBtn.classList[func]("just-copied");

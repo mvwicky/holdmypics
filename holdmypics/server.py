@@ -57,8 +57,7 @@ class Server(object):
         base_out = Path(bp.root_path) / bp.template_folder / "base-out.html"
         start_mtime = 0
         if base_out.is_file():
-            start_mtime = os.path.getmtime(base_out)
-            logger.debug("Waiting for changes (mtime={0}).", start_mtime)
+            base_out.unlink()
         env = {**os.environ, "NODE_ENV": "development", "TAILWIND_MODE": "build"}
         self._start_proc("yarn", ["yarn", "watch"], env=env)
         self._wait_for_yarn(base_out, start_mtime)

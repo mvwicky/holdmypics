@@ -105,6 +105,11 @@ def index() -> ResponseType:
         return render_template("index.jinja", **context)
 
 
+@bp.route("/tiled/")
+def tiled() -> ResponseType:
+    return render_template("tiled.jinja", title="Tiled Images")
+
+
 @bp.route("/robots.txt")
 def robots() -> ResponseType:
     headers = {"Content-Type": "text/plain", "Cache-Control": "public, max-age=86400"}

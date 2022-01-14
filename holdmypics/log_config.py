@@ -7,12 +7,10 @@ from pathlib import Path
 from typing import Optional
 
 import loguru
-from flask import Flask, Request, Response, request
+from flask import Flask, Response, request
 from loguru import logger
 
 from .utils import get_size, natsize
-
-req: Request = request
 
 
 class InterceptHandler(logging.Handler):
@@ -72,12 +70,12 @@ def config_logging(app: Flask) -> None:
     except Exception:
         return
     fmt_parts = [
+        # TODO: Change this to a locality test
+        "" if log_dir is None else "[<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>]",
         "<level>{level:<8}</level>",
         "<blue>{name}</blue>:<cyan>{line}</cyan> - <bold>{message}</bold>",
     ]
-    if log_dir is not None:  # TODO: Change this to a locality test
-        fmt_parts.insert(0, "[<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>]")
-    fmt = " | ".join(fmt_parts)
+    fmt = " | ".join(filter(None, fmt_parts))
     handlers = [{"sink": sys.stderr, "format": fmt, "level": log_level}]
     if log_dir is not None:
         log_dir = Path(log_dir).resolve()
@@ -89,15 +87,14 @@ def config_logging(app: Flask) -> None:
 def log_request(res: Response) -> None:
     code = res.status_code
     level = "WARNING" if code > 399 else "INFO"
-    path = req.path
-    if req.query_string:
-        path = "?".join([path, req.query_string.decode()])
-    addrs: str = req.headers.get("X-Forwarded-For", req.remote_addr)
+    path = request.path
+    if request.query_string:
+        path = "?".join((path, request.query_string.decode()))
+    addrs: str = request.headers.get("X-Forwarded-For", request.remote_addr)
     addr = addrs.split(",")[-1].strip()
     content_length = res.headers.get("Content-Length", 0, type=int)
-    msg = "{0:7} {1:3d} {2} content-length={3} addr={4}"
-    args = [req.method, res.status_code, path, natsize(content_length), addr]
-    logger.log(level, msg, *args)
+    args = [request.method, res.status_code, path, natsize(content_length), addr]
+    logger.log(level, "{0:7} {1:3d} {2} content-length={3} addr={4}", *args)
 
 
 def log_static_file(path: str, url: str) -> None:

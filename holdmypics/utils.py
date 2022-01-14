@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import math
 import os
+from collections.abc import Callable
 from functools import lru_cache
-from typing import Optional, TypeVar, Union
+from typing import Any, Optional, TypeVar, Union
 
 from flask import Flask, current_app
+from loguru import logger
 
 from .constants import (
     COUNT_KEY,
@@ -37,13 +39,18 @@ _T = TypeVar("_T")
 
 
 def config_value(
-    name: str, default: Union[_T, Unset] = UNSET, app: Optional[Flask] = None
+    name: str,
+    default: Union[_T, Unset] = UNSET,
+    app: Optional[Flask] = None,
+    cast: Optional[Callable[[Any], _T]] = None,
 ) -> _T:
-    if app is None:
-        app = current_app
+    app = app if app is not None else current_app
     value = app.config.get(name, default)
     if value is UNSET:
         raise ImproperlyConfigured("Unknown setting {0}".format(name))
+    if cast is not None:
+        value = cast(value)
+    logger.debug("Got config value. [key={0} value={1}]", name, value)
     return value
 
 

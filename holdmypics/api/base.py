@@ -5,13 +5,12 @@ from collections.abc import Callable
 from typing import Any, ClassVar, Generic, TypeVar
 
 import attr
-from flask import current_app
 from loguru import logger
 from PIL import Image
 
 from .. import redisw
 from ..constants import COUNT_KEY
-from ..utils import get_size, natsize
+from ..utils import config_value, get_size, natsize
 from .args import BaseImageArgs
 from .utils import normalize_fmt, resolve_color
 
@@ -20,30 +19,30 @@ _A = TypeVar("_A", bound=BaseImageArgs)
 
 def _jpeg_opt_kw(args: BaseImageArgs) -> dict[str, Any]:
     return {
-        "optimize": bool(current_app.config.get("JPEG_OPTIMIZE")),
-        "quality": current_app.config.get("JPEG_QUALITY"),
+        "optimize": config_value("JPEG_OPTIMIZE", cast=bool),
+        "quality": config_value("JPEG_QUALITY", 75),
         "dpi": (args.dpi, args.dpi),
     }
 
 
 def _png_opt_kw(args: BaseImageArgs) -> dict[str, Any]:
     return {
-        "optmize": bool(current_app.config.get("PNG_OPTIMIZE")),
+        "optmize": config_value("PNG_OPTIMIZE", True, cast=bool),
         "dpi": (args.dpi, args.dpi),
-        "compress_level": current_app.config.get("PNG_COMPRESS_LEVEL"),
+        "compress_level": config_value("PNG_COMPRESS_LEVEL", 6),
     }
 
 
 def _webp_opt_kw(args: BaseImageArgs) -> dict[str, Any]:
     return {
-        "quality": current_app.config.get("WEBP_QUALITY"),
-        "method": current_app.config.get("WEBP_METHOD"),
-        "lossless": bool(current_app.config.get("WEBP_LOSSLESS")),
+        "quality": config_value("WEBP_QUALITY"),
+        "method": config_value("WEBP_METHOD"),
+        "lossless": config_value("WEBP_LOSSLESS", cast=bool),
     }
 
 
 def _gif_opt_kw(args: BaseImageArgs) -> dict[str, Any]:
-    return {"optmize": bool(current_app.config.get("GIF_OPTIMIZE"))}
+    return {"optmize": config_value("GIF_OPTIMIZE", cast=bool)}
 
 
 SAVE_KW: dict[str, Callable[[BaseImageArgs], dict[str, Any]]] = {
@@ -74,6 +73,7 @@ class BaseGeneratedImage(Generic[_A]):
     def save_img(self, im: Image.Image, path: str):
         save_kw = self.get_save_kw()
         im.save(path, **save_kw)
+        logger.debug("Closing image {0}", path)
         im.close()
         sz = natsize(get_size(path), fmt="{0:.1f}")
         logger.info('Created "{0}" ({1})', os.path.basename(path), sz)

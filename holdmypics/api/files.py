@@ -3,7 +3,6 @@ from __future__ import annotations
 import hashlib
 import os
 import re
-from functools import partial
 from itertools import chain
 from operator import itemgetter
 from typing import Any, ClassVar, Optional
@@ -17,8 +16,6 @@ from .args import BaseImageArgs
 
 FNAME_TBL = str.maketrans({"#": "", " ": "-", ".": "", "/": "-", "\\": "-"})
 
-no_init = partial(attr.ib, init=False)
-
 
 @attr.s(slots=True, auto_attribs=True, repr=False)
 class GeneratedFiles(object):
@@ -29,15 +26,16 @@ class GeneratedFiles(object):
     )
 
     files: set[str] = attr.ib(factory=set)
-    initted: bool = no_init(default=False)
-    _images_folder: Optional[str] = no_init(default=None)
-    _max_size: Optional[int] = no_init(default=None)
-    _hash_file_names: Optional[bool] = no_init(default=None)
+    initted: bool = attr.ib(init=False, default=False)
+    _images_folder: Optional[str] = attr.ib(init=False, default=None)
+    _max_size: Optional[int] = attr.ib(init=False, default=None)
+    _hash_file_names: Optional[bool] = attr.ib(init=False, default=None)
 
     def setup(self, images_folder: str, max_size: int, hash_file_names: bool) -> None:
         self._images_folder = images_folder
         self._max_size = max_size
         self._hash_file_names = hash_file_names
+        self.find_current()
         self.initted = True
 
     def get_current_files(self) -> list[str]:
@@ -57,17 +55,22 @@ class GeneratedFiles(object):
     @property
     def max_size(self) -> int:
         if self._max_size is None:
-            self._max_size = bp.max_size  # type: ignore
+            logger.warning("Getting max size property from blueprint")
+            self._max_size = bp.max_size
         return self._max_size
 
     @property
     def images_folder(self) -> str:
-        return bp.images_folder  # type: ignore
+        if self._images_folder is None:
+            logger.warning("Getting images folder property from blueprint")
+            self._images_folder = bp.images_folder
+        return self._images_folder
 
     @property
     def hash_file_names(self) -> bool:
         if self._hash_file_names is None:
-            self._hash_file_names = bp.hash_file_names  # type: ignore
+            logger.warning("Getting hash file names property from blueprint")
+            self._hash_file_names = bp.hash_file_names
         return self._hash_file_names
 
     @property
@@ -75,7 +78,7 @@ class GeneratedFiles(object):
         return self.get_current_size() > self.max_size
 
     def hash_strings(self, *strings: str) -> str:
-        hasher = self.hash_function()  # type: ignore
+        hasher = self.hash_function()
         for s in strings:
             hasher.update(s.encode("utf-8"))
         return hasher.hexdigest()
@@ -96,12 +99,12 @@ class GeneratedFiles(object):
             args = attr.evolve(args, text=self.hash_strings(args.text))
         args = args.to_seq()
         params = chain(["x".join(map(str, size)), bg, fg, fmt], args, extra)
+        base_name: str
         if not self.hash_file_names:
             base_name = "-".join(map(str, params)).translate(FNAME_TBL)
-            name = ".".join([base_name, fmt])
         else:
-            phash = self.params_hash(*params)
-            name = ".".join([phash, fmt])
+            base_name = self.params_hash(*params)
+        name = ".".join((base_name, fmt))
         path = os.path.join(self.images_folder, name)
         self.files.add(path)
         return path

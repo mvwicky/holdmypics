@@ -37,6 +37,8 @@
     animation-direction: normal;
     animation-duration: 1250ms;
     animation-fill-mode: backwards;
+    animation-name: copied;
+    animation-play-state: paused;
     animation-timing-function: ease-in-out;
     background-clip: padding-box;
     background-image: linear-gradient(to right, var(--gradient-color-stops));
@@ -78,7 +80,7 @@
   }
 
   #copy-button.just-copied {
-    animation-name: copied;
+    animation-play-state: running;
   }
   #copy-button.just-copied::after {
     content: "Copied!";

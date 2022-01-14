@@ -1,15 +1,25 @@
 @layer components {
+  input {
+    @apply py-0 px-1;
+  }
   input,
   select {
     border-radius: 2px;
     box-shadow: var(--validity-shadow, none);
 
-    @apply border border-blue-700;
+    @apply border border-blue-900;
   }
 
   input:invalid,
   select:invalid {
-    --validity-color: rgba(240, 0, 0, 0.8);
+    /* --validity-color: rgba(240, 0, 0, 0.8); */
+    --validity-color: theme("colors.red.600");
+    /* --validity-shadow: 2.8px 2.8px 2.2px rgba(0, 0, 0, 0.02),
+      6.7px 6.7px 5.3px rgba(0, 0, 0, 0.028),
+      12.5px 12.5px 10px rgba(0, 0, 0, 0.035),
+      22.3px 22.3px 17.9px rgba(0, 0, 0, 0.042),
+      41.8px 41.8px 33.4px rgba(0, 0, 0, 0.05),
+      100px 100px 80px rgba(0, 0, 0, 0.07); */
     --validity-shadow: 0 0 5px 1px var(--validity-color);
   }
 

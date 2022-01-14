@@ -1,7 +1,13 @@
-from typing import Tuple, Union
+from __future__ import annotations
+
+from typing import Any, Union
 
 from flask import Response as FlaskResponse
 from werkzeug import Response as WerkzeugResponse
 
-Dimension = Tuple[int, int]
-ResponseType = Union[FlaskResponse, WerkzeugResponse, str]
+Dimension = tuple[int, int]
+Res = Union[FlaskResponse, WerkzeugResponse]
+Hdrs = Union[list[tuple[str, str]], dict[str, Any]]
+ResponseType = Union[
+    Res, dict[str, Any], tuple[Res, int], tuple[Res, Hdrs], tuple[Res, int, Hdrs], str
+]

@@ -1,6 +1,6 @@
 @layer base {
   body {
-    @apply text-base font-serif;
+    @apply text-lg font-serif;
   }
   h1,
   h2,
@@ -28,7 +28,7 @@
     @apply text-xl;
   }
   h6 {
-    @apply text-base font-bold;
+    @apply text-lg font-bold;
   }
   pre,
   code,

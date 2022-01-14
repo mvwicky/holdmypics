@@ -116,7 +116,7 @@ def image_route(
         after_this_request(do_cleanup)
 
     kw = get_send_file_kwargs(path)
-    res: Response = send_file(path, **kw)  # type: ignore
+    res: Response = send_file(path, **kw)
     if args.random_text or RAND_COLOR in {bg_lower, fg_lower}:
         res.headers["Cache-Control"] = NO_CACHE
     if args.random_text:

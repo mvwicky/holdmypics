@@ -1,12 +1,6 @@
-import type { NodeMaybe } from "../types";
-
-export type TagMap = HTMLElementTagNameMap;
-
-function elemIsTag<K extends keyof TagMap>(
+export function elemIsTag<K extends keyof HTMLElementTagNameMap>(
   tag: K,
-  elem: NodeMaybe
-): elem is TagMap[K] {
+  elem: Node | null | undefined
+): elem is HTMLElementTagNameMap[K] {
   return elem?.nodeName?.toUpperCase() === tag.toUpperCase();
 }
-
-export { elemIsTag };

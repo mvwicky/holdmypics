@@ -1,0 +1,11 @@
+{% macro external(href, text) -%}
+<a href="{{ href }}" target="_blank" rel="noreferrer noopener">{{ text }}</a>
+{%- endmacro %}
+
+{% macro option(value, name, selected=false) -%}
+{% if selected %}
+<option selected value="{{ value }}">{{ name }}</option>
+{% else %}
+<option value="{{ value }}">{{ name }}</option>
+{% endif %}
+{%- endmacro %}

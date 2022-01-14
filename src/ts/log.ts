@@ -1,3 +1,5 @@
+declare const PRODUCTION: boolean;
+
 const styles = [
   "border-radius: 0.3em;",
   "font-weight: 700;",
@@ -7,7 +9,7 @@ const styles = [
 ].join(" ");
 
 function makeLogger(): (...args: any[]) => void {
-  const func = PRODUCTION ? console.debug : console.log;
-  return func.bind(console, "%c[holdmypics]", styles);
+  const func = PRODUCTION ? "debug" : "log";
+  return console[func].bind(console, "%c[holdmypics]", styles);
 }
 export const log = makeLogger();

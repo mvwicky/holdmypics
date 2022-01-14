@@ -68,7 +68,6 @@ INDEX_IMG_MAX_HEIGHT: int = env.int(
 
 HASH_IMG_FILE_NAMES: bool = env.bool("HASH_IMG_FILE_NAMES", default=not DEBUG)
 
-
 JPEG_OPTIMIZE: bool = env.bool("JPEG_OPTIMIZE", default=True)
 JPEG_QUALITY: int = env.int("JPEG_QUALITY", default=75, validate=[Range(0, 95)])
 

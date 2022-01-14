@@ -21,10 +21,12 @@ jobs:
     #   redis:
     #     image: redis
     #     options: >-
-    #       --health-cmd "redis cli ping"
+    #       --health-cmd "redis-cli ping"
     #       --health-interval 10s
     #       --health-timeout 5s
     #       --health-retries 5
+    #     ports:
+    #       - "6379:6379"
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -36,9 +38,14 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: "14"
+      - name: Get yarn version
+        id: yarn-version
+        shell: bash
+        run: echo ::set-output name=version::$(yarn --version)
+        if: ${{ !env.ACT }}
       - name: Get full python version
         shell: bash
-        id: full-python-version
+        id: python-version
         # yamllint disable-line rule:line-length
         run: echo ::set-output name=version::$(python -c "import sys; print('-'.join(map(str, sys.version_info)))")
       - name: Install poetry
@@ -49,15 +56,18 @@ jobs:
       - name: Set up cache
         uses: actions/cache@v2
         with:
-          path: .venv
+          path: |
+            .venv
           # yamllint disable-line rule:line-length
-          key: venv-${{ runner.os }}-${{ steps.full-python-version.outputs.version }}-${{ hashFiles('**/poetry.lock') }}
-      - name: Install dependencies
-        run: |
-          $HOME/.local/bin/poetry install --no-interaction --no-dev -E tests
-          yarn install --prod
+          key: venv-${{ runner.os }}-${{ steps.python-version.outputs.version }}-${{ hashFiles('**/poetry.lock') }}
+      - name: Install python dependencies
+        run: $HOME/.local/bin/poetry install --no-interaction --no-dev -E tests
+      - name: Install node dependencies
+        run: yarn install --prod || true
+        if: ${{ !env.ACT }}
       - name: Run pytest
         env:
           TESTS_SKIP_INDEX: "1"
+          REDIS_URL: ""
         run: |
           $HOME/.local/bin/poetry run pytest

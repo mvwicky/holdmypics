@@ -6,9 +6,6 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "isolatedModules": true,
-    "baseUrl": "..",
-    "paths": {
-      "Feather/*": ["node_modules/feather-icons/dist/icons/*"]
-    }
+    "baseUrl": ".."
   }
 }

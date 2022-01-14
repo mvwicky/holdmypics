@@ -1,9 +1,11 @@
 import os
 from datetime import timedelta
 
-from flask import Blueprint, Config
+from flask import Blueprint
 from flask.blueprints import BlueprintSetupState
 from flask_cors import CORS
+
+from ..utils import config_value
 
 cors_kw = {
     "max_age": timedelta(days=1),
@@ -18,10 +20,9 @@ CORS(bp, **cors_kw)
 
 @bp.record
 def api_setup(state: BlueprintSetupState):
-    cfg: Config = state.app.config
-    images_folder: str = cfg["SAVED_IMAGES_CACHE_DIR"]
-    max_size: int = cfg["SAVED_IMAGES_MAX_SIZE"]
-    hash_files: bool = cfg["HASH_IMG_FILE_NAMES"]
+    images_folder: str = config_value("SAVED_IMAGES_CACHE_DIR", app=state.app)
+    max_size: int = config_value("SAVED_IMAGES_MAX_SIZE", app=state.app)
+    hash_files: bool = config_value("HASH_IMG_FILE_NAMES", app=state.app)
     if not os.path.isdir(images_folder):
         os.makedirs(images_folder)
     bp.images_folder = images_folder
@@ -32,9 +33,8 @@ def api_setup(state: BlueprintSetupState):
         from .files import files
 
         files.setup(images_folder, max_size, hash_files)
-        files.find_current()
 
     bp.before_app_first_request(_before_cb)
 
 
-from . import routes  # noqa: F401,E402
+from . import routes  # noqa: F401,E402,I202

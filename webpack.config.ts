@@ -22,10 +22,12 @@ function ifProd<T>(obj: T): T | undefined {
   return prodOr(obj, undefined);
 }
 
-const relToRoot = (...args: string[]) => resolve(__dirname, ...args);
-const relToSrc = (...args: string[]) => relToRoot("src", ...args);
+const rel = {
+  toRoot: (...args: string[]) => resolve(__dirname, ...args),
+  toSrc: (...args: string[]) => resolve(__dirname, "src", ...args),
+} as const;
 
-const outPath = relToRoot("static", "dist");
+const outPath = rel.toRoot("static", "dist");
 
 const mode = prodOr("production", "development");
 const publicPath = "/static/dist/";
@@ -34,7 +36,7 @@ const contenthash = prodOr(".[contenthash]", "");
 const entry = Object.fromEntries(
   Object.entries(config.entry).map(([name, e]) => [name, resolve(e)])
 );
-const templateDir = relToRoot("holdmypics", "core", "templates");
+const templateDir = rel.toRoot("holdmypics", "core", "templates");
 
 const configuration: Configuration = {
   entry,
@@ -45,7 +47,7 @@ const configuration: Configuration = {
     hashFunction: "xxhash64",
     publicPath,
   },
-  devtool: prodOr("source-map", "cheap-module-source-map"),
+  devtool: prodOr("source-map", "source-map"),
   mode,
   plugins: [
     new MiniCssExtractPlugin({
@@ -66,8 +68,8 @@ const configuration: Configuration = {
   module: {
     rules: [
       {
-        test: /\.(ts)$/,
-        include: [relToSrc("ts")],
+        test: /\.ts$/,
+        include: [rel.toSrc("ts")],
         exclude: [/node_modules/],
         use: [
           {
@@ -81,8 +83,8 @@ const configuration: Configuration = {
         ],
       },
       {
-        test: /\.(css)$/,
-        include: [relToSrc("css")],
+        test: /\.css$/,
+        include: [rel.toSrc("css")],
         use: [
           MiniCssExtractPlugin.loader,
           {
@@ -93,12 +95,10 @@ const configuration: Configuration = {
         ],
       },
       {
-        test: /\.(woff2?)$/,
-        include: [relToSrc("css")],
+        test: /\.woff2?$/,
+        include: [rel.toSrc("css")],
         type: "asset/resource",
-        generator: {
-          filename: join("fonts", `[name]${contenthash}[ext]`),
-        },
+        generator: { filename: `fonts/[name]${contenthash}[ext]` },
       },
     ],
   },
@@ -121,14 +121,14 @@ const configuration: Configuration = {
     cachedAssets: true,
     hash: true,
   },
-  recordsPath: relToSrc(`webpack-records-${prodOr("prod", "dev")}.json`),
+  recordsPath: rel.toSrc(`webpack-records-${prodOr("prod", "dev")}.json`),
   cache: {
     type: "filesystem",
     buildDependencies: {
       config: [
         __filename,
-        relToRoot("postcss.config.js"),
-        relToRoot("tailwind.config.js"),
+        rel.toRoot("postcss.config.js"),
+        rel.toRoot("tailwind.config.js"),
       ],
     },
   },
@@ -138,7 +138,8 @@ const configuration: Configuration = {
       "**/node_modules",
       outPath,
       templateDir,
-      relToSrc("webpack-records-*.json"),
+      rel.toSrc("webpack-records-*.json"),
+      rel.toRoot("holdmypics"),
     ],
   },
 };
