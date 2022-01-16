@@ -4,7 +4,7 @@ import logging
 import logging.config
 import sys
 from pathlib import Path
-from typing import Optional
+from typing import Optional, cast
 
 import loguru
 from flask import Flask, Response, request
@@ -26,9 +26,12 @@ class InterceptHandler(logging.Handler):
         except ValueError:
             level = record.levelno
         frame, depth = logging.currentframe(), 2
-        while frame.f_code.co_filename == logging.__file__:
-            frame = frame.f_back
-            depth += 1
+        if frame is not None:
+            while frame.f_code.co_filename == logging.__file__:
+                frame = frame.f_back
+                depth += 1
+                if frame is None:
+                    break
         logger.opt(depth=depth, exception=record.exc_info).log(
             level, record.getMessage()
         )
@@ -54,8 +57,8 @@ def make_file_handler(log_dir: Path, file_name: str, fmt: str, max_size: int) ->
 def config_logging(app: Flask) -> None:
     file_name: str = app.config.get("LOG_FILE_NAME") or app.name
     log_dir: Optional[Path] = app.config.get("LOG_DIR")
-    log_level: str = app.config.get("LOG_LEVEL")
-    max_log_size: int = app.config.get("MAX_LOG_SIZE")
+    log_level = cast(str, app.config.get("LOG_LEVEL"))
+    max_log_size = cast(int, app.config.get("MAX_LOG_SIZE"))
     logging.config.dictConfig(
         {
             "version": 1,
@@ -90,9 +93,9 @@ def log_request(res: Response) -> None:
     path = request.path
     if request.query_string:
         path = "?".join((path, request.query_string.decode()))
-    addrs: str = request.headers.get("X-Forwarded-For", request.remote_addr)
+    addrs: str = request.headers.get("X-Forwarded-For", request.remote_addr or "")
     addr = addrs.split(",")[-1].strip()
-    content_length = res.headers.get("Content-Length", 0, type=int)
+    content_length = res.headers.get("Content-Length", 0, type=int) or 0
     args = [request.method, res.status_code, path, natsize(content_length), addr]
     logger.log(level, "{0:7} {1:3d} {2} content-length={3} addr={4}", *args)
 

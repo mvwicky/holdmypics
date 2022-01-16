@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import os
 import re
+from collections.abc import Callable
 from itertools import chain
 from operator import itemgetter
 from typing import Any, ClassVar, Optional
@@ -19,7 +20,7 @@ FNAME_TBL = str.maketrans({"#": "", " ": "-", ".": "", "/": "-", "\\": "-"})
 
 @attr.s(slots=True, auto_attribs=True, repr=False)
 class GeneratedFiles(object):
-    hash_function: ClassVar[hashlib._Hash] = hashlib.md5
+    hash_function: ClassVar[Callable[..., hashlib._Hash]] = hashlib.md5
     extensions: ClassVar[tuple[str, ...]] = ("png", "webp", "jpg", "jpeg", "gif")
     fmt_re: ClassVar[re.Pattern[str]] = re.compile(
         "\\.({0})$".format("|".join(extensions))
@@ -56,21 +57,21 @@ class GeneratedFiles(object):
     def max_size(self) -> int:
         if self._max_size is None:
             logger.warning("Getting max size property from blueprint")
-            self._max_size = bp.max_size
+            self._max_size = bp.max_size  # type: ignore
         return self._max_size
 
     @property
     def images_folder(self) -> str:
         if self._images_folder is None:
             logger.warning("Getting images folder property from blueprint")
-            self._images_folder = bp.images_folder
+            self._images_folder = bp.images_folder  # type: ignore
         return self._images_folder
 
     @property
     def hash_file_names(self) -> bool:
         if self._hash_file_names is None:
             logger.warning("Getting hash file names property from blueprint")
-            self._hash_file_names = bp.hash_file_names
+            self._hash_file_names = bp.hash_file_names  # type: ignore
         return self._hash_file_names
 
     @property
@@ -96,9 +97,8 @@ class GeneratedFiles(object):
         *extra: Any,
     ) -> str:
         if getattr(args, "text", None):
-            args = attr.evolve(args, text=self.hash_strings(args.text))
-        args = args.to_seq()
-        params = chain(["x".join(map(str, size)), bg, fg, fmt], args, extra)
+            args = attr.evolve(args, text=self.hash_strings(args.text))  # type: ignore
+        params = chain(["x".join(map(str, size)), bg, fg, fmt], args.to_seq(), extra)
         base_name: str
         if not self.hash_file_names:
             base_name = "-".join(map(str, params)).translate(FNAME_TBL)
@@ -109,7 +109,7 @@ class GeneratedFiles(object):
         self.files.add(path)
         return path
 
-    def collect_for_cleaning(self) -> list[tuple[str, int, int]]:
+    def collect_for_cleaning(self) -> list[tuple[str, int, float]]:
         images_folder = self.images_folder
         files = (os.path.join(images_folder, f) for f in os.listdir(images_folder))
         files = (

@@ -25,9 +25,9 @@ def api_setup(state: BlueprintSetupState):
     hash_files: bool = config_value("HASH_IMG_FILE_NAMES", app=state.app)
     if not os.path.isdir(images_folder):
         os.makedirs(images_folder)
-    bp.images_folder = images_folder
-    bp.max_size = max_size
-    bp.hash_file_names = hash_files
+    bp.images_folder = images_folder  # type: ignore
+    bp.max_size = max_size  # type: ignore
+    bp.hash_file_names = hash_files  # type: ignore
 
     def _before_cb():
         from .files import files

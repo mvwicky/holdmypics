@@ -10,7 +10,7 @@ bg_color_default: dict[str, str] = {"bg_color": "000"}
 fmt_default: dict[str, str] = {"fmt": "png"}
 all_defaults: dict[str, str] = {**fg_color_default, **bg_color_default, **fmt_default}
 
-IMG_FORMATS: tuple[str] = ("jpg", "jpeg", "gif", "png", "webp")
+IMG_FORMATS = ("jpg", "jpeg", "gif", "png", "webp")
 IMG_FORMATS_STR = ",".join(IMG_FORMATS)
 
 DEFAULT_FONT = "overpass"

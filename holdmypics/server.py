@@ -9,18 +9,18 @@ from subprocess import Popen, TimeoutExpired
 from typing import Any
 
 import attr
-from flask import Blueprint, Flask
+from flask import Flask
 from loguru import logger
 
 from .utils import config_value
 
-WAIT = 30
 WEB_PROC_RE = re.compile(r"^web: (?P<cmd>.+)$")
 
 
 @attr.s(slots=True, auto_attribs=True)
 class Server(object):
     app: Flask
+    wait: float
     start_server: bool = True
     start_yarn: bool = True
 
@@ -39,7 +39,7 @@ class Server(object):
         self.procs[name] = Popen(args, **kwargs)
 
     def _start_server(self) -> None:
-        procfile: Path = config_value("BASE_PATH", app=self.app) / "Procfile"
+        procfile = config_value("BASE_PATH", app=self.app, cast_as=Path) / "Procfile"
         if not procfile.is_file():
             raise RuntimeError("Unable to find Procfile")
         lines = procfile.read_text().splitlines()
@@ -53,14 +53,15 @@ class Server(object):
         self._start_proc("dev_server", cmd)
 
     def _start_yarn(self) -> None:
-        bp: Blueprint = self.app.blueprints.get("core")
-        base_out = Path(bp.root_path) / bp.template_folder / "base-out.html"
+        bp = self.app.blueprints.get("core")
+        assert bp is not None
+        out = Path(bp.root_path) / bp.template_folder / "base-out.html"  # type: ignore
         start_mtime = 0
-        if base_out.is_file():
-            base_out.unlink()
+        if out.is_file():
+            out.unlink()
         env = {**os.environ, "NODE_ENV": "development", "TAILWIND_MODE": "build"}
         self._start_proc("yarn", ["yarn", "watch"], env=env)
-        self._wait_for_yarn(base_out, start_mtime)
+        self._wait_for_yarn(out, start_mtime)
 
     def _wait_for_yarn(self, base_tpl: Path, start_mtime: float):
         start = time.perf_counter()
@@ -70,7 +71,7 @@ class Server(object):
                     logger.debug("File changed.")
                     break
                 time.sleep(0.1)
-            if time.perf_counter() - start > WAIT:
+            if time.perf_counter() - start > self.wait:
                 logger.warning("Waited too long.")
                 break
         logger.info("Done waiting for yarn.")
@@ -99,11 +100,11 @@ class Server(object):
             logger.info("Terminating {0}", name)
             proc.terminate()
             try:
-                proc.wait(WAIT)
+                proc.wait(self.wait)
             except TimeoutExpired:
                 logger.warning("Killing {0}", name)
                 proc.kill()
                 try:
-                    proc.wait(WAIT)
+                    proc.wait(self.wait)
                 except TimeoutExpired:
                     logger.error("Unable to kill {0}", name)

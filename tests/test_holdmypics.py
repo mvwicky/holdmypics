@@ -3,12 +3,13 @@ from __future__ import annotations
 import imghdr
 import io
 import os
+import re
 from types import ModuleType
-from typing import Optional
+from typing import Optional, Union
 from urllib.parse import urlencode
 
 import pytest
-from flask import Flask, Response
+from flask import Flask
 from flask.testing import FlaskClient
 from hypothesis import example, given, strategies as st
 from loguru import logger
@@ -20,7 +21,7 @@ from holdmypics.api.img import GeneratedImage
 from holdmypics.converters import COLOR_REGEX
 
 try:
-    import pytesseract
+    import pytesseract  # type: ignore
 except ImportError:
     pytesseract = None
 
@@ -29,7 +30,7 @@ IMG_FORMATS = ("png", "webp", "jpeg", "gif")
 
 dim_strategy = st.integers(min_value=128, max_value=8192)
 size_strategy = st.tuples(dim_strategy, dim_strategy)
-color_strategy = st.from_regex(COLOR_REGEX, fullmatch=True)
+color_strategy = st.from_regex(re.compile(COLOR_REGEX), fullmatch=True)
 opt_color_strategy = st.one_of(st.none(), color_strategy)
 fmt_strategy = st.sampled_from(IMG_FORMATS)
 text_strategy = st.one_of(st.none(), st.text(max_size=255))
@@ -56,7 +57,7 @@ def test_index(client: FlaskClient):
 
 
 def test_favicon(client: FlaskClient):
-    res: Response = client.get("/favicon.ico")
+    res = client.get("/favicon.ico")
     assert res.status_code == 200
     assert res.content_type in ("image/x-icon", "image/vnd.microsoft.icon")
 
@@ -81,7 +82,7 @@ def test_create_images_using_function(
     image_format: str,
     fg_color: str,
     bg_color: str,
-    args: dict,
+    args: dict[str, Union[str, int, None]],
 ):
     app = create_app(config)
     with app.test_request_context():
@@ -108,14 +109,13 @@ def test_create_images_using_client(
     image_format: str,
     fg_color: Optional[str],
     bg_color: Optional[str],
-    args: dict,
+    args: dict[str, Union[str, int, None]],
 ):
     app = create_app(config)
     with app.test_client() as client:
-        query = args and urlencode({k: v for (k, v) in args.items() if v})
         url = make_route(size, bg_color, fg_color, image_format)
-        if query:
-            url = "?".join((url, query))
+        if args:
+            url = "?".join((url, urlencode({k: v for (k, v) in args.items() if v})))
         res = client.get(url, follow_redirects=False)
         assert res.status_code == 200
         img_type = imghdr.what("filename", h=res.data)
@@ -124,13 +124,32 @@ def test_create_images_using_client(
         assert im.size == size
 
 
+def test_timing_header(client: FlaskClient):
+    path = make_route((638, 328), "cef", "555", "png")
+    res = client.get(path, follow_redirects=False)
+    assert res.status_code == 200
+    proc_time = res.headers.get("X-Processing-Time", 0, float)
+    assert proc_time is not None
+
+
+def test_random_text_header(client: FlaskClient):
+    path = make_route((638, 328), "cef", "555", "png")
+    args = {"dpi": None, "random_text": True}
+    query = urlencode({k: v for (k, v) in args.items() if v})
+    url = "?".join((path, query))
+    res = client.get(url, follow_redirects=False)
+    assert res.status_code == 200
+    assert "X-Random-Text" in res.headers
+
+
 @pytest.mark.skipif(pytesseract is None, reason="pytesseract not installed")
-def test_random_text(client: FlaskClient):
+def test_random_text_ocr(client: FlaskClient):
+    assert pytesseract is not None
     path = make_route((638, 328), "cef", "555", "png")
     args = {"text": "Some Random Text", "dpi": None, "random_text": True}
     query = urlencode({k: v for (k, v) in args.items() if v})
     url = "?".join((path, query))
-    res: Response = client.get(url, follow_redirects=False)
+    res = client.get(url, follow_redirects=False)
     assert res.status_code == 200
     img_type = imghdr.what("filename", h=res.data)
     assert img_type == "png"
@@ -148,7 +167,7 @@ def test_forwarding_headers(client: FlaskClient):
     query = urlencode(args)
     url = "?".join((path, query))
     forwarded = "123.45.4.2,123.45.4.2"
-    res: Response = client.get(url, headers=[("X-Forwarded-For", forwarded)])
+    res = client.get(url, headers=[("X-Forwarded-For", forwarded)])
     was_forwarded = res.headers.get("X-Was-Forwarded-For", None)
     assert was_forwarded == forwarded
 

@@ -4,9 +4,9 @@ import time
 from functools import lru_cache, partial
 from importlib.metadata import version
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Optional, Union, cast
 
-from flask import Flask, Response, request, send_from_directory
+from flask import Flask, Response, g, request, send_from_directory
 from loguru import logger
 from whitenoise import WhiteNoise
 
@@ -21,6 +21,8 @@ if TYPE_CHECKING:
 redisw = WrappedRedis()
 
 HERE: Path = Path(__file__).resolve().parent
+
+REQUEST_TIMER = time.perf_counter
 
 CACHE_CONTROL_MAX = "max-age=315360000, public, immutable"
 PY_VERSION = ".".join(map(str, sys.version_info[:3]))
@@ -75,7 +77,7 @@ def configure_hsts(app: Flask):
 
 
 def before_request_callback():
-    request.start_time = time.monotonic()
+    g.start_time = REQUEST_TIMER()
 
 
 def after_request_callback(
@@ -98,8 +100,10 @@ def after_request_callback(
         res.headers["X-Was-Forwarded-For"] = forwarded
     res.headers["X-Powered-By"] = get_powered_by(False)
     res.headers["X-Version"] = version
-    elapsed = time.monotonic() - request.start_time
-    res.headers["X-Processing-Time"] = elapsed
+    start_time = g.pop("start_time", None)
+    if start_time is not None:
+        elapsed = REQUEST_TIMER() - start_time
+        res.headers["X-Processing-Time"] = elapsed
     return res
 
 
@@ -115,7 +119,8 @@ def create_app(cfg: Union[str, "ModuleType"] = "config") -> Holdmypics:
     HSTS_HEADER = configure_hsts(app)
 
     app.url_map.redirect_defaults = False
-    app.url_map.converters.update({"dim": DimensionConverter, "col": ColorConverter})
+    converters = {"dim": DimensionConverter, "col": ColorConverter}
+    app.url_map.converters.update(converters)
 
     redisw.init_app(app)
 
@@ -126,9 +131,9 @@ def create_app(cfg: Union[str, "ModuleType"] = "config") -> Holdmypics:
     app.register_blueprint(api.bp, url_prefix="/api")
     cli.register(app)
 
-    base_path = app.config.get("BASE_PATH")
+    base_path = cast(Path, app.config.get("BASE_PATH"))
 
-    debug = app.config.get("DEBUG")
+    debug: bool = cast(bool, app.config.get("DEBUG"))
     app.wsgi_app = WhiteNoise(
         app.wsgi_app,
         autorefresh=True,

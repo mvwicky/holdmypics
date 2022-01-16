@@ -3,12 +3,12 @@ from __future__ import annotations
 from collections.abc import Sequence
 from functools import partial
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 
 import attr
 from flask import current_app
 from loguru import logger
-from PIL.ImageFont import ImageFont, truetype
+from PIL.ImageFont import FreeTypeFont, ImageFont, truetype
 
 none_attr = partial(attr.ib, default=None, init=False, repr=False)
 
@@ -22,13 +22,15 @@ class Font(object):
     file: Path = attr.ib(converter=Path)
     font_sizes: set[int] = attr.ib(converter=set)
 
-    _sizes: dict[int, ImageFont] = attr.ib(factory=dict, init=False)
+    _sizes: dict[int, Union[ImageFont, FreeTypeFont]] = attr.ib(
+        factory=dict, init=False
+    )
 
     def load(self, sizes: Sequence[int]):
         for size in sizes:
             self[size]
 
-    def __getitem__(self, size: int) -> ImageFont:
+    def __getitem__(self, size: int) -> Union[ImageFont, FreeTypeFont]:
         if size not in self._sizes:
             self._sizes[size] = truetype(str(self.file), size=size)
         return self._sizes[size]
@@ -93,7 +95,7 @@ class Fonts(object):
             font_file = self.font_files.get(key)
             if font_file is not None:
                 logger.debug("Loading font {0}", key)
-                self._fonts[key] = Font(font_file, self.font_sizes)
+                self._fonts[key] = Font(font_file, set(self.font_sizes))
             else:
                 raise UnknownFont(key)
         return self._fonts[key]

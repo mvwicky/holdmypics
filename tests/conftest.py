@@ -1,4 +1,5 @@
 import os
+from collections.abc import Iterable
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -92,6 +93,6 @@ def app(config) -> "Holdmypics":
 
 
 @pytest.fixture()
-def client(app: "Holdmypics") -> "FlaskClient":
+def client(app: "Holdmypics") -> Iterable["FlaskClient"]:
     with app.test_client() as client:
         yield client

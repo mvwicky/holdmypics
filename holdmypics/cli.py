@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from collections.abc import Callable
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import click
 import semver
@@ -20,7 +20,7 @@ SEMVER_BUMPS: dict[str, Callable[[VersionInfo], Any]] = {
 
 
 def register(app: Flask):
-    cfg_path = app.config.get("BASE_PATH") / "config"
+    cfg_path = cast(Path, app.config.get("BASE_PATH")) / "config"
 
     @app.cli.command(context_settings=CTX_SETTINGS)
     @click.option(
@@ -119,11 +119,12 @@ def register(app: Flask):
     @app.cli.command(context_settings=CTX_SETTINGS)
     @click.option("--serve/--no-serve", default=True, help="Start the server.")
     @click.option("--yarn/--no-yarn", default=True, help="Start yarn")
-    def serve(serve: bool, yarn: bool):
+    @click.option("--wait-time", "wait", default=30, type=click.FLOAT, hidden=True)
+    def serve(serve: bool, yarn: bool, wait: float):
         """Run dev server and build client bundles."""
         from .server import Server
 
-        server = Server(app, start_server=serve, start_yarn=yarn)
+        server = Server(app, wait, start_server=serve, start_yarn=yarn)
         server.start()
         server.loop()
 
@@ -143,7 +144,7 @@ def register(app: Flask):
     @click.option(
         "--prod-output",
         "-p",
-        type=click.Path(),
+        type=click.Path(path_type=Path, file_okay=False),
         default=cfg_path / "prod",
         help="The location of the production Dockerfile",
     )
@@ -169,9 +170,9 @@ def register(app: Flask):
         help="The exposed port in the resulting container.",
     )
     def dockerfiles(
-        template: str,
-        dev_output: str,
-        prod_output: str,
+        template: Path,
+        dev_output: Path,
+        prod_output: Path,
         dry_run: bool,
         verbose: int,
         yes: bool,

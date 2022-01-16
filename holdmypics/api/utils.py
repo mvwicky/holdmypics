@@ -3,16 +3,16 @@ from __future__ import annotations
 import functools
 import random
 from string import hexdigits
-from typing import NamedTuple
+from typing import NamedTuple, Union
 
 from loguru import logger
-from PIL.ImageFont import ImageFont
+from PIL.ImageFont import FreeTypeFont, ImageFont
 
 from ..constants import PX_PER_PT
 
 
 class FontParams(NamedTuple):
-    font: ImageFont
+    font: Union[ImageFont, FreeTypeFont]
     size: tuple[int, int]
 
 

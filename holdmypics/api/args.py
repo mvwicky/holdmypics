@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from typing import Any, Optional
+from typing import Any, Optional, cast
 
 import attr
 import marshmallow as ma
@@ -14,7 +14,6 @@ from ..converters import ColorConverter
 from .utils import resolve_color
 from .words import words
 
-# truthy = set()
 truthy = ma.fields.Boolean.truthy.union({""})
 
 
@@ -58,10 +57,10 @@ class ImageArgs(BaseImageArgs):
 
     @classmethod
     def from_request(
-        cls: type["ImageArgs"], args: Optional[Mapping[str, Any]] = None
+        cls: type["ImageArgs"], kwargs: Optional[Mapping[str, Any]] = None
     ) -> "ImageArgs":
         args = parser.parse(ImageArgsSchema(), request, location="query")
-        return args.real_args()
+        return cast(ImageArgs, args).real_args()
 
     def real_args(self) -> "ImageArgs":
         if not self.random_text:
@@ -97,7 +96,8 @@ class TiledImageArgs(BaseImageArgs):
 
     @classmethod
     def from_request(cls: type["TiledImageArgs"]) -> "TiledImageArgs":
-        return parser.parse(TiledImageArgsSchema(), request, location="query")
+        args = parser.parse(TiledImageArgsSchema(), request, location="query")
+        return cast(TiledImageArgs, args)
 
     def to_seq(self) -> tuple[Any, ...]:
         return attr.astuple(attr.evolve(self, colors="-".join(self.colors)))

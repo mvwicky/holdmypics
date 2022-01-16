@@ -3,7 +3,7 @@ from __future__ import annotations
 import mimetypes
 import random
 from collections.abc import Callable
-from typing import Any
+from typing import Any, cast
 from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 
 from flask import (
@@ -18,7 +18,7 @@ from flask import (
 from loguru import logger
 from PIL import features
 
-from .._types import ResponseType
+from .._types import Res, ResponseType
 from ..constants import IMG_FORMATS, IMG_FORMATS_STR, NO_CACHE
 from ..fonts import fonts
 from ..utils import get_count, make_rules
@@ -49,7 +49,7 @@ def make_route(prefix: str = "") -> Callable:
     return func
 
 
-def do_cleanup(res: ResponseType) -> ResponseType:
+def do_cleanup(res: Response) -> Response:
     n = files.clean()
     if n > 0:
         logger.info("Removed {0} file{1}", n, "" if n == 1 else "s")
@@ -116,10 +116,10 @@ def image_route(
         after_this_request(do_cleanup)
 
     kw = get_send_file_kwargs(path)
-    res: Response = send_file(path, **kw)
+    res = send_file(path, **kw)
     if args.random_text or RAND_COLOR in {bg_lower, fg_lower}:
         res.headers["Cache-Control"] = NO_CACHE
-    if args.random_text:
+    if args.random_text and args.text:
         res.headers["X-Random-Text"] = args.text
 
     return res
@@ -128,14 +128,14 @@ def image_route(
 @make_route(prefix="anim")
 def anim_route(
     size: tuple[int, int], bg_color: str, fg_color: str, fmt: str
-) -> Response:
+) -> ResponseType:
     check_size(size)
     if fmt not in ANIM_FMTS:
         abort(400)
     anim = make_anim(size, bg_color, fg_color, fmt)
     print(len(anim.getvalue()))
 
-    return send_file(anim, mimetype=f"image/{fmt}")
+    return cast(Res, send_file(anim, mimetype=f"image/{fmt}"))
 
 
 @bp.route("/text")
@@ -144,7 +144,7 @@ def text_route() -> str:
 
 
 @bp.route(f"/tiled/<dim:size>/<int:cols>/<int:rows>/<any({IMG_FORMATS_STR}):fmt>/")
-def tiled_route(size: tuple[int, int], cols: int, rows: int, fmt: str) -> str:
+def tiled_route(size: tuple[int, int], cols: int, rows: int, fmt: str) -> ResponseType:
     check_size(size)
     fmt = check_format(fmt)
     args = TiledImageArgs.from_request()
@@ -154,6 +154,7 @@ def tiled_route(size: tuple[int, int], cols: int, rows: int, fmt: str) -> str:
         after_this_request(do_cleanup)
 
     kw = get_send_file_kwargs(path)
-    res: Response = send_file(path, **kw)  # type: ignore
+    res = send_file(path, **kw)
     res.headers["Cache-Control"] = NO_CACHE
-    return res
+
+    return cast(Res, res)

@@ -24,7 +24,7 @@ class GeneratedTiledImage(BaseGeneratedImage[TiledImageArgs]):
 
     def make(self) -> Image.Image:
         base = Image.new(self.mode, self.size, self.bg_color)
-        draw_im = Image.new(base.mode, base.size, (255, 255, 255, 0))
+        draw_im = Image.new(self.mode, base.size, (255, 255, 255, 0))
         d = ImageDraw.Draw(draw_im)
         width, height = self.size
         t_width = math.ceil(width / self.cols)

@@ -1,8 +1,11 @@
 import hashlib
 import os
+from pathlib import Path
+from typing import Optional
 
-from .constants import HERE
 from .utils import get_debug
+
+HERE = Path(__file__).parent.parent
 
 
 class HashedFile(object):
@@ -17,11 +20,11 @@ class HashedFile(object):
     static_dir = HERE / "static"
 
     def __init__(self, file_name: str, strip_newlines: bool = True):
-        self._orig_file = self.static_dir / file_name
-        self.strip_newlines = strip_newlines
-        self._last_mtime = 0
-        self._output_file = None
-        self._out_dir = self._orig_file.parent / "dist"
+        self._orig_file: Path = self.static_dir / file_name
+        self.strip_newlines: bool = strip_newlines
+        self._last_mtime: float = 0
+        self._output_file: Optional[Path] = None
+        self._out_dir: Path = self._orig_file.parent / "dist"
         self._out_dir.mkdir(exist_ok=True)
 
     @property
@@ -35,7 +38,7 @@ class HashedFile(object):
         if not get_debug():
             return False
         mtime = os.path.getmtime(self._orig_file)
-        if mtime > self._last_mtime:
+        if mtime > self._last_mtime and self._output_file:
             self._last_mtime = mtime
             self._output_file.unlink()
             self._output_file = None

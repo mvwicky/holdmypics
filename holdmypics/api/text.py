@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+from typing import Union
+
 from loguru import logger
 from PIL import Image, ImageDraw
-from PIL.ImageFont import ImageFont
+from PIL.ImageFont import FreeTypeFont, ImageFont
 
 from ..fonts import fonts
 from .utils import FontParams, TextArgs, px_to_pt
@@ -11,7 +13,9 @@ MAX_TEXT_HEIGHT = 0.9
 MAX_TEXT_WIDTH = 0.9
 
 
-def guess_font_size(size: tuple[int, int], font_name: str) -> tuple[ImageFont, int]:
+def guess_font_size(
+    size: tuple[int, int], font_name: str
+) -> tuple[Union[ImageFont, FreeTypeFont], int]:
     """Try and figure out the correct font size for a given height and font.
 
     Args:
@@ -52,11 +56,13 @@ def guess_font_size(size: tuple[int, int], font_name: str) -> tuple[ImageFont, i
         if last < pt_height < sz:
             logger.debug("Returning {0} with size {1} ({2})", font_name, sz, i)
             return font[sz], i
+    i = len(fonts.font_sizes) - 1
+    sz = fonts.font_sizes[-1]
     logger.debug("Returning {0} with size {1} ({2})", font_name, sz, i)
     return font[sz], i
 
 
-def get_font(d: ImageDraw.Draw, sz: tuple[int, int], args: TextArgs) -> FontParams:
+def get_font(d: ImageDraw.ImageDraw, sz: tuple[int, int], args: TextArgs) -> FontParams:
     """Get the correctly sized font for the given image size and text.
 
     Args:
@@ -86,6 +92,6 @@ def draw_text(im: Image.Image, args: TextArgs) -> Image.Image:
     d.text(tc, args.text, font=font, fill=args.color, align="center", anchor=anchor)
     if args.debug:
         d.rectangle(
-            [tc, (int((w + tw) / 2), int((h + th) / 2))], outline="#000", width=3
+            (tc, (int((w + tw) / 2), int((h + th) / 2))), outline="#000", width=3
         )
     return im

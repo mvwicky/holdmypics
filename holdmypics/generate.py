@@ -25,7 +25,7 @@ def diff_contents(a: str, b: str) -> SequenceMatcher:
 
 @attr.s(slots=True, auto_attribs=True)
 class Generator(object):
-    common_context: ClassVar[dict[str, str]] = {"python_version": sys.version_info[:3]}
+    common_context: ClassVar[dict[str, Any]] = {"python_version": sys.version_info[:3]}
 
     template_file: Path = attr.ib(converter=Path)
     dev_dir: Path = attr.ib(converter=Path)

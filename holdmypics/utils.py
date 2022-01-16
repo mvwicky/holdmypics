@@ -4,7 +4,7 @@ import math
 import os
 from collections.abc import Callable
 from functools import lru_cache
-from typing import Any, Optional, TypeVar, Union
+from typing import Any, Optional, TypeVar, Union, cast
 
 from flask import Flask, current_app
 from loguru import logger
@@ -42,16 +42,16 @@ def config_value(
     name: str,
     default: Union[_T, Unset] = UNSET,
     app: Optional[Flask] = None,
-    cast: Optional[Callable[[Any], _T]] = None,
+    cast_as: Optional[Callable[[Any], _T]] = None,
 ) -> _T:
     app = app if app is not None else current_app
     value = app.config.get(name, default)
     if value is UNSET:
         raise ImproperlyConfigured("Unknown setting {0}".format(name))
-    if cast is not None:
-        value = cast(value)
+    if cast_as is not None:
+        value = cast_as(value)
     logger.debug("Got config value. [key={0} value={1}]", name, value)
-    return value
+    return cast(Any, value)
 
 
 def get_debug() -> bool:

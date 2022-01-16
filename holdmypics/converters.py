@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from werkzeug.routing import BaseConverter, ValidationError
+from werkzeug.routing import BaseConverter, Map, UnicodeConverter, ValidationError
 
 from .constants import RAND_COLOR
 
@@ -30,8 +30,11 @@ class DimensionConverter(BaseConverter):
         return "x".join(super(DimensionConverter, self).to_url(p) for p in parts)
 
 
-class ColorConverter(BaseConverter):
+class ColorConverter(UnicodeConverter):
     regex = f"(?:{COLOR_REGEX}|{RAND_REGEX})"
+
+    def __init__(self, map: "Map", *args: Any, **kwargs: Any) -> None:
+        super().__init__(map, 3, 8, None)
 
     def to_python(self, value: str) -> str:
         return value

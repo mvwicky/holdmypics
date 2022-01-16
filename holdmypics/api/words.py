@@ -32,7 +32,7 @@ class Words(object):
     @property
     def word_file(self) -> Path:
         if self._word_file is None:
-            base: Path = config_value("BASE_PATH", None)
+            base: Path = config_value("BASE_PATH")
             self._word_file = base.joinpath(*word_path_parts)
             if not self._word_file.is_file():
                 download_words(self._word_file)

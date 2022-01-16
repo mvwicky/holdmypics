@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 from collections.abc import Callable
-from typing import Any, ClassVar, Generic, TypeVar
+from typing import Any, ClassVar, Generic, Literal, TypeVar
 
 import attr
 from loguru import logger
@@ -19,7 +19,7 @@ _A = TypeVar("_A", bound=BaseImageArgs)
 
 def _jpeg_opt_kw(args: BaseImageArgs) -> dict[str, Any]:
     return {
-        "optimize": config_value("JPEG_OPTIMIZE", cast=bool),
+        "optimize": config_value("JPEG_OPTIMIZE", cast_as=bool),
         "quality": config_value("JPEG_QUALITY", 75),
         "dpi": (args.dpi, args.dpi),
     }
@@ -27,7 +27,7 @@ def _jpeg_opt_kw(args: BaseImageArgs) -> dict[str, Any]:
 
 def _png_opt_kw(args: BaseImageArgs) -> dict[str, Any]:
     return {
-        "optmize": config_value("PNG_OPTIMIZE", True, cast=bool),
+        "optmize": config_value("PNG_OPTIMIZE", True, cast_as=bool),
         "dpi": (args.dpi, args.dpi),
         "compress_level": config_value("PNG_COMPRESS_LEVEL", 6),
     }
@@ -37,12 +37,12 @@ def _webp_opt_kw(args: BaseImageArgs) -> dict[str, Any]:
     return {
         "quality": config_value("WEBP_QUALITY"),
         "method": config_value("WEBP_METHOD"),
-        "lossless": config_value("WEBP_LOSSLESS", cast=bool),
+        "lossless": config_value("WEBP_LOSSLESS", cast_as=bool),
     }
 
 
 def _gif_opt_kw(args: BaseImageArgs) -> dict[str, Any]:
-    return {"optmize": config_value("GIF_OPTIMIZE", cast=bool)}
+    return {"optmize": config_value("GIF_OPTIMIZE", cast_as=bool)}
 
 
 SAVE_KW: dict[str, Callable[[BaseImageArgs], dict[str, Any]]] = {
@@ -55,7 +55,7 @@ SAVE_KW: dict[str, Callable[[BaseImageArgs], dict[str, Any]]] = {
 
 @attr.s(slots=True, auto_attribs=True)
 class BaseGeneratedImage(Generic[_A]):
-    mode: ClassVar[str] = "RGBA"
+    mode: ClassVar[Literal["RGBA"]] = "RGBA"
 
     size: tuple[int, int]
     fmt: str = attr.ib(converter=normalize_fmt)

@@ -6,7 +6,8 @@ from collections.abc import Iterable
 from typing import Any
 from urllib.parse import urlencode
 
-from flask import Markup, current_app, render_template, request, url_for
+from flask import current_app, render_template, request, url_for
+from markupsafe import Markup
 from werkzeug.routing import Map, Rule
 
 from .._types import ResponseType
@@ -64,9 +65,6 @@ def get_context() -> dict[str, Any]:
         "font": {"value": font, "options": font_names, "label": "Font"},
     }
 
-    ofl_license = url_for("static", filename="licenses/ofl.txt")
-    apache_license = url_for("static", filename="licenses/apache.txt")
-
     return {
         "rules": get_rules(),
         "img_url": img_url,
@@ -87,8 +85,6 @@ def get_context() -> dict[str, Any]:
         "sel_fields": sel_fields,
         "title": "Hold My Pics",
         "img_dim": (width, height),
-        "ofl_license": ofl_license,
-        "apache_license": apache_license,
         "max_width": max_width,
         "max_height": max_height,
     }
@@ -107,7 +103,16 @@ def index() -> ResponseType:
 
 @bp.route("/tiled/")
 def tiled() -> ResponseType:
-    return render_template("tiled.jinja", title="Tiled Images")
+    get_context.cache_clear()
+    context = {
+        **get_context(),
+        "count": f"{get_count():,}",
+        "title": "Tiled",
+        "img_url": url_for(
+            "api.tiled_route", size=(638, 328), cols=10, rows=8, fmt="png"
+        ),
+    }
+    return render_template("tiled.jinja", **context)
 
 
 @bp.route("/robots.txt")
