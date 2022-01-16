@@ -77,7 +77,7 @@ const configuration: Configuration = {
             options: {
               loader: "ts",
               target: "es2015",
-              tsconfigRaw: require("./src/tsconfig.json"),
+              tsconfigRaw: require("./src/ts/tsconfig.json"),
             },
           },
         ],

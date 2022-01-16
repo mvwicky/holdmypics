@@ -47,8 +47,7 @@ class Package(object):
         return self._lock_file
 
     def req_file(self, dev: bool) -> Path:
-        name = "".join(["requirements", "-dev" if dev else "", ".txt"])
-        return self.root_dir / name
+        return self.root_dir / f"requirements-{'-dev' if dev else '.txt'}"
 
     def sh(self, args: Sequence[str], **kwargs: Any) -> CompletedProcess:
         kwargs = {"cwd": self.root_dir, **kwargs}

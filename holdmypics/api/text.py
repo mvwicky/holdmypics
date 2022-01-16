@@ -13,6 +13,10 @@ MAX_TEXT_HEIGHT = 0.9
 MAX_TEXT_WIDTH = 0.9
 
 
+def _log_font(font_name: str, pt: int, idx: int):
+    logger.opt(depth=1).debug("Returning {0} with size {1} ({2})", font_name, pt, idx)
+
+
 def guess_font_size(
     size: tuple[int, int], font_name: str
 ) -> tuple[Union[ImageFont, FreeTypeFont], int]:
@@ -33,32 +37,27 @@ def guess_font_size(
     if pt_height in font:
         # If this point value is an actual font size, return it.
         idx = fonts.font_sizes.index(pt_height)
-        logger.debug("Returning {0} with size {1} ({2})", font_name, pt_height, idx)
+        _log_font(font_name, pt_height, idx)
         return font[pt_height], idx
     s_mod = pt_height - (pt_height % 4)
     if s_mod in font:
         idx = fonts.font_sizes.index(s_mod)
-        logger.debug("Returning {0} with size {1} ({2})", font_name, s_mod, idx)
+        _log_font(font_name, s_mod, idx)
         return font[s_mod], idx
     if pt_height > fonts.max_size:
-        logger.debug(
-            "Returning {0} with size {1} ({2})",
-            font_name,
-            fonts.max_size,
-            len(fonts.font_sizes) - 1,
-        )
+        _log_font(font_name, fonts.max_size, len(fonts.font_sizes) - 1)
         return font[fonts.max_size], len(fonts.font_sizes) - 1
     elif pt_height < fonts.min_size:
-        logger.debug("Returning {0} with size {1} (0)", font_name, fonts.min_size)
+        _log_font(font_name, fonts.min_size, 0)
         return font[fonts.min_size], 0
     last = fonts.font_sizes[0]
     for i, sz in enumerate(fonts.font_sizes[1:]):
         if last < pt_height < sz:
-            logger.debug("Returning {0} with size {1} ({2})", font_name, sz, i)
+            _log_font(font_name, sz, i)
             return font[sz], i
     i = len(fonts.font_sizes) - 1
     sz = fonts.font_sizes[-1]
-    logger.debug("Returning {0} with size {1} ({2})", font_name, sz, i)
+    _log_font(font_name, sz, i)
     return font[sz], i
 
 

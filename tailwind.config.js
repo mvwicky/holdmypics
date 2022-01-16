@@ -39,10 +39,14 @@ function ms(n) {
 }
 
 module.exports = {
-  content: [
-    "./holdmypics/**/*.{jinja,html}",
-    "./config/safelist.txt",
-    "./src/index.ejs",
+  content: ["./holdmypics/**/*.{jinja,html}", "./src/index.ejs"],
+  safelist: [
+    "just-copied",
+    "feather",
+    "feather-check",
+    "feather-copy",
+    "never-underline",
+    "wrapper",
   ],
   theme: {
     extend: {},

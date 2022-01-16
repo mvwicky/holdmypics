@@ -61,7 +61,7 @@
       "webpack": { "config": "./webpack.config.ts" },
       "typescript": {
         "alwaysTryTypes": true,
-        "project": ["src/tsconfig.json", "tsconfig.json"]
+        "project": ["src/ts/tsconfig.json", "tsconfig.json"]
       }
     }
   },

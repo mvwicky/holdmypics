@@ -4,8 +4,6 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
-@import "sanitize.css/forms.css";
-
 @import "./base/base.css";
 
 @import "./theme/theme.css";

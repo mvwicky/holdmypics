@@ -4,7 +4,7 @@ import logging
 import logging.config
 import sys
 from pathlib import Path
-from typing import Optional, cast
+from typing import Optional, Union, cast
 
 import loguru
 from flask import Flask, Response, request
@@ -41,12 +41,14 @@ def file_filter(record: loguru.Record) -> bool:
     return "log_request" not in record["function"]
 
 
-def make_file_handler(log_dir: Path, file_name: str, fmt: str, max_size: int) -> dict:
+def make_file_handler(
+    log_dir: Path, file_name: str, fmt: str, max_size: int, level: Union[str, int]
+) -> dict:
     log_file = log_dir.joinpath(file_name).with_suffix(".log")
     return {
         "sink": log_file,
         "rotation": max_size,
-        "level": "TRACE",
+        "level": level,
         "compression": "tar.gz",
         "retention": 5,
         "filter": file_filter,
@@ -83,7 +85,9 @@ def config_logging(app: Flask) -> None:
     if log_dir is not None:
         log_dir = Path(log_dir).resolve()
         if log_dir.is_dir():
-            handlers.append(make_file_handler(log_dir, file_name, fmt, max_log_size))
+            handlers.append(
+                make_file_handler(log_dir, file_name, fmt, max_log_size, "DEBUG")
+            )
     logger.configure(handlers=handlers)
 
 

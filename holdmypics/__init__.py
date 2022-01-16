@@ -149,15 +149,12 @@ def create_app(cfg: Union[str, "ModuleType"] = "config") -> Holdmypics:
 
         app.wsgi_app = DebuggedApplication(app.wsgi_app, evalex=True)
 
-    def _favicon():
-        return send_from_directory(app.root_path, "fav.ico")
-
-    def _ctx():
-        return {"version": __version__}
+    _favicon = partial(send_from_directory, app.root_path, "fav.ico")
+    _version_ctx = partial(dict, version=__version__)
 
     app.before_request(before_request_callback)
     app.after_request(partial(after_request_callback, HSTS_HEADER, __version__))
     app.add_url_rule("/favicon.ico", "favicon", _favicon)
-    app.context_processor(_ctx)
+    app.context_processor(_version_ctx)
 
     return app

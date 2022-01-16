@@ -34,9 +34,9 @@ class Server(object):
         n = len(self.procs)
         logger.info("Started {0} process{1}", n, "" if n == 1 else "es")
 
-    def _start_proc(self, name: str, args: Sequence[str], **kwargs: Any) -> None:
+    def _start_proc(self, name: str, args: Sequence[str], **kwargs: Any) -> Popen:
         logger.info("Starting process `{0}`", " ".join(args))
-        self.procs[name] = Popen(args, **kwargs)
+        return self.procs.setdefault(name, Popen(args, **kwargs))
 
     def _start_server(self) -> None:
         procfile = config_value("BASE_PATH", app=self.app, cast_as=Path) / "Procfile"
@@ -55,15 +55,16 @@ class Server(object):
     def _start_yarn(self) -> None:
         bp = self.app.blueprints.get("core")
         assert bp is not None
-        out = Path(bp.root_path) / bp.template_folder / "base-out.html"  # type: ignore
+        assert bp.template_folder is not None
+        out = Path(bp.root_path) / bp.template_folder / "base-out.html"
         start_mtime = 0
         if out.is_file():
             out.unlink()
         env = {**os.environ, "NODE_ENV": "development", "TAILWIND_MODE": "build"}
-        self._start_proc("yarn", ["yarn", "watch"], env=env)
-        self._wait_for_yarn(out, start_mtime)
+        proc = self._start_proc("yarn", ["yarn", "watch"], env=env)
+        self._wait_for_yarn(out, start_mtime, proc)
 
-    def _wait_for_yarn(self, base_tpl: Path, start_mtime: float):
+    def _wait_for_yarn(self, base_tpl: Path, start_mtime: float, proc: Popen):
         start = time.perf_counter()
         while True:
             if base_tpl.is_file():

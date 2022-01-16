@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from collections.abc import Callable
 from pathlib import Path
-from typing import Any, cast
+from typing import Any
 
 import click
 import semver
@@ -12,29 +12,29 @@ from loguru import logger
 from semver import VersionInfo
 
 from .cli_utils import CTX_SETTINGS, run
+from .utils import config_value
 
 SEMVER_LEVELS = ("major", "minor", "patch", "prerelease", "build")
 SEMVER_BUMPS: dict[str, Callable[[VersionInfo], Any]] = {
     level: getattr(VersionInfo, f"bump_{level}") for level in SEMVER_LEVELS
 }
+MAIN = "main"
+DEV = "dev"
+CATEGORIES = (MAIN, DEV)
 
 
 def register(app: Flask):
-    cfg_path = cast(Path, app.config.get("BASE_PATH")) / "config"
+    cfg_path = config_value("BASE_PATH", app=app, cast_as=Path) / "config"
 
     @app.cli.command(context_settings=CTX_SETTINGS)
     @click.option(
-        "--both/--not-both",
-        "-b/ ",
-        default=True,
-        help="Freeze main and dev requirements.",
+        "--category",
+        "-c",
+        type=click.Choice(CATEGORIES),
+        default=CATEGORIES,
+        multiple=True,
+        help="Which type of requirements to freeze.",
         show_default=True,
-    )
-    @click.option(
-        "--dev/--not-dev",
-        "-d/ ",
-        default=False,
-        help="Freeze development requirements.",
     )
     @click.option(
         "--hashes/--no-hashes",
@@ -42,17 +42,14 @@ def register(app: Flask):
         help="Create lock file without file hashes.",
         show_default=True,
     )
-    def freeze(both: bool, dev: bool, hashes: bool):
+    def freeze(category: tuple[str, ...], hashes: bool):
         """Create a requirements.txt file."""
         from .package import Package
 
-        package: Package = Package.find_root()
-        if both:
-            logger.info("Freezing both requirement types.")
-            package.freeze(False, hashes)
-            package.freeze(True, hashes)
-        else:
-            package.freeze(dev, hashes)
+        package = Package.find_root()
+        for cat in category:
+            logger.info("Freezing {0} requirements.", cat)
+            package.freeze(cat == DEV, hashes)
 
     @app.cli.command(context_settings=CTX_SETTINGS)
     @click.option(
@@ -76,7 +73,7 @@ def register(app: Flask):
         from . import __version__
         from .package import Package
 
-        package: Package = Package.find_root()
+        package = Package.find_root()
         version_cmd = run(
             "poetry", "version", "--short", text=True, capture_output=True
         )
