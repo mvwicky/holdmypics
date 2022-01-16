@@ -8,19 +8,14 @@
         "bySource": {
           "0 HtmlWebpackPlugin_0-0": 563
         },
-        "usedIds": [
-          563
-        ]
+        "usedIds": [563]
       },
       "modules": {
         "byIdentifier": {
           "./node_modules/html-webpack-plugin/lib/loader.js!./src/index.ejs": 582,
           "javascript/esm|data:text/javascript,__webpack_public_path__ = __webpack_base_uri__ = htmlWebpackPluginPublicPath;": 163
         },
-        "usedIds": [
-          163,
-          582
-        ]
+        "usedIds": [163, 582]
       }
     }
   ],
@@ -34,12 +29,7 @@
       "0 ./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/main.ts clipboard": 152,
       "0 main": 179
     },
-    "usedIds": [
-      152,
-      179,
-      508,
-      984
-    ]
+    "usedIds": [152, 179, 508, 984]
   },
   "modules": {
     "byIdentifier": {
@@ -50,13 +40,6 @@
       "./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/random-text.ts": 984,
       "./node_modules/feather-icons/dist/feather.js": 508
     },
-    "usedIds": [
-      152,
-      508,
-      731,
-      850,
-      858,
-      984
-    ]
+    "usedIds": [152, 508, 731, 850, 858, 984]
   }
 }
