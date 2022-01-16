@@ -50,7 +50,7 @@ def config_value(
         raise ImproperlyConfigured("Unknown setting {0}".format(name))
     if cast_as is not None:
         value = cast_as(value)
-    logger.debug("Got config value. [key={0} value={1}]", name, value)
+    logger.trace("Got config value. [key={0} value={1}]", name, value)
     return cast(Any, value)
 
 

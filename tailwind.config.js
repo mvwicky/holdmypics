@@ -39,7 +39,11 @@ function ms(n) {
 }
 
 module.exports = {
-  content: ["./holdmypics/**/*.{jinja,html}", "./config/safelist.txt"],
+  content: [
+    "./holdmypics/**/*.{jinja,html}",
+    "./config/safelist.txt",
+    "./src/index.ejs",
+  ],
   theme: {
     extend: {},
     fontFamily: {

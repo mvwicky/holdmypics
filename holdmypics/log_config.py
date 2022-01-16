@@ -46,7 +46,7 @@ def make_file_handler(log_dir: Path, file_name: str, fmt: str, max_size: int) ->
     return {
         "sink": log_file,
         "rotation": max_size,
-        "level": "DEBUG",
+        "level": "TRACE",
         "compression": "tar.gz",
         "retention": 5,
         "filter": file_filter,
