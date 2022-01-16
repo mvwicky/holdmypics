@@ -8,7 +8,9 @@
         "bySource": {
           "0 HtmlWebpackPlugin_0-0": 563
         },
-        "usedIds": [563]
+        "usedIds": [
+          563
+        ]
       },
       "modules": {
         "byIdentifier": {
@@ -17,7 +19,10 @@
           "data:text/javascript,__webpack_public_path__ = htmlWebpackPluginPublicPath;": 187,
           "javascript/esm|data:text/javascript,__webpack_public_path__ = __webpack_base_uri__ = htmlWebpackPluginPublicPath;": 163
         },
-        "usedIds": [163, 582]
+        "usedIds": [
+          163,
+          582
+        ]
       }
     }
   ],
@@ -39,7 +44,12 @@
       "0 random-text": 69,
       "1 main": 179
     },
-    "usedIds": [152, 179, 508, 984]
+    "usedIds": [
+      152,
+      179,
+      508,
+      984
+    ]
   },
   "mini-css-extract-plugin /Users/michael/GitHub/holdmypics/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[1].use[3]!./src/scss/main.scss": [
     {
@@ -52,7 +62,9 @@
           "0 child": 396,
           "0 mini-css-extract-plugin": 323
         },
-        "usedIds": [396]
+        "usedIds": [
+          396
+        ]
       },
       "modules": {
         "byIdentifier": {
@@ -74,8 +86,22 @@
           "./src/scss/theme/fonts/spectral-v6-latin-regular.woff2": 574
         },
         "usedIds": [
-          15, 91, 118, 136, 180, 229, 438, 559, 574, 645, 667, 681, 769, 975,
-          994, 997
+          15,
+          91,
+          118,
+          136,
+          180,
+          229,
+          438,
+          559,
+          574,
+          645,
+          667,
+          681,
+          769,
+          975,
+          994,
+          997
         ]
       }
     }
@@ -89,7 +115,9 @@
         "bySource": {
           "0 child": 396
         },
-        "usedIds": [396]
+        "usedIds": [
+          396
+        ]
       },
       "modules": {
         "byIdentifier": {
@@ -109,7 +137,20 @@
           "./src/css/theme/fonts/spectral/spectral-v6-regular.woff2": 902
         },
         "usedIds": [
-          15, 101, 225, 376, 460, 475, 491, 621, 645, 667, 695, 702, 901, 902
+          15,
+          101,
+          225,
+          376,
+          460,
+          475,
+          491,
+          621,
+          645,
+          667,
+          695,
+          702,
+          901,
+          902
         ]
       }
     }
@@ -123,7 +164,9 @@
         "bySource": {
           "0 mini-css-extract-plugin": 323
         },
-        "usedIds": [323]
+        "usedIds": [
+          323
+        ]
       },
       "modules": {
         "byIdentifier": {
@@ -145,8 +188,22 @@
           "./src/scss/theme/fonts/spectral-v6-latin-regular.woff2": 574
         },
         "usedIds": [
-          15, 26, 118, 136, 167, 180, 229, 438, 440, 559, 574, 645, 667, 681,
-          769, 997
+          15,
+          26,
+          118,
+          136,
+          167,
+          180,
+          229,
+          438,
+          440,
+          559,
+          574,
+          645,
+          667,
+          681,
+          769,
+          997
         ]
       }
     }
@@ -160,7 +217,9 @@
         "bySource": {
           "0 child": 396
         },
-        "usedIds": [396]
+        "usedIds": [
+          396
+        ]
       },
       "modules": {
         "byIdentifier": {
@@ -180,7 +239,20 @@
           "./src/css/theme/fonts/spectral/spectral-v6-regular.woff2": 902
         },
         "usedIds": [
-          15, 24, 101, 225, 376, 460, 475, 491, 621, 645, 667, 695, 702, 902
+          15,
+          24,
+          101,
+          225,
+          376,
+          460,
+          475,
+          491,
+          621,
+          645,
+          667,
+          695,
+          702,
+          902
         ]
       }
     }
@@ -310,6 +382,7 @@
       "./node_modules/core-js/modules/web.url.js": 285,
       "./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/helpers/elem-is-tag.ts": 731,
       "./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/log.ts": 858,
+      "./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/main.ts|12ae752bbff2ff14": 850,
       "./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/main.ts|4996a82f8c88f0021c4b97aad54cf0b4": 688,
       "./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/main.ts|f892a471adc3f3f0fc3289b39aff86dd": 717,
       "./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/main.ts|f8959a94650a2e646fc4f000f7d090dd": 163,
@@ -317,6 +390,13 @@
       "./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/random-text.ts": 984,
       "./node_modules/feather-icons/dist/feather.js": 8508
     },
-    "usedIds": [166, 731, 858, 984, 2152, 8508]
+    "usedIds": [
+      731,
+      850,
+      858,
+      984,
+      2152,
+      8508
+    ]
   }
 }

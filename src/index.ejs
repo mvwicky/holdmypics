@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{{ title }}</title>
+    <title>{{ title }} | Hold My Pics</title>
     <meta
       name="description"
       content="A site that can generate a variety of images."
@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="<%= htmlWebpackPlugin.files.css[key] %>"> <% } %>
   </head>
   <body>
-    {% block content %}{% endblock content %}
+    <div class="{% block wrapper_class %}wrapper{% endblock %}">{% block content %}{% endblock content %}</div>
     <%
     for (key in htmlWebpackPlugin.files.js) { %>
     <script type="module" src="<%= htmlWebpackPlugin.files.js[key] %>"></script> <% } %>

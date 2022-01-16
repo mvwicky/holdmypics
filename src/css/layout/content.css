@@ -2,4 +2,8 @@
   .row {
     @apply flex flex-row justify-center w-full;
   }
+
+  .section {
+    @apply rounded border border-gray-300 px-4 md:px-9;
+  }
 }

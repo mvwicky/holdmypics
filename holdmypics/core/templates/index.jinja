@@ -1,27 +1,23 @@
-{% extends "base-out.html" %}
+{% extends "./base.jinja" %}
 
 {% from "./helpers.jinja" import external, option %}
 
-{% block content %}
-<div class="wrapper space-y-5">
-  <header class="index-section py-4 space-y-5">
-    <div class="row text-row">
-      <h1>{{ title }}</h1>
-    </div>
-    <div class="row text-row">
-      <p>Ever needed to create some placeholder images? Here's an easy way to do that.</p>
-    </div>
+{% block wrapper_class %}{{ super() }} space-y-5{% endblock %}
+{% block header_extra %}
+  <div class="row text-row">
+    <p>Ever needed to create some placeholder images? Here's an easy way to do that.</p>
+  </div>
 
-    <div class="row text-row">
-      <h2><span id="img-count">~{{ count }}</span> Images Created</h2>
-    </div>
+  <div class="row text-row">
+    <h2><span id="img-count">~{{ count }}</span> Images Created</h2>
+  </div>
 
-    <div class="row text-row pt-2">
-      <h3 class="text-2xl"><a href="https://app.holdmypics.com">Check out the new front end.</a></h3>
-    </div>
-
-  </header>
-  <main class="index-section content py-4 space-y-4">
+  <div class="row text-row pt-2">
+    <h3 class="text-2xl"><a href="https://app.holdmypics.com">Check out the new front end.</a></h3>
+  </div>
+{% endblock %}
+{% block main_content %}
+  <main class="section content py-4 space-y-4">
     {% set image_url = img_url ~ "?" ~ img_query %}
     <div class="row">
       <img
@@ -134,17 +130,17 @@
         <input id="seed" type="text" />
       </div>
     </form>
-    <div>
-    </div>
 
-    {# <div id="color-picker"></div> #}
+    <div>
+      <a href="{{ url_for('core.tiled') }}">Tiled</a>
+    </div>
 
     <section class="pt-3" id="routes">
       <h3 class="mb-2">Routes</h3>
       {% for rule in rules %}
-      <p>
-        <code>{{ rule | e }}</code>
-      </p>
+        <p>
+          <code>{{ rule | e }}</code>
+        </p>
       {% endfor %}
       <div class="size-explanation">
         <small>
@@ -158,26 +154,4 @@
       </div>
     </section>
   </main>
-  <footer>
-    <div class="footer-group">
-      <h6>Powered by {{ external("https://palletsprojects.com/p/flask/", "Flask") }}</h6>
-      <h6>And {{ external("https://www.heroku.com/", "Heroku") }}</h6>
-    </div>
-    <div class="footer-group">
-      <div>
-        Fira Mono, Fira Sans, Overpass, and Spectral are licensed under the
-        <a href="{{ ofl_license }}">Open Font License</a>.
-      </div>
-      <div>Roboto is licensed under the <a href="{{ apache_license }}">Apache License</a>.</div>
-    </div>
-    {% set tag = "v" ~ version %}
-    {% set github_url = "https://github.com/mvwicky/holdmypics/tree/" ~ tag %}
-    <div class="footer-group">
-      <h6>Created by Michael Van Wickle</h6>
-      <h6>
-        Version: <code>{{ external(github_url, version) }}</code>
-      </h6>
-    </div>
-  </footer>
-</div>
-{% endblock content %}
+{% endblock %}

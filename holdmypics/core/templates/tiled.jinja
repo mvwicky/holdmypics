@@ -1,5 +1,17 @@
-{% extends "base-out.html" %}
-
-{% block content %}
-
-{% endblock content %}
+{% extends "./base.jinja" %}
+{% block wrapper_class %}{{ super() }} space-y-5{% endblock %}
+{% block header_extra %}
+  <div class="row text-row">
+    <a href="{{ url_for('core.index') }}">Home</a>
+  </div>
+{% endblock %}
+{% block main_content %}
+  <main class="section content py-4 space-y-4">
+    <div class="row">
+      <img src="{{ img_url }}" alt="An example tiled image.">
+    </div>
+  </main>
+{% endblock %}
+{# {% block content %}
+  {{ super() }}
+{% endblock content %} #}

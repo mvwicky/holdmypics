@@ -63,7 +63,7 @@ jobs:
       - name: Install python dependencies
         run: $HOME/.local/bin/poetry install --no-interaction --no-dev -E tests
       - name: Install node dependencies
-        run: yarn install --prod || true
+        run: bahmutov/npm-install@v1
         if: ${{ !env.ACT }}
       - name: Run pytest
         env:
