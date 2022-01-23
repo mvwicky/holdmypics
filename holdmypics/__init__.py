@@ -85,7 +85,7 @@ def after_request_callback(
 ) -> Response:
     log_request(res)
     endpoint = request.endpoint
-    if endpoint == "core.index":
+    if endpoint == "web.index":
         res.headers["Cache-Control"] = "max-age=0, no-store"
     elif endpoint == "static":
         name = request.path.split("/")[-1]
@@ -130,10 +130,10 @@ def create_app(cfg: Union[str, "ModuleType"] = "config") -> Holdmypics:
 
     redisw.init_app(app)
 
-    from . import api, cli, core
+    from . import api, cli, web
     from .__version__ import __version__
 
-    app.register_blueprint(core.bp)
+    app.register_blueprint(web.bp)
     app.register_blueprint(api.bp, url_prefix="/api")
     cli.register(app)
 

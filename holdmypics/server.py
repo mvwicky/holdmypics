@@ -53,7 +53,7 @@ class Server(object):
         self._start_proc("dev_server", cmd)
 
     def _start_yarn(self) -> None:
-        bp = self.app.blueprints.get("core")
+        bp = self.app.blueprints.get("web")
         assert bp is not None
         assert bp.template_folder is not None
         out = Path(bp.root_path) / bp.template_folder / "base-out.html"

@@ -134,7 +134,7 @@ clean-lint:
 	$(RM_CMD) $(SENTINEL_DIR)
 
 clean-webpack:
-	$(RM_CMD) static/dist holdmypics/core/templates/base-out.html
+	$(RM_CMD) static/dist holdmypics/web/templates/base-out.html
 
 clean-webpack-cache:
 	$(RM_CMD)  node_modules/.cache/webpack

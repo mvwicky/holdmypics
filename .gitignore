@@ -10,7 +10,7 @@ pytest-report/
 **/videos
 
 */api/images/
-*/core/templates/*.html
+*/web/templates/*.html
 
 *.pem
 .envrc

@@ -36,7 +36,7 @@ const contenthash = prodOr(".[contenthash]", "");
 const entry = Object.fromEntries(
   Object.entries(config.entry).map(([name, e]) => [name, resolve(e)])
 );
-const templateDir = rel.toRoot("holdmypics", "core", "templates");
+const templateDir = rel.toRoot("holdmypics", "web", "templates");
 
 const configuration: Configuration = {
   entry,

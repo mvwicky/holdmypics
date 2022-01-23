@@ -26,22 +26,30 @@
     "bySource": {
       "0 ./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/icons.ts feather-icons": 508,
       "0 ./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/main.ts ./helpers/random-text": 989,
+      "0 ./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/main.ts ./pages/index_page": 209,
+      "0 ./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/main.ts ./pages/tiled_page": 114,
       "0 ./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/main.ts ./random-text": 984,
       "0 ./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/main.ts clipboard": 152,
+      "0 ./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/pages/index_page.ts ../helpers/random-text": 332,
       "0 main": 179
     },
-    "usedIds": [152, 179, 508, 989]
+    "usedIds": [114, 152, 179, 209, 332, 508]
   },
   "modules": {
     "byIdentifier": {
       "./node_modules/clipboard/dist/clipboard.js": 152,
+      "./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/dom/idle.ts": 278,
+      "./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/helpers/debounce.ts": 372,
       "./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/helpers/elem-is-tag.ts": 731,
       "./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/helpers/random-text.ts": 989,
       "./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/log.ts": 858,
       "./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/main.ts|12ae752bbff2ff14": 850,
+      "./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/main.ts|a4da0c3179a3d700": 662,
+      "./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/pages/index_page.ts|35e0d2db5c2f946d": 209,
+      "./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/pages/tiled_page.ts": 114,
       "./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/random-text.ts": 984,
       "./node_modules/feather-icons/dist/feather.js": 508
     },
-    "usedIds": [152, 508, 731, 850, 858, 989]
+    "usedIds": [114, 152, 209, 278, 372, 508, 662, 731, 858, 989]
   }
 }
