@@ -39,7 +39,7 @@ function ms(n) {
 }
 
 module.exports = {
-  content: ["./holdmypics/**/*.{jinja,html}", "./src/index.ejs"],
+  content: ["./holdmypics/**/*.jinja", "./src/index.ejs"],
   safelist: [
     "just-copied",
     "feather",

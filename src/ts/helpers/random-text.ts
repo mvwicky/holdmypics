@@ -1,5 +1,5 @@
-import { elemIsTag } from "./helpers/elem-is-tag";
-import { log } from "./log";
+import { log } from "../log";
+import { elemIsTag } from "./elem-is-tag";
 
 export function initRandomText() {
   const txtInp = document.getElementById("imageText");

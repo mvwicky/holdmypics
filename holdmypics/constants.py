@@ -19,6 +19,12 @@ NO_CACHE = "max-age=0, no-store, must-revalidate"
 COUNT_KEY = "image_count"
 PX_PER_PT = 0.75
 
+DEFAULT_COLORS = (
+    (0x55, 0x55, 0x55, 0xFF),
+    (0xDD, 0xDD, 0xDD, 128),
+    (0xEE, 0x77, 0x33, 0xFF),
+)
+
 
 class Unset(enum.Enum):
     """Singleton type for situations where `None` may be a valid value.

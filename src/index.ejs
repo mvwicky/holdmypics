@@ -13,8 +13,7 @@
   </head>
   <body>
     <div class="{% block wrapper_class %}wrapper{% endblock %}">{% block content %}{% endblock content %}</div>
-    <%
-    for (key in htmlWebpackPlugin.files.js) { %>
+    <% for (key in htmlWebpackPlugin.files.js) { %>
     <script type="module" src="<%= htmlWebpackPlugin.files.js[key] %>"></script> <% } %>
   </body>
 </html>

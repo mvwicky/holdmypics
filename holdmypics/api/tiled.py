@@ -8,13 +8,12 @@ import attr
 from loguru import logger
 from PIL import Image, ImageDraw
 
+from ..constants import DEFAULT_COLORS
 from .args import TiledImageArgs
 from .base import BaseGeneratedImage
 from .files import files
 
-COLORS = cycle(
-    ((0x55, 0x55, 0x55, 0xFF), (0xDD, 0xDD, 0xDD, 128), (0xEE, 0x77, 0x33, 0xFF))
-)
+COLORS = cycle(DEFAULT_COLORS)
 
 
 @attr.s(slots=True, auto_attribs=True)

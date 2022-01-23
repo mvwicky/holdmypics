@@ -1,4 +1,5 @@
 {% extends "./base.jinja" %}
+{% from "./helpers.jinja" import option, single_tag, external, input, select  %}
 {% block wrapper_class %}{{ super() }} space-y-5{% endblock %}
 {% block header_extra %}
   <div class="row text-row">
@@ -8,8 +9,46 @@
 {% block main_content %}
   <main class="section content py-4 space-y-4">
     <div class="row">
-      <img src="{{ img_url }}" alt="An example tiled image.">
+      <img
+        id="example-image"
+        class="h-auto max-h-screen max-w-full"
+        src="{{ img_url }}"
+        alt="Example image."
+        width="{{ img_dim.0 }}"
+        height="{{ img_dim.1 }}"
+      />
     </div>
+    <div class="endpoint-container flex-col md:flex-row row items-center px-4 md:px-7">
+      <code class="mb-2 md:mb-0 hover:underline">
+        {{ external(img_url, img_url|escape, id="endpoint-url") }}
+      </code>
+    </div>
+    <form class="border border-gray-300 p-3 space-y-3 md:px-5 md:py-4" id="params-form" action="">
+      {% for field in num_fields %}
+        <div class="form-group">
+          <label for="{{ field.id }}">{{ field.label }}</label>
+          <div class="input-group">
+            {{ input("number", name=field.name, id=field.id, min=field.min, max=field.max, value=field.value, required=field.required, **field.extra) }}
+            <small class="help-text">{{ field.help_text|default("&nbsp;", true) }}</small>
+          </div>
+        </div>
+      {% endfor %}
+      {% for field in sel_fields %}
+        <div class="form-group">
+          <label for="{{ field.id }}">{{ field.label }}</label>
+          <div class="input-group">
+            {{ select(field.name, field.value, field.options, id=field.id) }}
+          </div>
+        </div>
+      {% endfor %}
+      <div class="form-group">
+        <label for="colors">Colors</label>
+        <div class="input-group">
+          <input type="text" name="colors" id="colors" pattern="({{ color_pattern }})(,{{ color_pattern }})*" value="{{ default_colors }}">
+          <small class="help-text">Colors as a comma separated list.</small>
+        </div>
+      </div>
+    </form>
   </main>
 {% endblock %}
 {# {% block content %}

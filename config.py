@@ -66,6 +66,28 @@ INDEX_IMG_MAX_HEIGHT: int = env.int(
     "INDEX_IMG_MAX_HEIGHT", default=4608, validate=[Range(1)]
 )
 
+TILED_DEFAULT_WIDTH: int = env.int(
+    "TILED_DEFAULT_WIDTH", default=INDEX_DEFAULT_WIDTH, validate=[Range(1)]
+)
+TILED_DEFAULT_HEIGHT: int = env.int(
+    "TILED_DEFAULT_HEIGHT", default=INDEX_DEFAULT_HEIGHT, validate=[Range(1)]
+)
+TILED_DEFAULT_COLUMNS: int = env.int(
+    "TILED_DEFAULT_COLUMNS", default=10, validate=[Range(1)]
+)
+TILED_DEFAULT_ROWS: int = env.int("TILED_DEFAULT_ROWS", default=8, validate=[Range(1)])
+TILED_DEFAULT_FORMAT: str = env(
+    "TILED_DEFAULT_FORMAT",
+    default=INDEX_DEFAULT_FORMAT,
+    validate=[OneOf(["png", "webp", "jpeg", "gif"])],
+)
+TILED_IMG_MAX_WIDTH: int = env.int(
+    "TILED_IMG_MAX_WIDTH", default=INDEX_IMG_MAX_WIDTH, validate=[Range(1)]
+)
+TILED_IMG_MAX_HEIGHT: int = env.int(
+    "TILED_IMG_MAX_HEIGHT", default=INDEX_IMG_MAX_HEIGHT, validate=[Range(1)]
+)
+
 HASH_IMG_FILE_NAMES: bool = env.bool("HASH_IMG_FILE_NAMES", default=not DEBUG)
 
 JPEG_OPTIMIZE: bool = env.bool("JPEG_OPTIMIZE", default=True)

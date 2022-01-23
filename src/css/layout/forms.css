@@ -5,13 +5,15 @@
   input,
   select {
     border-radius: 2px;
-    box-shadow: var(--validity-shadow, none);
+    /* box-shadow: var(--validity-shadow, none); */
 
     @apply border border-blue-900;
   }
 
   input:invalid,
   select:invalid {
+    /* --tw-ring-opacity: 0.9; */
+    @apply ring ring-red-600/90;
     /* --validity-color: rgba(240, 0, 0, 0.8); */
     --validity-color: theme("colors.red.600");
     /* --validity-shadow: 2.8px 2.8px 2.2px rgba(0, 0, 0, 0.02),

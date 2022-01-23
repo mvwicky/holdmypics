@@ -1,6 +1,6 @@
 {% extends "./base.jinja" %}
 
-{% from "./helpers.jinja" import external, option %}
+{% from "./helpers.jinja" import external, option, input %}
 
 {% block wrapper_class %}{{ super() }} space-y-5{% endblock %}
 {% block header_extra %}
@@ -25,7 +25,6 @@
         class="h-auto max-h-screen max-w-full"
         src="{{ image_url }}"
         alt="Example image."
-        loading="lazy"
         width="{{ img_dim.0 }}"
         height="{{ img_dim.1 }}"
       />
@@ -33,9 +32,7 @@
 
     <div class="endpoint-container flex-col md:flex-row row items-center px-4 md:px-7">
       <code class="mb-2 md:mb-0 hover:underline" id="endpoint">
-        <a id="endpoint-url" href="{{ image_url }}" target="_blank" rel="noreferrer noopener" data-cy="endpoint-url">
-          {{ image_url|escape }}
-        </a>
+        {{ external(image_url, image_url|escape, id="endpoint-url", data_cy="endpoint-url") }}
       </code>
     </div>
 
@@ -62,34 +59,24 @@
     #}
 
     <form class="border border-gray-300 p-3 space-y-3 md:px-5 md:py-4" id="params-form" action="">
-      <div class="form-group">
-        <label for="width">Width</label>
-        <div class="input-group">
-          <input id="width" type="number" min="1" step="1" value="{{ img_dim.0 }}" max="{{ max_width }}" required data-cy="width" />
-          <small class="help-text">&nbsp;</small>
+      {% for field in num_fields %}
+        <div class="form-group">
+          <label for="{{ field.id }}">{{ field.label }}</label>
+          <div class="input-group">
+            {{ input("number", name=field.name, id=field.id, min=field.min, max=field.max, value=field.value, required=field.required, **field.extra) }}
+            <small class="help-text">{{ field.help_text|default("&nbsp;", true) }}</small>
+          </div>
         </div>
-      </div>
-      <div class="form-group">
-        <label for="height">Height</label>
-        <div class="input-group">
-          <input id="height" type="number" min="1" step="1" value="{{ img_dim.1 }}" max="{{ max_height }}" required data-cy="height" />
-          <small class="help-text">&nbsp;</small>
+      {% endfor %}
+      {% for field in col_fields %}
+        <div class="form-group">
+          <label for="{{ field.id }}">{{ field.label }}</label>
+          <div class="input-group">
+            {{ input("text", name=field.name, id=field.id, required=field.required, value=field.value, pattern=field.pattern, **field.extra) }}
+            <small class="help-text">{{ field.help_text|default("&nbsp;", true) }}</small>
+          </div>
         </div>
-      </div>
-      <div class="form-group">
-        <label for="bg">Background Color</label>
-        <div class="input-group">
-          <input id="bg" type="text" value="{{ bg_color }}" pattern="{{ color_pattern }}" data-cy="bg" />
-          <small class="help-text">Three, four, six, or eight hex digits.</small>
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="fg">Text Color</label>
-        <div class="input-group">
-          <input id="fg" type="text" value="{{ fg_color }}" pattern="{{ color_pattern }}" data-cy="fg" />
-          <small class="help-text">Three, four, six, or eight hex digits.</small>
-        </div>
-      </div>
+      {% endfor %}
       <div class="form-group">
         <label for="fmt">Format</label>
         <div class="input-group">

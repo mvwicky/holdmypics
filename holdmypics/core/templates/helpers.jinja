@@ -1,11 +1,28 @@
-{% macro external(href, text) -%}
-<a href="{{ href }}" target="_blank" rel="noreferrer noopener">{{ text }}</a>
+{% macro tag(tag, contents="") -%}
+<{{ tag }}{{ kwargs|fmt_attrs }}>{% if caller is defined %}{{ caller() }}{% else %}{{ contents }}{% endif %}</{{ tag }}>
+{% endmacro %}
+
+{% macro single_tag(tag) %}
+<{{ tag }}{{ kwargs|fmt_attrs }} >
+{% endmacro %}
+
+{% macro external(href, text="") -%}
+{{ tag("a", text, href=href, target="_blank", rel="noreferrer noopener", **kwargs) }}
+{# <a href="{{ href }}" target="_blank" rel="noreferrer noopener">{{ text }}</a> #}
 {%- endmacro %}
 
-{% macro option(value, name, selected=false) -%}
-{% if selected %}
-<option selected value="{{ value }}">{{ name }}</option>
-{% else %}
-<option value="{{ value }}">{{ name }}</option>
-{% endif %}
+{% macro option(value, name, selected=false, disabled=false) -%}
+{{ tag("option", name, value=value, selected=selected, disabled=disabled) }}
 {%- endmacro %}
+
+{% macro input(type) %}
+  {{ single_tag("input", type=type, **kwargs) }}
+{% endmacro %}
+
+{% macro select(name, value, options) %}
+  {% call tag("select", value=value, **kwargs) %}
+    {% for opt_val, opt_name in options %}
+      {{ option(opt_val, opt_name, selected=opt_val==value) }}
+    {% endfor %}
+  {% endcall %}
+{% endmacro %}

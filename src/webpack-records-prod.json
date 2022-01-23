@@ -25,21 +25,23 @@
     },
     "bySource": {
       "0 ./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/icons.ts feather-icons": 508,
+      "0 ./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/main.ts ./helpers/random-text": 989,
       "0 ./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/main.ts ./random-text": 984,
       "0 ./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/main.ts clipboard": 152,
       "0 main": 179
     },
-    "usedIds": [152, 179, 508, 984]
+    "usedIds": [152, 179, 508, 989]
   },
   "modules": {
     "byIdentifier": {
       "./node_modules/clipboard/dist/clipboard.js": 152,
       "./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/helpers/elem-is-tag.ts": 731,
+      "./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/helpers/random-text.ts": 989,
       "./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/log.ts": 858,
       "./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/main.ts|12ae752bbff2ff14": 850,
       "./node_modules/esbuild-loader/dist/index.js??ruleSet[1].rules[0].use[0]!./src/ts/random-text.ts": 984,
       "./node_modules/feather-icons/dist/feather.js": 508
     },
-    "usedIds": [152, 508, 731, 850, 858, 984]
+    "usedIds": [152, 508, 731, 850, 858, 989]
   }
 }

@@ -4,7 +4,7 @@ import time
 from functools import lru_cache, partial
 from importlib.metadata import version
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional, Union, cast
+from typing import TYPE_CHECKING, Any, Optional, Union, cast
 
 from flask import Flask, Response, g, request, send_from_directory
 from loguru import logger
@@ -107,6 +107,12 @@ def after_request_callback(
     return res
 
 
+def format_attrs_ctx() -> dict[str, Any]:
+    from .utils import format_attrs, format_attrs_kw
+
+    return {"format_attrs": format_attrs, "format_attrs_kw": format_attrs_kw}
+
+
 class Holdmypics(Flask):
     pass
 
@@ -156,5 +162,15 @@ def create_app(cfg: Union[str, "ModuleType"] = "config") -> Holdmypics:
     app.after_request(partial(after_request_callback, HSTS_HEADER, __version__))
     app.add_url_rule("/favicon.ico", "favicon", _favicon)
     app.context_processor(_version_ctx)
+    app.context_processor(format_attrs_ctx)
+
+    @app.template_filter("log")
+    def _log_filter(inp: Any) -> str:
+        logger.info("{0!r}", inp)
+        return ""
+
+    from .utils import format_attrs
+
+    app.template_filter("fmt_attrs")(format_attrs)
 
     return app
