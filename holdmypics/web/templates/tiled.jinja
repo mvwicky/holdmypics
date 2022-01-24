@@ -14,8 +14,8 @@
         class="h-auto max-h-screen max-w-full"
         src="{{ img_url }}"
         alt="Example image."
-        width="{{ img_dim.0 }}"
-        height="{{ img_dim.1 }}"
+        width="{{ size.0 }}"
+        height="{{ size.1 }}"
       />
     </div>
     <div class="endpoint-container flex-col md:flex-row row items-center px-4 md:px-7">
@@ -38,6 +38,7 @@
           <label for="{{ field.id }}">{{ field.label }}</label>
           <div class="input-group">
             {{ select(field.name, field.value, field.options, id=field.id) }}
+            <small class="help-text">{{ field.help_text|default("&nbsp;", true) }}</small>
           </div>
         </div>
       {% endfor %}

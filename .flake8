@@ -10,6 +10,7 @@ exclude =
 application-import-names =
     config
     holdmypics
+    tests
 max-complexity = 10
 enable-extensions =
     E704,

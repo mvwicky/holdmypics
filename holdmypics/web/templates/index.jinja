@@ -1,6 +1,6 @@
 {% extends "./base.jinja" %}
 
-{% from "./helpers.jinja" import external, option, input %}
+{% from "./helpers.jinja" import external, option, input, select %}
 
 {% block wrapper_class %}{{ super() }} space-y-5{% endblock %}
 {% block header_extra %}
@@ -18,28 +18,27 @@
 {% endblock %}
 {% block main_content %}
   <main class="section content py-4 space-y-4">
-    {% set image_url = img_url ~ "?" ~ img_query %}
     <div class="row">
       <img
         id="example-image"
         class="h-auto max-h-screen max-w-full"
-        src="{{ image_url }}"
+        src="{{ img_url }}"
         alt="Example image."
-        width="{{ img_dim.0 }}"
-        height="{{ img_dim.1 }}"
+        width="{{ size.0 }}"
+        height="{{ size.1 }}"
       />
     </div>
 
     <div class="endpoint-container flex-col md:flex-row row items-center px-4 md:px-7">
       <code class="mb-2 md:mb-0 hover:underline" id="endpoint">
-        {{ external(image_url, image_url|escape, id="endpoint-url", data_cy="endpoint-url") }}
+        {{ external(img_url, img_url|escape, id="endpoint-url", data_cy="endpoint-url") }}
       </code>
     </div>
 
     <div class="row items-center mb-6">
       <button
         id="copy-button"
-        data-clipboard-text="{{ image_url }}"
+        data-clipboard-text="{{ img_url }}"
         aria-label="Copied to clipboard!"
         disabled
         title="Copy image URL to clipboard."
@@ -77,38 +76,22 @@
           </div>
         </div>
       {% endfor %}
-      <div class="form-group">
-        <label for="fmt">Format</label>
-        <div class="input-group">
-          <select name="fmt" id="fmt" data-cy="fmt">
-            {%- for value in img_formats %}
-            {{ option(value, value, value==fmt) }}
-            {%- endfor %}
-          </select>
-          <small class="help-text">“jpg” and “jpeg” are equivalent.</small>
+      {% for field in sel_fields %}
+        <div class="form-group">
+          <label for="{{ field.id }}">{{ field.label }}</label>
+          <div class="input-group">
+            {{ select(field.name, field.value, field.options, id=field.id) }}
+            <small class="help-text">{{ field.help_text|default("&nbsp;", true) }}</small>
+          </div>
         </div>
-      </div>
-      <div class="form-group">
-        <label for="font">Font</label>
-        <div class="input-group">
-          <select class="query" name="font" id="font" data-cy="font">
-            <option value="">None</option>
-            <option disabled value="">-----------</option>
-            {% for value, name in font_names %}
-            {{ option(value, name, value==font) }}
-            {% endfor %}
-          </select>
-          <small class="help-text">&nbsp;</small>
-        </div>
-      </div>
+      {% endfor %}
       <div class="form-group">
         <label for="imageText">Text</label>
         <div class="input-group flex-nowrap">
           <div class="text-input">
             <input class="query" id="imageText" type="text" value="{{ text }}" maxlength="30" data-cy="imageText" />
-            <input class="query check-check flex-grow-0 my-0 mx-auto" type="checkbox" name="randomText" id="randomText" title="Randomize text." data-cy="randomText" />
+            <input class="query check-check flex-grow-0 my-auto ml-auto" type="checkbox" name="randomText" id="randomText" title="Randomize text." data-cy="randomText" />
           </div>
-
           <small class="help-text ml-auto">Randomize text.</small>
         </div>
       </div>
@@ -118,8 +101,8 @@
       </div>
     </form>
 
-    <div>
-      <a href="{{ url_for('web.tiled') }}">Tiled</a>
+    <div class="flex justify-center">
+      <h5><a href="{{ url_for('web.tiled') }}">Tiled</a></h5>
     </div>
 
     <section class="pt-3" id="routes">

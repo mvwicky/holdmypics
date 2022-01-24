@@ -21,8 +21,8 @@
 
 {% macro select(name, value, options) %}
   {% call tag("select", value=value, **kwargs) %}
-    {% for opt_val, opt_name in options %}
-      {{ option(opt_val, opt_name, selected=opt_val==value) }}
+    {% for opt in options %}
+      {{ option(opt.value, opt.name, selected=opt.value==value if opt.selected is none else opt.selected, disabled=opt.disabled) }}
     {% endfor %}
   {% endcall %}
 {% endmacro %}

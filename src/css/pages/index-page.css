@@ -1,18 +1,5 @@
 @layer components {
-  .text-row {
-    @apply px-3 md:px-0;
-  }
-
-  @screen md {
-    #example-images {
-      max-height: 50vh;
-    }
-  }
   .rule {
     display: block;
-  }
-
-  .index-section {
-    @apply rounded border border-gray-300 px-4 md:px-9;
   }
 }

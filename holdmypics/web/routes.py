@@ -15,7 +15,7 @@ from ..constants import DEFAULT_COLORS, DEFAULT_FONT, IMG_FORMATS
 from ..fonts import fonts
 from ..utils import config_value, get_count
 from . import bp
-from .forms import NumberInput, SelectInput, TextInput
+from .forms import NumberInput, SelectInput, SelectOption, TextInput
 
 RULE_RE = re.compile(r"(?:(?:dim|col):|any)")
 ROBOTS = """User-agent: *
@@ -28,8 +28,8 @@ class CommonContext(TypedDict):
     height: int
     max_width: int
     max_height: int
-    img_dim: tuple[int, int]
-    max_dim: tuple[int, int]
+    size: tuple[int, int]
+    max_size: tuple[int, int]
     num_fields: Sequence[NumberInput]
     fmt: str
     sel_fields: Sequence[SelectInput]
@@ -60,14 +60,11 @@ def get_common_context(page: str) -> CommonContext:
             name="height", label="Height", value=height, max=max_height, **num_kw
         ).add_cy(),
     ]
-
+    fmt_opts = [SelectOption(f, f) for f in IMG_FORMATS]
+    fmt_help = Markup("<q>jpg</q> and <q>jpeg</q> are equivalent.")
     sel_fields = [
         SelectInput(
-            name="fmt",
-            label="Format",
-            value=fmt,
-            options=[(f, f) for f in IMG_FORMATS],
-            help_text=Markup("<q>jpg</q> and <q>jpeg</q> are equivalent."),
+            name="fmt", label="Format", value=fmt, options=fmt_opts, help_text=fmt_help
         )
     ]
 
@@ -77,8 +74,8 @@ def get_common_context(page: str) -> CommonContext:
         height=height,
         max_width=max_width,
         max_height=max_height,
-        img_dim=(width, height),
-        max_dim=(max_width, max_height),
+        size=(width, height),
+        max_size=(max_width, max_height),
         num_fields=num_fields,
         fmt=fmt,
         sel_fields=sel_fields,
@@ -92,12 +89,23 @@ def get_index_context() -> dict[str, Any]:
     text = config_value("INDEX_TEXT")
     font = DEFAULT_FONT
     img_url = url_for(
-        "api.image_route", size=ctx["img_dim"], bg_color=bg, fg_color=fg, fmt=ctx["fmt"]
+        "api.image_route",
+        size=ctx["size"],
+        bg_color=bg,
+        fg_color=fg,
+        fmt=ctx["fmt"],
+        text=text,
+        font=font,
     )
-    font_names: list[tuple[str, str]] = [
+    font_opts = [
         ("", "None"),
-        *((n, n.replace("-", " ").title()) for n in sorted(fonts.font_names)),
+        ("", "-----------", None, True),
+        *(
+            SelectOption(n, n.replace("-", " ").title())
+            for n in sorted(fonts.font_names)
+        ),
     ]
+    font_names = [SelectOption(*opt) for opt in font_opts]
     col_kw = {
         "pattern": ctx["color_pattern"],
         "help_text": "Three, four, six, or eight hex digits.",
@@ -113,7 +121,6 @@ def get_index_context() -> dict[str, Any]:
         **ctx,
         "rules": get_rules(),
         "img_url": img_url,
-        "img_query": urlencode({"text": text, "font": font}),
         "bg_color": bg,
         "fg_color": fg,
         "text": text,
@@ -160,15 +167,15 @@ def index() -> ResponseType:
 @bp.route("/tiled/")
 def tiled() -> ResponseType:
     ctx = get_tiled_context()
-    cols = ["".join(f"{c:02x}" for c in col) for col in DEFAULT_COLORS]
-    kw = {"size": ctx["img_dim"], **{k: ctx[k] for k in ("cols", "rows", "fmt")}}
+    colors = ["".join(f"{c:02x}" for c in col) for col in DEFAULT_COLORS]
+    kw = {k: ctx[k] for k in ("cols", "rows", "fmt", "size")}
     img_url = url_for("api.tiled_route", **kw)
     context = {
         **ctx,
         **get_count_context(),
         "title": "Tiled",
-        "img_url": img_url,
-        "default_colors": ",".join(cols),
+        "img_url": f"{img_url}?{urlencode({'colors': colors}, doseq=True)}",
+        "default_colors": colors,
     }
     return render_template("tiled.jinja", **context)
 

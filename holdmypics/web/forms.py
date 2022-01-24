@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, Generic, Optional, TypeVar, Union
+from typing import Any, Generic, NamedTuple, Optional, TypeVar, Union
 
 import attr
 
@@ -40,7 +40,14 @@ class NumberInput(BaseInput[Union[int, float]]):
     step: Optional[Union[int, float]] = None
 
 
+class SelectOption(NamedTuple):
+    value: str
+    name: str
+    selected: Optional[bool] = None
+    disabled: bool = False
+
+
 @attr.s(slots=True, auto_attribs=True)
 class SelectInput(BaseInput[str]):
-    options: list[tuple[str, str]] = attr.ib(factory=list)
+    options: list[SelectOption] = attr.ib(factory=list)
     help_text: Optional[str] = None

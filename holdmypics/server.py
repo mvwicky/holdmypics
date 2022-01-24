@@ -26,7 +26,7 @@ class Server(object):
 
     procs: dict[str, Popen] = attr.ib(init=False, factory=dict)
 
-    def start(self):
+    def start(self) -> None:
         if self.start_yarn:
             self._start_yarn()
         if self.start_server:
@@ -35,7 +35,7 @@ class Server(object):
         logger.info("Started {0} process{1}", n, "" if n == 1 else "es")
 
     def _start_proc(self, name: str, args: Sequence[str], **kwargs: Any) -> Popen:
-        logger.info("Starting process `{0}`", " ".join(args))
+        logger.info("Running `{0}`", " ".join(args))
         return self.procs.setdefault(name, Popen(args, **kwargs))
 
     def _start_server(self) -> None:
@@ -64,7 +64,7 @@ class Server(object):
         proc = self._start_proc("yarn", ["yarn", "watch"], env=env)
         self._wait_for_yarn(out, start_mtime, proc)
 
-    def _wait_for_yarn(self, base_tpl: Path, start_mtime: float, proc: Popen):
+    def _wait_for_yarn(self, base_tpl: Path, start_mtime: float, proc: Popen) -> None:
         start = time.perf_counter()
         while True:
             if base_tpl.is_file():
@@ -77,10 +77,10 @@ class Server(object):
                 break
         logger.info("Done waiting for yarn.")
 
-    def loop(self):
+    def loop(self) -> None:
         while True:
             try:
-                should_shutdown = self._inner_loop()
+                should_shutdown = self._check_procs()
                 if should_shutdown:
                     break
                 time.sleep(0.1)
@@ -88,14 +88,14 @@ class Server(object):
                 break
         self.shutdown()
 
-    def _inner_loop(self):
+    def _check_procs(self) -> bool:
         for name, proc in self.procs.items():
             if proc.poll() is not None:
                 logger.warning("Subprocess {0} died", name)
                 return True
         return False
 
-    def shutdown(self):
+    def shutdown(self) -> None:
         logger.info("Shutting down.")
         for name, proc in self.procs.items():
             logger.info("Terminating {0}", name)
