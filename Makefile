@@ -1,5 +1,4 @@
 SHELL:=bash
-.ONESHELL:
 .SHELLFLAGS:=-eu -o pipefail -c
 .DELETE_ON_ERROR:
 MAKEFLAGS += --warn-undefined-variables
@@ -30,6 +29,7 @@ ISORT_SENTINEL=$(call SENTINEL_FILE,isort)
 FLAKE8_SENTINEL=$(call SENTINEL_FILE,flake8)
 ESLINT_SENTINEL=$(call SENTINEL_FILE,eslint)
 STYLELINT_SENTINEL=$(call SENTINEL_FILE,stylelint)
+PYRIGHT_SENTINEL=$(call SENTINEL_FILE,pyright)
 DOCKERFILE_SENTINEL=$(call SENTINEL_FILE,dockerfiles)
 
 VERSION_FILE=holdmypics/__version__.py
@@ -48,6 +48,10 @@ COMPILE_DEPS=$(CONFIG_DIR)/Dockerfile.template holdmypics/generate.py
 COMPILE_OUT=$(CONFIG_DIR)/dev/Dockerfile $(CONFIG_DIR)/prod/Dockerfile
 
 ESLINT_DEPS=$(filter %.ts,$(LS_FILES)) $(filter %.js,$(LS_FILES)) $(filter .eslintrc.%,$(LS_FILES))
+STYLELINT_DEPS=$(filter %.css,$(LS_FILES)) $(filter .stylelintrc.%,$(LS_FILES))
+ISORT_DEPS=$(filter-out %/__version__.py,$(LS_PYTHON))
+
+WEBPACK_ARGS=--config webpack.config.ts --progress
 
 .PHONY: compile compose dbuilddev dbuildprod docker docker-build run stop version-tag \
 	lint isort flake8 eslint stylelint clean-lint clean-webpack
@@ -90,7 +94,7 @@ prod: webpack
 
 webpack: export NODE_ENV=$(NODE_ENV_VALUE)
 webpack:
-	@$(WEBPACK) --config webpack.config.ts --progress
+	@$(WEBPACK) $(WEBPACK_ARGS)
 
 version-tag:
 ifdef DRY_RUN
@@ -99,33 +103,38 @@ else
 	@git tag $(VERSION_TAG) -m $(VERSION_TAG)
 endif
 
-lint: isort flake8 eslint stylelint
+lint: isort flake8 eslint stylelint pyright
 
 isort: $(SENTINEL_DIR) $(ISORT_SENTINEL)
 flake8: $(SENTINEL_DIR) $(FLAKE8_SENTINEL)
 eslint: $(SENTINEL_DIR) $(ESLINT_SENTINEL)
 stylelint: $(SENTINEL_DIR) $(STYLELINT_SENTINEL)
+pyright: $(SENTINEL_DIR) $(PYRIGHT_SENTINEL)
 
-$(ISORT_SENTINEL): $(LS_PYTHON) pyproject.toml
-	@echo "Running isort. Outdated: $(words $?)"
-	isort --check-only $(filter %.py,$?)
-	date > $@
+$(ISORT_SENTINEL): $(ISORT_DEPS) pyproject.toml
+	@echo "Running isort. $(words $?) outdated."
+	@isort --check-only $(filter %.py,$?)
+	@date > $@
 
 $(FLAKE8_SENTINEL): $(LS_PYTHON) .flake8
-	@echo "Running flake8. Outdated: $(words $?)"
-	flake8 $(filter %.py,$?)
-	date > $@
+	@echo "Running flake8. $(words $?) outdated."
+	@flake8 $(filter %.py,$?)
+	@date > $@
 
 $(ESLINT_SENTINEL): $(ESLINT_DEPS)
-	@echo "Running eslint. Outdated: $(words $?)"
-	$(ESLINT) '**/*.ts' '**/*.js'
-	date > $@
+	@echo "Running eslint. $(words $?) outdated."
+	@$(ESLINT) '**/*.ts' '**/*.js'
+	@date > $@
 
-$(STYLELINT_SENTINEL): $(filter %.css,$(LS_FILES)) $(filter .stylelintrc.%,$(LS_FILES))
-	@echo "Running stylelint. Outdated: $(words $?)"
-	yarn --silent run stylelint 'src/css/**/*.css'
-	date > $@
-	echo "$?" >> $@
+$(STYLELINT_SENTINEL): $(STYLELINT_DEPS)
+	@echo "Running stylelint. $(words $?) outdated."
+	@yarn --silent run stylelint 'src/css/**/*.css'
+	@date > $@
+
+$(PYRIGHT_SENTINEL): $(LS_PYTHON) pyproject.toml poetry.lock pyrightconfig.json
+	@echo "Running pyright. $(words $?) outdated."
+	@pyright
+	@date > $@
 
 $(SENTINEL_DIR):
 	mkdir $@

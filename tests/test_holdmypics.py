@@ -2,15 +2,19 @@ from __future__ import annotations
 
 import os
 import re
+from typing import TYPE_CHECKING
 from urllib.parse import urlencode
 
+import attr
 import pytest
 from flask import url_for
 from flask.testing import FlaskClient
 from hypothesis import given
 
-from holdmypics.converters import ColorConverter
 from tests.utils import color_strategy
+
+if TYPE_CHECKING:
+    from holdmypics.api.args import BaseImageArgs, BaseImageArgsSchema
 
 SKIP_INDEX = os.environ.get("TESTS_SKIP_INDEX", None) is not None
 
@@ -59,11 +63,32 @@ def test_forwarding_headers(client: FlaskClient):
     assert was_forwarded == forwarded
 
 
+def match_color(color: str):
+    from holdmypics.converters import ColorConverter
+
+    return re.match(ColorConverter.regex, color)
+
+
 @given(string=color_strategy)
 def test_color_validator_accepts(string: str):
-    assert re.match(ColorConverter.regex, string) is not None
+    assert match_color(string) is not None
 
 
 @pytest.mark.parametrize("string", ["ee7733f"])
 def test_color_validator_rejects(string: str):
-    assert re.match(ColorConverter.regex, string) is None
+    assert match_color(string) is None
+
+
+def cmp_args(
+    args_type: type["BaseImageArgs"], schema_type: type["BaseImageArgsSchema"]
+):
+    args_fields = set(attr.fields_dict(args_type))
+    schema_fields = set(schema_type().fields)
+    assert args_fields == schema_fields
+
+
+def test_image_args_schemas():
+    from holdmypics.api import args
+
+    cmp_args(args.ImageArgs, args.ImageArgsSchema)
+    cmp_args(args.TiledImageArgs, args.TiledImageArgsSchema)

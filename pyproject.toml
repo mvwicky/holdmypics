@@ -12,13 +12,13 @@ flask = "^2.0.0"
 flask-cors = "^3.0.8"
 flask-redis = "^0.4.0"
 gunicorn = { version = "^20.0" }
-loguru = "^0.5.0"
+loguru = "^0.6.0"
 Pillow = "^9.0.0"
 semver = "^2.9.1"
 webargs = "^8.0.0"
 whitenoise = { version = "^5.0.1", extras = ["brotli"] }
 # Test Dependencies
-pytest = { version = "^6.0", optional = true }
+pytest = { version = "^7.0", optional = true }
 hypothesis = { version = "^6.0.0", optional = true }
 pytesseract = { version = "^0.3.4", optional = true }
 # Development dependencies
@@ -43,6 +43,8 @@ profile = "black"
 known_first_party = ["config", "holdmypics"]
 no_lines_before = "LOCALFOLDER"
 combine_as_imports = true
+add_imports = ["from __future__ import annotations"]
+extend_skip_glob = ["**/__version__.py"]
 
 [tool.black]
 line-length = 88

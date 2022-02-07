@@ -17,6 +17,7 @@ DEFAULT_FONT = "overpass"
 DEFAULT_DPI = 144
 NO_CACHE = "max-age=0, no-store, must-revalidate"
 COUNT_KEY = "image_count"
+SIZE_KEY = "image_size"
 PX_PER_PT = 0.75
 
 DEFAULT_COLORS = (

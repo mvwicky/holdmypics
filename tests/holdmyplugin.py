@@ -1,12 +1,10 @@
-from typing import TYPE_CHECKING
+from __future__ import annotations
 
-if TYPE_CHECKING:
-    from _pytest.config.argparsing import OptionGroup, Parser
-    from _pytest.python import Metafunc
+import pytest
 
 
-def pytest_addoption(parser: "Parser"):
-    group: "OptionGroup" = parser.getgroup("holdmypics")
+def pytest_addoption(parser: pytest.Parser):
+    group: pytest.OptionGroup = parser.getgroup("holdmypics")
     group.addoption(
         "--formats",
         nargs="+",
@@ -18,7 +16,7 @@ def pytest_addoption(parser: "Parser"):
     group.addoption("--image-dir", default=None, help="Saved images output directory")
 
 
-def pytest_generate_tests(metafunc: "Metafunc"):
+def pytest_generate_tests(metafunc: pytest.Metafunc):
     if "image_format" in metafunc.fixturenames:
         metafunc.parametrize(
             "image_format", metafunc.config.getoption("image_formats", [])

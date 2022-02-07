@@ -4,68 +4,67 @@ import imghdr
 import io
 import os
 import time
-from types import ModuleType
-from typing import Optional, Union
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Optional, Union
 from urllib.parse import urlencode
 
 import pytest
-from flask import Flask
 from flask.testing import FlaskClient
-from hypothesis import example, given
+from hypothesis import example, given, strategies as st
 from loguru import logger
 from PIL import Image
 
-from holdmypics import create_app
-from holdmypics.api.args import ImageArgs
-from holdmypics.api.img import GeneratedImage
 from tests.utils import (
-    args_strategy,
     color_strategy,
+    compact_dict,
+    dpi_strategy,
     fmt_strategy,
+    make_route,
     opt_color_strategy,
     size_strategy,
 )
 
+if TYPE_CHECKING:
+    from holdmypics import Holdmypics
 
-def make_route(
-    sz: tuple[int, int],
-    bg_color: Optional[str] = None,
-    fg_color: Optional[str] = None,
-    fmt: Optional[str] = None,
-) -> str:
-    parts = (bg_color, fg_color, fmt)
-    if not any(parts):
-        pytest.fail("Can't make a route with just size")
-    return f"/api/{sz[0]}x{sz[1]}/{'/'.join(filter(None, parts))}/"
+text_strategy = st.one_of(st.none(), st.text(max_size=255))
+args_strategy = st.fixed_dictionaries({"text": text_strategy, "dpi": dpi_strategy})
+
+
+def make_args(**kwargs: Union[str, int, None]):
+    from holdmypics.api.args import ImageArgs
+
+    return ImageArgs(**compact_dict(kwargs))
 
 
 @given(
     size=size_strategy,
     img_fmt=fmt_strategy,
-    fg_color=color_strategy,
-    bg_color=color_strategy,
+    fg=color_strategy,
+    bg=color_strategy,
     args=args_strategy,
 )
 @example(
     size=(1920, 1080),
     img_fmt="png",
-    fg_color="fff",
-    bg_color="000",
+    fg="fff",
+    bg="000",
     args={"text": "Some Text", "dpi": 300},
 )
 def test_create_images_using_function(
-    config: ModuleType,
+    app_factory: Callable[[], "Holdmypics"],
     size: tuple[int, int],
     img_fmt: str,
-    fg_color: str,
-    bg_color: str,
+    fg: str,
+    bg: str,
     args: dict[str, Union[str, int, None]],
 ):
+    from holdmypics.api.img import GeneratedImage
+
     start = time.perf_counter()
-    app = create_app(config)
-    with app.test_request_context():
-        img_args = ImageArgs(**{k: v for (k, v) in args.items() if v})
-        img = GeneratedImage(size, img_fmt, bg_color, fg_color, img_args)
+    with app_factory().test_request_context():
+        img_args = make_args(**args)
+        img = GeneratedImage(size, img_fmt, bg, fg, img_args)
         assert img.get_save_kw()
         p = img.get_path()
         assert os.path.isfile(p)
@@ -78,24 +77,28 @@ def test_create_images_using_function(
 @given(
     size=size_strategy,
     img_fmt=fmt_strategy,
-    fg_color=opt_color_strategy,
-    bg_color=opt_color_strategy,
+    fg=opt_color_strategy,
+    bg=opt_color_strategy,
     args=args_strategy,
 )
 def test_create_images_using_client(
-    config: ModuleType,
+    app_factory: Callable[[], "Holdmypics"],
     size: tuple[int, int],
     img_fmt: str,
-    fg_color: Optional[str],
-    bg_color: Optional[str],
+    fg: Optional[str],
+    bg: Optional[str],
     args: dict[str, Union[str, int, None]],
 ):
+    if bg is None and fg:
+        bg, fg = fg, None
     start = time.perf_counter()
-    app = create_app(config)
+    app = app_factory()
     with app.test_client() as client:
-        url = make_route(size, bg_color, fg_color, img_fmt)
+        url = make_route(
+            app, "api.image_route", size=size, bg_color=bg, fg_color=fg, fmt=img_fmt
+        )
         if args:
-            url = "?".join((url, urlencode({k: v for (k, v) in args.items() if v})))
+            url = "?".join((url, urlencode(compact_dict(args))))
         res = client.get(url, follow_redirects=False)
         assert res.status_code == 200
         img_type = imghdr.what("filename", h=res.data)
@@ -106,7 +109,14 @@ def test_create_images_using_client(
 
 
 def test_random_text_header(client: FlaskClient):
-    path = make_route((638, 328), "cef", "555", "png")
+    path = make_route(
+        client,
+        "api.image_route",
+        size=(638, 328),
+        bg_color="cef",
+        fg_color="555",
+        fmt="png",
+    )
     args = {"dpi": None, "random_text": True}
     query = urlencode({k: v for (k, v) in args.items() if v})
     url = "?".join((path, query))
@@ -117,7 +127,14 @@ def test_random_text_header(client: FlaskClient):
 
 def test_random_text_ocr(client: FlaskClient):
     pytesseract = pytest.importorskip("pytesseract", reason="pytesseract not installed")
-    path = make_route((638, 328), "cef", "555", "png")
+    path = make_route(
+        client,
+        "api.image_route",
+        size=(638, 328),
+        bg_color="cef",
+        fg_color="555",
+        fmt="png",
+    )
     args = {"text": "Some Random Text", "dpi": None, "random_text": True}
     query = urlencode({k: v for (k, v) in args.items() if v})
     url = "?".join((path, query))
@@ -137,16 +154,17 @@ def _sz_id(sz: tuple[int, int]) -> str:
     return "{0}x{1}".format(*sz)
 
 
-# @pytest.mark.parametrize("fmt", ["png", "webp"])
 @pytest.mark.parametrize(
     "font_name", ["overpass", "fira-mono", "fira-sans", "roboto", "spectral"]
 )
-@pytest.mark.parametrize("size", [(3840, 2160), (1920, 1080), (960, 540)], ids=_sz_id)
+@pytest.mark.parametrize("size", [(3840, 2160), (960, 540)], ids=_sz_id)
 def test_text_with_fonts(
-    app: Flask, image_format: str, font_name: str, size: tuple[int, int]
+    app: "Holdmypics", image_format: str, font_name: str, size: tuple[int, int]
 ):
+    from holdmypics.api.img import GeneratedImage
+
     with app.test_request_context():
-        img_args = ImageArgs(text=f"Text with font: {font_name}", font_name=font_name)
+        img_args = make_args(text=f"Text with font: {font_name}", font_name=font_name)
         img = GeneratedImage(size, image_format, "cef", "555", img_args)
         assert img.get_save_kw()
         p = img.get_path()

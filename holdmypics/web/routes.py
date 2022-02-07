@@ -10,10 +10,11 @@ from flask import current_app, render_template, request, url_for
 from markupsafe import Markup
 from werkzeug.routing import Map, Rule
 
+from .. import redisw
 from .._types import ResponseType
 from ..constants import DEFAULT_COLORS, DEFAULT_FONT, IMG_FORMATS
 from ..fonts import fonts
-from ..utils import config_value, get_count
+from ..utils import config_value
 from . import bp
 from .forms import NumberInput, SelectInput, SelectOption, TextInput
 
@@ -151,7 +152,7 @@ def get_tiled_context() -> dict[str, Any]:
 
 
 def get_count_context():
-    return {"count": f"{get_count():,}"}
+    return {"count": f"{redisw.get_count():,}"}
 
 
 @bp.route("/")

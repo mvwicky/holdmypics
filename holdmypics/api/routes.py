@@ -18,10 +18,11 @@ from flask import (
 from loguru import logger
 from PIL import features
 
+from .. import redisw
 from .._types import Res, ResponseType
 from ..constants import IMG_FORMATS, IMG_FORMATS_STR, NO_CACHE
 from ..fonts import fonts
-from ..utils import get_count, make_rules
+from ..utils import make_rules
 from . import bp
 from .anim import make_anim
 from .args import ImageArgs, TiledImageArgs
@@ -89,7 +90,12 @@ def get_send_file_kwargs(path: str) -> dict[str, Any]:
 
 @bp.route("/count/")
 def count_route():
-    return {"count": get_count()}
+    return {"count": redisw.get_count()}
+
+
+@bp.route("/stats/")
+def stats_route():
+    return {"count": redisw.get_count(), "size": redisw.get_size()}
 
 
 @make_route()

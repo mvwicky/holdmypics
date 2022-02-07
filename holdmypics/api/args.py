@@ -6,6 +6,7 @@ from typing import Any, Optional, cast
 import attr
 import marshmallow as ma
 from flask import request
+from marshmallow import fields
 from marshmallow.validate import Range, Regexp
 from webargs.flaskparser import parser
 
@@ -14,7 +15,8 @@ from ..converters import ColorConverter
 from .utils import resolve_color
 from .words import words
 
-truthy = ma.fields.Boolean.truthy.union({""})
+truthy = fields.Boolean.truthy.union({""})
+_col_regex = ColorConverter.regex
 
 
 def clamp_alpha(a: float) -> float:
@@ -22,9 +24,9 @@ def clamp_alpha(a: float) -> float:
 
 
 class BaseImageArgsSchema(ma.Schema):
-    dpi = ma.fields.Integer(missing=DEFAULT_DPI)
-    seed = ma.fields.String(missing=None)
-    debug = ma.fields.Boolean(missing=False, truthy=truthy)
+    dpi = fields.Integer(missing=DEFAULT_DPI)
+    seed = fields.String(missing=None)
+    debug = fields.Boolean(missing=False, truthy=truthy)
 
 
 @attr.s(slots=True, auto_attribs=True, frozen=True)
@@ -38,10 +40,10 @@ class BaseImageArgs(object):
 
 
 class ImageArgsSchema(BaseImageArgsSchema):
-    text = ma.fields.String(missing=None)
-    font_name = ma.fields.String(missing=DEFAULT_FONT, data_key="font")
-    alpha = ma.fields.Float(missing=1.0, validate=[Range(0.0, 1.0)])
-    random_text = ma.fields.Boolean(missing=False, truthy=truthy)
+    text = fields.String(missing=None)
+    font_name = fields.String(missing=DEFAULT_FONT, data_key="font")
+    alpha = fields.Float(missing=1.0, validate=[Range(0.0, 1.0)])
+    random_text = fields.Boolean(missing=False, truthy=truthy)
 
     @ma.post_load
     def make_args(self, data: Mapping[str, Any], **kwargs: Any) -> "ImageArgs":
@@ -66,15 +68,14 @@ class ImageArgs(BaseImageArgs):
         if not self.random_text:
             return self
         else:
-            text = " ".join([words.random("predicates"), words.random("objects")])
+            text = " ".join((words.random("predicates"), words.random("objects")))
             return attr.evolve(self, text=text)
 
 
 class TiledImageArgsSchema(BaseImageArgsSchema):
-    colors = ma.fields.List(
-        ma.fields.String(validate=[Regexp(ColorConverter.regex)]), missing=list
-    )
-    alpha = ma.fields.Float(missing=1.0, validate=[Range(0.0, 1.0)])
+    colors = fields.List(fields.String(validate=[Regexp(_col_regex)]), missing=list)
+    alpha = fields.Float(missing=1.0, validate=[Range(0.0, 1.0)])
+    # col_major = fields.Boolean(missing=False, truthy=truthy)
 
     @ma.post_load
     def make_args(self, data: Mapping[str, Any], **kwargs: Any) -> "TiledImageArgs":
@@ -91,8 +92,7 @@ def color_converter(inp: Any) -> Any:
 class TiledImageArgs(BaseImageArgs):
     colors: list[str] = attr.ib(factory=list, converter=color_converter)
     alpha: float = attr.ib(default=1.0, converter=clamp_alpha)
-
-    text: None = attr.ib(default=None, init=False)
+    # col_major: bool = False
 
     @classmethod
     def from_request(cls: type["TiledImageArgs"]) -> "TiledImageArgs":

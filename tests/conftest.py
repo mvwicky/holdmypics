@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import os
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
+from functools import partial
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -12,13 +15,11 @@ from marshmallow.validate import OneOf
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from _pytest.config import Config
-    from _pytest.tmpdir import TempPathFactory
     from flask.testing import FlaskClient
 
     from holdmypics import Holdmypics
 
-MAX_LOG_SIZE = 3 * (1024 ** 2)
+MAX_LOG_SIZE = 3 * (1024**2)
 COMMON_PROFILE = {
     "suppress_health_check": (HealthCheck.data_too_large,),
     "deadline": None,
@@ -45,7 +46,7 @@ def configure_logging():
     logger.add(log_file, **log_kw)
 
 
-def pytest_configure(config: "Config"):
+def pytest_configure(config: pytest.Config):
     env = Env()
     env.read_env()
     configure_logging()
@@ -59,7 +60,7 @@ def pytest_configure(config: "Config"):
 
 @pytest.fixture(scope="session", name="config")
 def config_fixture(
-    tmp_path_factory: "TempPathFactory", pytestconfig: "Config"
+    tmp_path_factory: pytest.TempPathFactory, pytestconfig: pytest.Config
 ) -> "ModuleType":
     import config as _config
 
@@ -83,8 +84,15 @@ def config_fixture(
     return _config
 
 
+@pytest.fixture(scope="module", name="app_factory")
+def app_factory_fixture(config: "ModuleType") -> Callable[[], "Holdmypics"]:
+    from holdmypics import create_app
+
+    return partial(create_app, config)
+
+
 @pytest.fixture()
-def app(config) -> "Holdmypics":
+def app(config: "ModuleType") -> "Holdmypics":
     from holdmypics import create_app
 
     app = create_app(config)

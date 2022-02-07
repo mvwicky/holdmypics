@@ -10,7 +10,6 @@ from flask import Flask, current_app
 from loguru import logger
 
 from .constants import (
-    COUNT_KEY,
     IMG_FORMATS_STR,
     UNSET,
     Unset,
@@ -87,20 +86,8 @@ def natsize(num: Union[float, int], fmt: str = "{0:.2f}") -> str:
     if num < 1:
         return f"{fmt.format(num)} {UNITS[0]}"
     exp = min(math.floor(math.log10(num) / 3), len(UNITS) - 1)
-    num = num / 1000 ** exp
+    num = num / 1000**exp
     return f"{fmt.format(num)} {UNITS[exp]}"
-
-
-def get_count() -> int:
-    from . import redisw
-
-    count = redisw.client.get(COUNT_KEY)
-    if count is not None:
-        try:
-            return int(count.decode())
-        except ValueError:
-            return 0
-    return 0
 
 
 @lru_cache(maxsize=128)

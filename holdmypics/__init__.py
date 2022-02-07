@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import re
 import sys
 import time
@@ -17,6 +19,9 @@ from .wrapped_redis import WrappedRedis
 if TYPE_CHECKING:
     from types import ModuleType
     from wsgiref.headers import Headers
+
+__all__ = ("Holdmypics", "create_app", "redisw")
+
 
 redisw = WrappedRedis()
 

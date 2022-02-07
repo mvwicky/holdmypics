@@ -51,17 +51,24 @@ def get_color(color: str) -> str:
     start = int(color.startswith("#"))
     color = color[start:].casefold()
     if not all(e in hexdigits for e in color):
-        logger.warning("Unable to create hex color from `{0}`", color)
+        logger.warning("Unable to create hex color from {0!r}", color)
         return color
     n = len(color)
     if n in (3, 4):
         color = "".join(c * 2 for c in color)
-    if len(color) == 6:
-        color = "".join((color, "ff"))
+        n *= 2
+    if n == 6:
+        color = f"{color}ff"
     if len(color) in (3, 4, 6, 8):  # Should only be 8
-        return "".join(("#", color))
-    logger.warning("Unable to create hex color from `{0}`", color)
+        return f"#{color}"
+    logger.warning("Unable to create hex color from {0!r}", color)
     return color
+
+
+def convert_color(
+    color: Union[float, tuple[float, ...], str]
+) -> tuple[float, float, float, float]:
+    raise NotImplementedError
 
 
 def resolve_color(col: str) -> str:

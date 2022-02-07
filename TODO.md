@@ -23,3 +23,4 @@
 ## Frontend
 
 - [x] Replace `webpack` with `esbuild` (at least for the TypeScript parts)
+- [ ] Use <https://github.com/tailwindlabs/tailwindcss-forms> to style forms.
