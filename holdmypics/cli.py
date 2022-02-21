@@ -89,8 +89,7 @@ def register(app: Flask):
 
         if __version__.__version__ != version:
             logger.info("{0} out of date.", __version__.__name__)
-            ver_file = Path(__version__.__file__)
-            ver_file.write_text('__version__ = "{0}"\n'.format(version))
+            Path(__version__.__file__).write_text(f'__version__ = "{version}"\n')
         else:
             logger.info("{0} up to date.", __version__.__name__)
 

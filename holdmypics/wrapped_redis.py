@@ -31,7 +31,7 @@ class FakeRedis(object):
 @attr.s(slots=True, auto_attribs=True)
 class WrappedRedis(object):
     has_redis: bool = False
-    client: Union[FlaskRedis, FakeRedis] = FakeRedis()
+    client: Union[FlaskRedis, FakeRedis] = attr.ib(factory=FakeRedis, repr=False)
 
     def init_app(self, app: Flask) -> None:
         self.has_redis = bool(app.config.get("REDIS_URL"))

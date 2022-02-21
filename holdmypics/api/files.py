@@ -22,9 +22,7 @@ FNAME_TBL = str.maketrans({"#": "", " ": "-", ".": "", "/": "-", "\\": "-"})
 class GeneratedFiles(object):
     hash_function: ClassVar[Callable[..., hashlib._Hash]] = hashlib.md5
     extensions: ClassVar[tuple[str, ...]] = ("png", "webp", "jpg", "jpeg", "gif")
-    fmt_re: ClassVar[re.Pattern[str]] = re.compile(
-        "\\.({0})$".format("|".join(extensions))
-    )
+    fmt_re: ClassVar[re.Pattern[str]] = re.compile(f"\\.({'|'.join(extensions)})$")
 
     files: set[str] = attr.ib(factory=set)
     initted: bool = attr.ib(init=False, default=False)

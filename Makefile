@@ -5,7 +5,7 @@ MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 
 YARN=yarn
-YARN_RUN=$(YARN) run
+YARN_RUN=$(YARN) --silent run
 WEBPACK=$(YARN_RUN) webpack
 NODE_ENV_VALUE?=development
 CACHE_DIR=.cache
@@ -18,7 +18,7 @@ CONTAINER_NAME?=hold
 GFIND=$(shell command -v gfind)
 ESLINT_D=$(shell command -v eslint_d)
 ESLINT=$(or $(ESLINT_D),$(ESLINT_D),$(YARN_RUN) eslint)
-FIND=$(or $(GFIND),$(GFIND),find)
+FIND:=$(or $(GFIND),$(GFIND),find)
 LS_FILES:=$(sort $(wildcard $(shell git ls-files) $(shell git ls-files --others --exclude-standard)))
 LS_PYTHON=$(filter %.py,$(LS_FILES))
 RM_CMD:=$(or $(shell command -v trash),trash,rm -rf)
@@ -128,7 +128,7 @@ $(ESLINT_SENTINEL): $(ESLINT_DEPS)
 
 $(STYLELINT_SENTINEL): $(STYLELINT_DEPS)
 	@echo "Running stylelint. $(words $?) outdated."
-	@yarn --silent run stylelint 'src/css/**/*.css'
+	@$(YARN_RUN) stylelint 'src/css/**/*.css'
 	@date > $@
 
 $(PYRIGHT_SENTINEL): $(LS_PYTHON) pyproject.toml poetry.lock pyrightconfig.json

@@ -90,5 +90,5 @@ def cmp_args(
 def test_image_args_schemas():
     from holdmypics.api import args
 
-    cmp_args(args.ImageArgs, args.ImageArgsSchema)
+    cmp_args(args.TextImageArgs, args.TextImageArgsSchema)
     cmp_args(args.TiledImageArgs, args.TiledImageArgsSchema)

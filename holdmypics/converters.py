@@ -33,7 +33,7 @@ class DimensionConverter(BaseConverter):
 class ColorConverter(UnicodeConverter):
     regex = f"^(?:{COLOR_REGEX}|{RAND_REGEX})$"
 
-    def __init__(self, map: "Map", *args: Any, **kwargs: Any) -> None:
+    def __init__(self, map: Map, *args: Any, **kwargs: Any) -> None:
         super().__init__(map, 3, 8, None)
 
     def to_python(self, value: str) -> str:

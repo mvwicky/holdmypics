@@ -6,12 +6,13 @@ import time
 from collections.abc import Sequence
 from pathlib import Path
 from subprocess import Popen, TimeoutExpired
-from typing import Any
+from typing import Any, Optional
 
 import attr
 from flask import Flask
 from loguru import logger
 
+from .exceptions import ImproperlyConfigured
 from .utils import config_value
 
 WEB_PROC_RE = re.compile(r"^web: (?P<cmd>.+)$")
@@ -43,19 +44,22 @@ class Server(object):
         if not procfile.is_file():
             raise RuntimeError("Unable to find Procfile")
         lines = procfile.read_text().splitlines()
-        cmd = None
+        cmd: Optional[list[str]] = None
         for line in lines:
             match = WEB_PROC_RE.match(line.strip())
             if match:
                 cmd = match.group("cmd").split(" ")
+                break
         if cmd is None:
             raise RuntimeError("Unable to parse command from Procfile")
-        self._start_proc("dev_server", cmd)
+        self._start_proc("server", cmd)
 
     def _start_yarn(self) -> None:
         bp = self.app.blueprints.get("web")
-        assert bp is not None
-        assert bp.template_folder is not None
+        if bp is None:
+            raise ImproperlyConfigured("Unable to find `web` blueprint.")
+        if bp.template_folder is None:
+            raise ImproperlyConfigured("`web` blueprint has no template folder.")
         out = Path(bp.root_path) / bp.template_folder / "base-out.html"
         start_mtime = 0
         if out.is_file():

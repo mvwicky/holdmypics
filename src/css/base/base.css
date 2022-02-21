@@ -1,7 +1,11 @@
 @layer base {
+  :root {
+    --wrapper-width: 100ch;
+  }
+
   .wrapper {
     display: grid;
-    grid-template-columns: 1fr min(100ch, 100%) 1fr;
+    grid-template-columns: 1fr min(var(--wrapper-width, 100ch), 100%) 1fr;
     @apply my-px mx-2 md:my-6 md:mx-0;
   }
 

@@ -29,6 +29,31 @@ class BaseImageArgsSchema(ma.Schema):
     debug = fields.Boolean(missing=False, truthy=truthy)
 
 
+class TextImageArgsSchema(BaseImageArgsSchema):
+    text = fields.String(missing=None)
+    font_name = fields.String(missing=DEFAULT_FONT, data_key="font")
+    alpha = fields.Float(missing=1.0, validate=[Range(0.0, 1.0)])
+    random_text = fields.Boolean(missing=False, truthy=truthy)
+
+    @ma.post_load
+    def make_args(self, data: Mapping[str, Any], **kwargs: Any) -> "TextImageArgs":
+        return TextImageArgs(**data).real_args()
+
+
+class TiledImageArgsSchema(BaseImageArgsSchema):
+    colors = fields.List(fields.String(validate=[Regexp(_col_regex)]), missing=list)
+    alpha = fields.Float(missing=1.0, validate=[Range(0.0, 1.0)])
+    col_major = fields.Boolean(missing=False, truthy=truthy)
+
+    @ma.post_load
+    def make_args(self, data: Mapping[str, Any], **kwargs: Any) -> "TiledImageArgs":
+        return TiledImageArgs(**data)
+
+
+text_schema = TextImageArgsSchema()
+tiled_schema = TiledImageArgsSchema()
+
+
 @attr.s(slots=True, auto_attribs=True, frozen=True)
 class BaseImageArgs(object):
     dpi: int = DEFAULT_DPI
@@ -39,19 +64,8 @@ class BaseImageArgs(object):
         return attr.astuple(self)
 
 
-class ImageArgsSchema(BaseImageArgsSchema):
-    text = fields.String(missing=None)
-    font_name = fields.String(missing=DEFAULT_FONT, data_key="font")
-    alpha = fields.Float(missing=1.0, validate=[Range(0.0, 1.0)])
-    random_text = fields.Boolean(missing=False, truthy=truthy)
-
-    @ma.post_load
-    def make_args(self, data: Mapping[str, Any], **kwargs: Any) -> "ImageArgs":
-        return ImageArgs(**data)
-
-
 @attr.s(slots=True, auto_attribs=True, frozen=True)
-class ImageArgs(BaseImageArgs):
+class TextImageArgs(BaseImageArgs):
     text: Optional[str] = None
     font_name: str = DEFAULT_FONT
     alpha: float = attr.ib(default=1.0, converter=clamp_alpha)
@@ -59,27 +73,17 @@ class ImageArgs(BaseImageArgs):
 
     @classmethod
     def from_request(
-        cls: type["ImageArgs"], kwargs: Optional[Mapping[str, Any]] = None
-    ) -> "ImageArgs":
-        args = parser.parse(ImageArgsSchema(), request, location="query")
-        return cast(ImageArgs, args).real_args()
+        cls: type["TextImageArgs"], kwargs: Optional[Mapping[str, Any]] = None
+    ) -> "TextImageArgs":
+        args = parser.parse(text_schema, request, location="query")
+        return cast(TextImageArgs, args)
 
-    def real_args(self) -> "ImageArgs":
+    def real_args(self) -> "TextImageArgs":
         if not self.random_text:
             return self
         else:
-            text = " ".join((words.random("predicates"), words.random("objects")))
+            text = f'{words.random("predicates")} {words.random("objects")}'
             return attr.evolve(self, text=text)
-
-
-class TiledImageArgsSchema(BaseImageArgsSchema):
-    colors = fields.List(fields.String(validate=[Regexp(_col_regex)]), missing=list)
-    alpha = fields.Float(missing=1.0, validate=[Range(0.0, 1.0)])
-    # col_major = fields.Boolean(missing=False, truthy=truthy)
-
-    @ma.post_load
-    def make_args(self, data: Mapping[str, Any], **kwargs: Any) -> "TiledImageArgs":
-        return TiledImageArgs(**data)
 
 
 def color_converter(inp: Any) -> Any:
@@ -92,11 +96,11 @@ def color_converter(inp: Any) -> Any:
 class TiledImageArgs(BaseImageArgs):
     colors: list[str] = attr.ib(factory=list, converter=color_converter)
     alpha: float = attr.ib(default=1.0, converter=clamp_alpha)
-    # col_major: bool = False
+    col_major: bool = False
 
     @classmethod
     def from_request(cls: type["TiledImageArgs"]) -> "TiledImageArgs":
-        args = parser.parse(TiledImageArgsSchema(), request, location="query")
+        args = parser.parse(tiled_schema, request, location="query")
         return cast(TiledImageArgs, args)
 
     def to_seq(self) -> tuple[Any, ...]:

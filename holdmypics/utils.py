@@ -13,8 +13,8 @@ from .constants import (
     IMG_FORMATS_STR,
     UNSET,
     Unset,
-    bg_color_default,
-    fg_color_default,
+    bg_default,
+    fg_default,
     fmt_default,
 )
 from .exceptions import ImproperlyConfigured
@@ -48,7 +48,7 @@ def config_value(
     app = app if app is not None else current_app
     value = app.config.get(name, default)
     if value is UNSET:
-        raise ImproperlyConfigured("Unknown setting {0}".format(name))
+        raise ImproperlyConfigured(f"Unknown setting {name}")
     if cast_as is not None:
         value = cast_as(value)
     if assert_is:
@@ -66,13 +66,13 @@ def get_debug() -> bool:
 
 def make_rules() -> list[tuple[str, dict[str, str]]]:
     fmt_rule = f"<any({IMG_FORMATS_STR}):fmt>"
-    colors_default = {**bg_color_default, **fg_color_default}
+    colors_default = {**bg_default, **fg_default}
     bg_color, fg_color = "<col:bg_color>", "<col:fg_color>"
 
     return [
         (fmt_rule, colors_default),
-        (bg_color, {**fg_color_default, **fmt_default}),
-        ("/".join((bg_color, fmt_rule)), fg_color_default),
+        (bg_color, {**fg_default, **fmt_default}),
+        ("/".join((bg_color, fmt_rule)), fg_default),
         ("/".join((bg_color, fg_color)), fmt_default),
         ("/".join((bg_color, fg_color, fmt_rule)), {}),
     ]

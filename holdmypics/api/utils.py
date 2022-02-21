@@ -33,7 +33,7 @@ def normalize_fmt(fmt: str) -> str:
 
 def random_color() -> str:
     """Generate a random hex string."""
-    return "".join("{0:02x}".format(random.randrange(1 << 8)) for _ in range(3))
+    return "".join(f"{random.randrange(1 << 8):02x}" for _ in range(3))
 
 
 def px_to_pt(px: float) -> float:

@@ -7,7 +7,7 @@ env.read_env()
 
 loglevel = "info"
 _host, _port = env("HOST", default="0.0.0.0"), env.int("PORT", default=8080)
-bind = ["{0}:{1}".format(_host, _port)]
+bind = [f"{_host}:{_port}"]
 
 keyfile = env("KEYFILE", default=None)
 certfile = env("CERTFILE", default=None)

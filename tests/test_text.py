@@ -32,9 +32,9 @@ args_strategy = st.fixed_dictionaries({"text": text_strategy, "dpi": dpi_strateg
 
 
 def make_args(**kwargs: Union[str, int, None]):
-    from holdmypics.api.args import ImageArgs
+    from holdmypics.api.args import TextImageArgs
 
-    return ImageArgs(**compact_dict(kwargs))
+    return TextImageArgs(**compact_dict(kwargs))
 
 
 @given(
@@ -59,12 +59,12 @@ def test_create_images_using_function(
     bg: str,
     args: dict[str, Union[str, int, None]],
 ):
-    from holdmypics.api.img import GeneratedImage
+    from holdmypics.api.text import GeneratedTextImage
 
     start = time.perf_counter()
     with app_factory().test_request_context():
         img_args = make_args(**args)
-        img = GeneratedImage(size, img_fmt, bg, fg, img_args)
+        img = GeneratedTextImage(size, img_fmt, bg, fg, img_args)
         assert img.get_save_kw()
         p = img.get_path()
         assert os.path.isfile(p)
@@ -161,11 +161,11 @@ def _sz_id(sz: tuple[int, int]) -> str:
 def test_text_with_fonts(
     app: "Holdmypics", image_format: str, font_name: str, size: tuple[int, int]
 ):
-    from holdmypics.api.img import GeneratedImage
+    from holdmypics.api.text import GeneratedTextImage
 
     with app.test_request_context():
         img_args = make_args(text=f"Text with font: {font_name}", font_name=font_name)
-        img = GeneratedImage(size, image_format, "cef", "555", img_args)
+        img = GeneratedTextImage(size, image_format, "cef", "555", img_args)
         assert img.get_save_kw()
         p = img.get_path()
         assert os.path.isfile(p)

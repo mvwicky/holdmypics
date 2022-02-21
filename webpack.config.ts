@@ -53,7 +53,7 @@ const configuration: Configuration = {
     new MiniCssExtractPlugin({
       filename: join("css", `style.[name]${contenthash}.css`),
       chunkFilename: join("css", `[name]${contenthash}.css`),
-    }) as any,
+    }),
     new HtmlWebpackPlugin({
       filename: join(templateDir, "base-out.html"),
       minify: false,

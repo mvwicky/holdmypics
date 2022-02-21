@@ -8,6 +8,7 @@
     "color-named": "never",
     "comment-no-empty": true,
     "order/properties-alphabetical-order": true,
-    "at-rule-no-unknown": [true, { "ignoreAtRules": ["screen", "layer"] }]
+    "at-rule-no-unknown": [true, { "ignoreAtRules": ["screen", "layer"] }],
+    "function-no-unknown": [true, { "ignoreFunctions": ["theme"] }]
   }
 }

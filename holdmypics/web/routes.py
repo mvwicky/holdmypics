@@ -43,6 +43,7 @@ def get_rules() -> list[str]:
     return [RULE_RE.sub("", r.rule) for r in rules_iter]
 
 
+@functools.cache
 def get_common_context(page: str) -> CommonContext:
     color_pattern = r"((([a-fA-F0-9]{3}){1,2})|(([a-fA-F0-9]{4}){1,2}))|rand"
     ns = page.upper()
@@ -125,9 +126,6 @@ def get_index_context() -> dict[str, Any]:
         "bg_color": bg,
         "fg_color": fg,
         "text": text,
-        "font_names": font_names,
-        "img_formats": IMG_FORMATS,
-        "font": font,
         "seed": None,
         "col_fields": [
             TextInput("bg", "Background Color", bg, **col_kw).add_cy(),
@@ -137,7 +135,6 @@ def get_index_context() -> dict[str, Any]:
     }
 
 
-@functools.cache
 def get_tiled_context() -> dict[str, Any]:
     ctx = get_common_context("tiled")
     cols = config_value("TILED_DEFAULT_COLUMNS", assert_is=int)

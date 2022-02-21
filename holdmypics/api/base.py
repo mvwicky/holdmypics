@@ -4,7 +4,7 @@ import os
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from types import MappingProxyType
-from typing import Any, ClassVar, Generic, Literal, Optional, TypeVar
+from typing import Any, ClassVar, Generic, Literal, Optional, TypeVar, Union
 
 import attr
 from loguru import logger
@@ -74,7 +74,9 @@ class BaseGeneratedImage(Generic[_Args], ABC):
     args: _Args
 
     def new_image(
-        self, size: Optional[tuple[int, int]] = None, color: Optional[str] = None
+        self,
+        size: Optional[tuple[int, int]] = None,
+        color: Union[float, tuple[float, float, float, float], str, None] = None,
     ) -> Image.Image:
         return Image.new(self.mode, size or self.size, color or self.bg_color)
 
@@ -95,6 +97,8 @@ class BaseGeneratedImage(Generic[_Args], ABC):
         )
 
     def save_img(self, im: Image.Image, path: str) -> None:
+        if self.fmt == "jpeg":
+            im = im.convert("RGB")
         save_kw = self.get_save_kw()
         im.save(path, **save_kw)
         im.close()

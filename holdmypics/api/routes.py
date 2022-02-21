@@ -3,7 +3,7 @@ from __future__ import annotations
 import mimetypes
 import random
 from collections.abc import Callable
-from typing import Any, cast
+from typing import Any
 from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 
 from flask import (
@@ -18,18 +18,19 @@ from flask import (
 from loguru import logger
 from PIL import features
 
+from holdmypics.api.base import BaseGeneratedImage
 from .. import redisw
-from .._types import Res, ResponseType
+from .._types import ResObject, ResponseType
 from ..constants import IMG_FORMATS, IMG_FORMATS_STR, NO_CACHE
 from ..fonts import fonts
 from ..utils import make_rules
 from . import bp
 from .anim import make_anim
-from .args import ImageArgs, TiledImageArgs
+from .args import TextImageArgs, TiledImageArgs
 from .files import files
-from .img import GeneratedImage
+from .text import GeneratedTextImage
 from .tiled import GeneratedTiledImage
-from .utils import RAND_COLOR, random_color
+from .utils import RAND_COLOR
 
 WEBP_ANIM = features.check_feature("webp_anim")
 ANIM_FMTS = {"gif"}.union({"webp"} if WEBP_ANIM else set())
@@ -42,9 +43,9 @@ def make_route(prefix: str = "") -> Callable:
     for part, defaults in rule_parts:
         rules.append((f"/<dim:size>/{part}/", defaults))
 
-    def func(f: Callable) -> Callable:
+    def func(f: Callable[..., ResponseType]) -> Callable[..., ResponseType]:
         for rule, defaults in rules:
-            bp.add_url_rule("".join((prefix, rule)), None, f, defaults=defaults)
+            bp.add_url_rule(f"{prefix}{rule}", None, f, defaults=defaults)
         return f
 
     return func
@@ -98,31 +99,30 @@ def stats_route():
     return {"count": redisw.get_count(), "size": redisw.get_size()}
 
 
+def get_img_response(img: BaseGeneratedImage) -> ResObject:
+    path = img.get_path()
+    if files.need_to_clean:
+        after_this_request(do_cleanup)
+    kw = get_send_file_kwargs(path)
+    return send_file(path, **kw)
+
+
 @make_route()
 def image_route(
     size: tuple[int, int], bg_color: str, fg_color: str, fmt: str
 ) -> ResponseType:
     check_size(size)
     fmt = check_format(fmt)
-    args = ImageArgs.from_request().real_args()
+    args = TextImageArgs.from_request()
     if args.font_name not in fonts.font_names:
         return font_redirect(args.font_name)
 
     bg_lower, fg_lower = map(str.casefold, (bg_color, fg_color))
     if RAND_COLOR in {bg_lower, fg_lower}:
         random.seed(args.seed)
-        if bg_lower == RAND_COLOR:
-            bg_color = random_color()
-        if fg_lower == RAND_COLOR:
-            fg_color = random_color()
 
-    img = GeneratedImage(size, fmt, bg_color, fg_color, args)
-    path = img.get_path()
-    if files.need_to_clean:
-        after_this_request(do_cleanup)
-
-    kw = get_send_file_kwargs(path)
-    res = send_file(path, **kw)
+    img = GeneratedTextImage(size, fmt, bg_color, fg_color, args)
+    res = get_img_response(img)
     if args.random_text or RAND_COLOR in {bg_lower, fg_lower}:
         res.headers["Cache-Control"] = NO_CACHE
     if args.random_text and args.text:
@@ -141,7 +141,7 @@ def anim_route(
     anim = make_anim(size, bg_color, fg_color, fmt)
     print(len(anim.getvalue()))
 
-    return cast(Res, send_file(anim, mimetype=f"image/{fmt}"))
+    return send_file(anim, mimetype=f"image/{fmt}")
 
 
 @bp.route("/text")
@@ -155,12 +155,7 @@ def tiled_route(size: tuple[int, int], cols: int, rows: int, fmt: str) -> Respon
     fmt = check_format(fmt)
     args = TiledImageArgs.from_request()
     img = GeneratedTiledImage(size, fmt, "0000", "0000", args, cols, rows)
-    path = img.get_path()
-    if files.need_to_clean:
-        after_this_request(do_cleanup)
-
-    kw = get_send_file_kwargs(path)
-    res = send_file(path, **kw)
+    res = get_img_response(img)
     res.headers["Cache-Control"] = NO_CACHE
 
-    return cast(Res, res)
+    return res

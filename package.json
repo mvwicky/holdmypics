@@ -60,7 +60,7 @@
     "prettier": "^2.0.0",
     "stylelint": "^14",
     "stylelint-config-prettier": "^9.0.0",
-    "stylelint-config-recommended": "^6",
+    "stylelint-config-recommended": "^7.0.0",
     "stylelint-order": "^5",
     "stylelint-prettier": "^2",
     "tailwindcss": "^3",

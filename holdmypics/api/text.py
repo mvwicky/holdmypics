@@ -2,15 +2,29 @@ from __future__ import annotations
 
 from typing import Union
 
+import attr
 from loguru import logger
 from PIL import Image, ImageDraw
 from PIL.ImageFont import FreeTypeFont, ImageFont
 
 from ..fonts import fonts
+from .args import TextImageArgs
+from .base import BaseGeneratedImage
 from .utils import FontParams, TextArgs, px_to_pt
 
 MAX_TEXT_HEIGHT = 0.9
 MAX_TEXT_WIDTH = 0.9
+
+
+@attr.s(slots=True, auto_attribs=True)
+class GeneratedTextImage(BaseGeneratedImage[TextImageArgs]):
+    def make(self) -> Image.Image:
+        im = self.new_image()
+        args = self.args
+        if args.text is not None:
+            text_args = TextArgs(self.fg_color, args.text, args.font_name, args.debug)
+            im = draw_text(im, text_args)
+        return im
 
 
 def _log_font(font_name: str, pt: int, idx: int):
