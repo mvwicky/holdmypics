@@ -36,7 +36,7 @@ class TextImageArgsSchema(BaseImageArgsSchema):
     random_text = fields.Boolean(missing=False, truthy=truthy)
 
     @ma.post_load
-    def make_args(self, data: Mapping[str, Any], **kwargs: Any) -> "TextImageArgs":
+    def make_args(self, data: Mapping[str, Any], **kwargs: Any) -> TextImageArgs:
         return TextImageArgs(**data).real_args()
 
 
@@ -46,7 +46,7 @@ class TiledImageArgsSchema(BaseImageArgsSchema):
     col_major = fields.Boolean(missing=False, truthy=truthy)
 
     @ma.post_load
-    def make_args(self, data: Mapping[str, Any], **kwargs: Any) -> "TiledImageArgs":
+    def make_args(self, data: Mapping[str, Any], **kwargs: Any) -> TiledImageArgs:
         return TiledImageArgs(**data)
 
 
@@ -72,13 +72,11 @@ class TextImageArgs(BaseImageArgs):
     random_text: bool = False
 
     @classmethod
-    def from_request(
-        cls: type["TextImageArgs"], kwargs: Optional[Mapping[str, Any]] = None
-    ) -> "TextImageArgs":
+    def from_request(cls: type[TextImageArgs]) -> TextImageArgs:
         args = parser.parse(text_schema, request, location="query")
         return cast(TextImageArgs, args)
 
-    def real_args(self) -> "TextImageArgs":
+    def real_args(self) -> TextImageArgs:
         if not self.random_text:
             return self
         else:
@@ -99,7 +97,7 @@ class TiledImageArgs(BaseImageArgs):
     col_major: bool = False
 
     @classmethod
-    def from_request(cls: type["TiledImageArgs"]) -> "TiledImageArgs":
+    def from_request(cls: type[TiledImageArgs]) -> TiledImageArgs:
         args = parser.parse(tiled_schema, request, location="query")
         return cast(TiledImageArgs, args)
 
@@ -112,6 +110,6 @@ class AnimArgs(object):
     frames: int = 10
 
     @classmethod
-    def from_request(cls) -> "AnimArgs":
+    def from_request(cls) -> AnimArgs:
         kw = {"frames": request.args.get("frames", 10, type=int)}
         return cls(**kw)

@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 from abc import ABC, abstractmethod
 from collections.abc import Callable
+from functools import partial
 from types import MappingProxyType
 from typing import Any, ClassVar, Generic, Literal, Optional, TypeVar, Union
 
@@ -17,6 +18,9 @@ from .files import files
 from .utils import normalize_fmt, resolve_color
 
 _Args = TypeVar("_Args", bound=BaseImageArgs)
+
+
+get_nat = partial(natsize, fmt="{0:.1f}")
 
 
 def _jpeg_opt_kw(args: BaseImageArgs) -> dict[str, Any]:
@@ -103,8 +107,7 @@ class BaseGeneratedImage(Generic[_Args], ABC):
         im.save(path, **save_kw)
         im.close()
         size = get_size(path)
-        sz = natsize(size, fmt="{0:.1f}")
-        logger.info("Created {0!r} ({1})", os.path.basename(path), sz)
+        logger.info("Created {0!r} ({1})", os.path.basename(path), get_nat(size))
         redisw.incr_count()
         redisw.incr_size(size)
 

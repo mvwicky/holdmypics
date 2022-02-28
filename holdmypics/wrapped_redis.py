@@ -54,7 +54,7 @@ class WrappedRedis(object):
         return self.client.incr(COUNT_KEY)
 
     def incr_size(self, size: int) -> int:
-        return self.client.incrby(SIZE_KEY)
+        return self.client.incrby(SIZE_KEY, size)
 
     def get_count(self) -> int:
         return self._get_int(COUNT_KEY)

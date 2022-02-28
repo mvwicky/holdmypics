@@ -112,12 +112,6 @@ def get_index_context() -> dict[str, Any]:
         "pattern": ctx["color_pattern"],
         "help_text": "Three, four, six, or eight hex digits.",
     }
-    ctx["sel_fields"] = [
-        *ctx["sel_fields"],
-        SelectInput(
-            name="font", value=font, options=font_names, label="Font", help_text=None
-        ),
-    ]
 
     return {
         **ctx,
@@ -132,6 +126,16 @@ def get_index_context() -> dict[str, Any]:
             TextInput("fg", "Text Color", fg, **col_kw).add_cy(),
         ],
         "title": "Hold My Pics",
+        "sel_fields": [
+            *ctx["sel_fields"],
+            SelectInput(
+                name="font",
+                value=font,
+                options=font_names,
+                label="Font",
+                help_text=None,
+            ),
+        ],
     }
 
 
@@ -140,12 +144,19 @@ def get_tiled_context() -> dict[str, Any]:
     cols = config_value("TILED_DEFAULT_COLUMNS", assert_is=int)
     rows = config_value("TILED_DEFAULT_ROWS", assert_is=int)
     num_kw = {"required": True, "min": 1, "step": 1}
-    ctx["num_fields"] = [
-        *ctx["num_fields"],
-        NumberInput(name="cols", label="Columns", value=cols, **num_kw).add_cy(),
-        NumberInput(name="rows", label="Rows", value=rows, **num_kw).add_cy(),
-    ]
-    return {**ctx, "cols": cols, "rows": rows}
+    _a_color = r"(([a-f0-9]{4}){1,2})|([a-f0-9]{3}){1,2}|rand"
+    colors_pattern = f"({_a_color})((,{_a_color})*)"
+    return {
+        **ctx,
+        "num_fields": [
+            *ctx["num_fields"],
+            NumberInput(name="cols", label="Columns", value=cols, **num_kw).add_cy(),
+            NumberInput(name="rows", label="Rows", value=rows, **num_kw).add_cy(),
+        ],
+        "cols": cols,
+        "rows": rows,
+        "colors_pattern": colors_pattern,
+    }
 
 
 def get_count_context():

@@ -45,7 +45,7 @@
       <div class="form-group">
         <label for="colors">Colors</label>
         <div class="input-group">
-          <input type="text" name="colors" id="colors" pattern="({{ color_pattern }})(,{{ color_pattern }})*" value="{{ default_colors }}">
+          <input type="text" name="colors" id="colors" pattern="^{{ colors_pattern }}$" value="{{ default_colors | join(',') }}">
           <small class="help-text">Colors as a comma separated list.</small>
         </div>
       </div>

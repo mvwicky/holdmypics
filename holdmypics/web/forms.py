@@ -9,7 +9,7 @@ _T = TypeVar("_T")
 _Inp = TypeVar("_Inp", bound="BaseInput")
 
 
-def _default_id(obj: "BaseInput") -> str:
+def _default_id(obj: BaseInput) -> str:
     return obj.name
 
 

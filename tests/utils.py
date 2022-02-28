@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from flask.testing import FlaskClient
 
 IMG_FORMATS = ("png", "webp", "jpeg", "gif")
-DPI_VALUES = (300, 72, 144, 216, 244, 488)
+DPI_VALUES = (None, 300, 72, 144, 216, 244, 488)
 
 
 def _get_col_strategy():
@@ -25,10 +25,10 @@ size_strategy = st.tuples(dim_strategy, dim_strategy)
 color_strategy = st.deferred(_get_col_strategy)
 opt_color_strategy = st.one_of(st.none(), color_strategy)
 fmt_strategy = st.sampled_from(IMG_FORMATS)
-dpi_strategy = st.one_of(st.none(), st.sampled_from(DPI_VALUES))
+dpi_strategy = st.sampled_from(DPI_VALUES)
 
 
-def make_route(app: Union["Flask", "FlaskClient"], endpoint: str, **kwargs: Any) -> str:
+def make_route(app: Union[Flask, FlaskClient], endpoint: str, **kwargs: Any) -> str:
     if not isinstance(app, Flask):
         app = app.application
     with app.test_request_context():

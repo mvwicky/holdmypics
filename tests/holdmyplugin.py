@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import cast
+
 import pytest
 
 
@@ -18,6 +20,5 @@ def pytest_addoption(parser: pytest.Parser):
 
 def pytest_generate_tests(metafunc: pytest.Metafunc):
     if "image_format" in metafunc.fixturenames:
-        metafunc.parametrize(
-            "image_format", metafunc.config.getoption("image_formats", [])
-        )
+        fmt = metafunc.config.getoption("image_formats", [])  # type: ignore
+        metafunc.parametrize("image_format", cast(list[str], fmt))

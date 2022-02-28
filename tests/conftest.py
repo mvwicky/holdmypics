@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import os
+import time
 from collections.abc import Callable, Iterable
-from functools import partial
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
+import attr
 import pytest
 from environs import Env
 from hypothesis import HealthCheck, settings
@@ -20,14 +21,19 @@ if TYPE_CHECKING:
     from holdmypics import Holdmypics
 
 MAX_LOG_SIZE = 3 * (1024**2)
-COMMON_PROFILE = {
-    "suppress_health_check": (HealthCheck.data_too_large,),
-    "deadline": None,
-}
 PROFILES = {
-    "ci": {"max_examples": 50, **COMMON_PROFILE},
-    "dev": {"max_examples": 15, **COMMON_PROFILE},
+    "ci": {"max_examples": 50, "derandomize": True},
+    "dev": {"max_examples": 15},
 }
+
+
+@attr.s(slots=True, auto_attribs=True, frozen=True)
+class AppFactory(object):
+    factory: Callable[[ModuleType], Holdmypics] = attr.ib(repr=False)
+    config: ModuleType = attr.ib(repr=False)
+
+    def __call__(self) -> Holdmypics:
+        return self.factory(self.config)
 
 
 def configure_logging():
@@ -49,10 +55,14 @@ def configure_logging():
 def pytest_configure(config: pytest.Config):
     env = Env()
     env.read_env()
-    configure_logging()
+    # configure_logging()
 
+    deadline = env.timedelta("HYPOTHESIS_DEADLINE", default=None)
+    common_settings = settings(
+        suppress_health_check=(HealthCheck.data_too_large,), deadline=deadline
+    )
     for name in PROFILES:
-        settings.register_profile(name, **PROFILES[name])
+        settings.register_profile(name, common_settings, **PROFILES[name])
 
     profile = env("HYPOTHESIS_PROFILE", default="ci", validate=[OneOf(PROFILES)])
     settings.load_profile(profile)
@@ -61,12 +71,12 @@ def pytest_configure(config: pytest.Config):
 @pytest.fixture(scope="session", name="config")
 def config_fixture(
     tmp_path_factory: pytest.TempPathFactory, pytestconfig: pytest.Config
-) -> "ModuleType":
+) -> ModuleType:
     import config as _config
 
-    image_dir = pytestconfig.getoption("--image-dir", None)
+    image_dir = pytestconfig.getoption("--image-dir", None)  # type: ignore
     if image_dir is not None:
-        image_dir = Path(image_dir).resolve()
+        image_dir = Path(cast(str, image_dir)).resolve()
     else:
         image_dir = tmp_path_factory.mktemp("holdmypics-images")
     logger.info("Image dir: {0}", image_dir)
@@ -85,22 +95,27 @@ def config_fixture(
 
 
 @pytest.fixture(scope="module", name="app_factory")
-def app_factory_fixture(config: "ModuleType") -> Callable[[], "Holdmypics"]:
+def app_factory_fixture(config: ModuleType) -> AppFactory:
     from holdmypics import create_app
 
-    return partial(create_app, config)
+    return AppFactory(create_app, config)
 
 
 @pytest.fixture()
-def app(config: "ModuleType") -> "Holdmypics":
-    from holdmypics import create_app
-
-    app = create_app(config)
-
-    return app
+def app(app_factory: AppFactory) -> Holdmypics:
+    return app_factory()
 
 
 @pytest.fixture()
-def client(app: "Holdmypics") -> Iterable["FlaskClient"]:
+def client(app: Holdmypics) -> Iterable[FlaskClient]:
     with app.test_client() as client:
         yield client
+
+
+@pytest.fixture()
+def time_test(request: pytest.FixtureRequest):
+    start = time.perf_counter()
+    yield None
+    func = cast(Callable, request.function)
+    name = func.__name__
+    logger.debug("Timed {0!r} - Elapsed: {1:.4f}", name, time.perf_counter() - start)

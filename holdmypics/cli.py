@@ -24,7 +24,7 @@ CATEGORIES = (MAIN, DEV)
 
 
 def register(app: Flask):
-    cfg_path = config_value("BASE_PATH", app=app, cast_as=Path) / "config"
+    cfg_path = config_value("BASE_PATH", app=app, assert_is=Path) / "config"
 
     @app.cli.command(context_settings=CTX_SETTINGS)
     @click.option(

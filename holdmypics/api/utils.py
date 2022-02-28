@@ -26,7 +26,7 @@ class TextArgs(NamedTuple):
 RAND_COLOR = "rand".casefold()
 
 
-@functools.lru_cache(maxsize=8)
+@functools.cache
 def normalize_fmt(fmt: str) -> str:
     return "jpeg" if fmt == "jpg" else fmt
 

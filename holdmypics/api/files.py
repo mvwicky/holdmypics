@@ -102,8 +102,7 @@ class GeneratedFiles(object):
             base_name = "-".join(map(str, params)).translate(FNAME_TBL)
         else:
             base_name = self.params_hash(*params)
-        name = ".".join((base_name, fmt))
-        path = os.path.join(self.images_folder, name)
+        path = os.path.join(self.images_folder, f"{base_name}.{fmt}")
         self.files.add(path)
         return path
 

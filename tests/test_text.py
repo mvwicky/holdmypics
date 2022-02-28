@@ -52,7 +52,7 @@ def make_args(**kwargs: Union[str, int, None]):
     args={"text": "Some Text", "dpi": 300},
 )
 def test_create_images_using_function(
-    app_factory: Callable[[], "Holdmypics"],
+    app_factory: Callable[[], Holdmypics],
     size: tuple[int, int],
     img_fmt: str,
     fg: str,
@@ -82,7 +82,7 @@ def test_create_images_using_function(
     args=args_strategy,
 )
 def test_create_images_using_client(
-    app_factory: Callable[[], "Holdmypics"],
+    app_factory: Callable[[], Holdmypics],
     size: tuple[int, int],
     img_fmt: str,
     fg: Optional[str],
@@ -159,7 +159,7 @@ def _sz_id(sz: tuple[int, int]) -> str:
 )
 @pytest.mark.parametrize("size", [(3840, 2160), (960, 540)], ids=_sz_id)
 def test_text_with_fonts(
-    app: "Holdmypics", image_format: str, font_name: str, size: tuple[int, int]
+    app: Holdmypics, image_format: str, font_name: str, size: tuple[int, int]
 ):
     from holdmypics.api.text import GeneratedTextImage
 
