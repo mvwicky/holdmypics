@@ -96,6 +96,14 @@ webpack: export NODE_ENV=$(NODE_ENV_VALUE)
 webpack:
 	@$(WEBPACK) $(WEBPACK_ARGS)
 
+
+version-commit:
+ifdef DRY_RUN
+	@echo $(VERSION_TAG)
+else
+	@git commit --no-verify -m $(VERSION_TAG)
+endif
+
 version-tag:
 ifdef DRY_RUN
 	@echo $(VERSION_TAG)

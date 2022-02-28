@@ -8,7 +8,7 @@ from .constants import RAND_COLOR
 
 RGB_REGEX = r"(?:(?:[A-Fa-f0-9]{3}){1,2})"
 RGBA_REGEX = r"(?:(?:[A-Fa-f0-9]{4}){1,2})"
-COLOR_REGEX = f"(?:{RGB_REGEX}|{RGBA_REGEX})"
+COLOR_REGEX = f"(?:{RGBA_REGEX}|{RGB_REGEX})"
 RAND_REGEX = f"(?i:{RAND_COLOR})"
 
 
