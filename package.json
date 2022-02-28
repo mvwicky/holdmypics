@@ -33,6 +33,7 @@
     "friendly-words": "^1.1.10"
   },
   "devDependencies": {
+    "@tailwindcss/forms": "^0.4.0",
     "@types/debug": "^4.1.5",
     "@types/feather-icons": "^4.7.0",
     "@types/node": "^16",

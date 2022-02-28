@@ -23,6 +23,17 @@
 }
 
 @layer utilities {
+  .full-bleed,
+  .mostly-full-bleed {
+    grid-column: 1 / 4;
+    @apply w-full;
+  }
+
+  .mostly-full-bleed {
+    grid-column: 1 / 4;
+    @apply max-w-6xl mx-auto;
+  }
+
   a[href]:not(.never-underline):hover {
     @apply underline;
   }
