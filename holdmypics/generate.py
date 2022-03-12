@@ -43,15 +43,16 @@ class Generator(object):
     def get_context(
         self, dev: bool, port: Optional[int]
     ) -> dict[str, Union[str, bool, int]]:
-        ctx = {
-            **self.common_context,
+        extra = {
             "yarn_build": f"build{':dev' if dev else ''}",
             "requirements": f"requirements{'-dev' if dev else ''}.txt",
             "node_version": self.get_node_version(),
             "dev": dev,
         }
         if port is not None:
-            ctx["port"] = port
+            extra["port"] = port
+        ctx = self.common_context.copy()
+        ctx.update(extra)
         return ctx
 
     def generate(self, dry_run: bool, verbosity: int, yes: bool, port: Optional[int]):
@@ -118,8 +119,10 @@ class Generator(object):
 
     def get_node_version(self) -> str:
         if self._node_version is None:
-            cmd = run("node", "--version", capture_output=True, text=True)
-            version = cmd.stdout.strip().split(".", 1)[0].lstrip("v")
-            assert version.isnumeric()
+            cmd = run("node", "--version", capture_output=True, text=True, no_log=True)
+            version = cmd.stdout.strip().rsplit(".", 1)[0].lstrip("v")
+            parts = version.split(".")
+            assert len(parts) == 2
+            assert all(p.isnumeric() for p in parts)
             self._node_version = version
         return self._node_version

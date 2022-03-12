@@ -1,4 +1,4 @@
-FROM node:14-alpine3.12 AS client-builder
+FROM node:16.14-alpine3.15 AS client-builder
 
 RUN mkdir /app/
 WORKDIR /app/
@@ -6,7 +6,7 @@ COPY ./package.json ./yarn.lock /app/
 
 RUN yarn install --prod
 
-FROM python:3.9.5-slim
+FROM python:3.10.2-slim
 
 ENV LC_ALL=C.UTF-8 LANG=C.UTF-8 PYTHONUNBUFFERED=1
 

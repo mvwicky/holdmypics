@@ -1,4 +1,4 @@
-FROM node:{{ node_version }}-alpine3.12 AS client-builder
+FROM node:{{ node_version }}-alpine3.15 AS client-builder
 
 RUN mkdir /app/
 WORKDIR /app/

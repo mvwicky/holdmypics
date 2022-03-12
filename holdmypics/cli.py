@@ -128,21 +128,21 @@ def register(app: Flask):
     @click.argument(
         "template",
         type=click.Path(exists=True, dir_okay=False, path_type=Path),
-        default=cfg_path / "Dockerfile.template",
+        default=cfg_path / "Dockerfile.jinja",
     )
     @click.option(
         "--dev-output",
         "-d",
         type=click.Path(path_type=Path, file_okay=False),
         default=cfg_path / "dev",
-        help="The location of the development Dockerfile",
+        help="The output directory for the development Dockerfile",
     )
     @click.option(
         "--prod-output",
         "-p",
         type=click.Path(path_type=Path, file_okay=False),
         default=cfg_path / "prod",
-        help="The location of the production Dockerfile",
+        help="The output directory for the production Dockerfile",
     )
     @click.option(
         "--dry-run/--for-real",

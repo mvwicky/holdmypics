@@ -44,7 +44,7 @@ DOCKER_TAG=holdmypics-$(MODE):$(VERSION_TAG)
 BUILD_CPU_SHARES?=512
 COMPILE_OPTS?=--port 8080 -y
 
-COMPILE_DEPS=$(CONFIG_DIR)/Dockerfile.template holdmypics/generate.py
+COMPILE_DEPS=$(CONFIG_DIR)/Dockerfile.jinja holdmypics/generate.py
 COMPILE_OUT=$(CONFIG_DIR)/dev/Dockerfile $(CONFIG_DIR)/prod/Dockerfile
 
 ESLINT_DEPS=$(filter %.ts,$(LS_FILES)) $(filter %.js,$(LS_FILES)) $(filter .eslintrc.%,$(LS_FILES))
