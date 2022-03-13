@@ -37,3 +37,7 @@ def make_route(app: Union[Flask, FlaskClient], endpoint: str, **kwargs: Any) -> 
 
 def compact_dict(mapping: Mapping[str, Any]) -> Mapping[str, Any]:
     return {k: v for (k, v) in mapping.items() if v}
+
+
+def size_id(sz: tuple[int, int]) -> str:
+    return "{0}x{1}".format(*sz)

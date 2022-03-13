@@ -5,8 +5,8 @@ import re
 from typing import TYPE_CHECKING
 from urllib.parse import urlencode
 
-import attr
 import pytest
+from attrs import fields_dict
 from flask import url_for
 from flask.testing import FlaskClient
 from hypothesis import given
@@ -79,10 +79,8 @@ def test_color_validator_rejects(string: str):
     assert match_color(string) is None
 
 
-def cmp_args(
-    args_type: type["BaseImageArgs"], schema_type: type["BaseImageArgsSchema"]
-):
-    args_fields = set(attr.fields_dict(args_type))
+def cmp_args(args_type: type[BaseImageArgs], schema_type: type[BaseImageArgsSchema]):
+    args_fields = set(fields_dict(args_type))
     schema_fields = set(schema_type().fields)
     assert args_fields == schema_fields
 

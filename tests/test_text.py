@@ -21,6 +21,7 @@ from tests.utils import (
     fmt_strategy,
     make_route,
     opt_color_strategy,
+    size_id,
     size_strategy,
 )
 
@@ -150,14 +151,10 @@ def test_random_text_ocr(client: FlaskClient):
     assert from_ocr.casefold() == from_header.casefold()
 
 
-def _sz_id(sz: tuple[int, int]) -> str:
-    return "{0}x{1}".format(*sz)
-
-
 @pytest.mark.parametrize(
     "font_name", ["overpass", "fira-mono", "fira-sans", "roboto", "spectral"]
 )
-@pytest.mark.parametrize("size", [(3840, 2160), (960, 540)], ids=_sz_id)
+@pytest.mark.parametrize("size", [(3840, 2160), (960, 540)], ids=size_id)
 def test_text_with_fonts(
     app: Holdmypics, image_format: str, font_name: str, size: tuple[int, int]
 ):

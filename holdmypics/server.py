@@ -8,7 +8,7 @@ from pathlib import Path
 from subprocess import Popen, TimeoutExpired
 from typing import Any, Optional
 
-import attr
+from attrs import define, field
 from flask import Flask
 from loguru import logger
 
@@ -18,14 +18,14 @@ from .utils import config_value
 WEB_PROC_RE = re.compile(r"^web: (?P<cmd>.+)$")
 
 
-@attr.s(slots=True, auto_attribs=True)
+@define()
 class Server(object):
     app: Flask
     wait: float
     start_server: bool = True
     start_yarn: bool = True
 
-    procs: dict[str, Popen] = attr.ib(init=False, factory=dict)
+    procs: dict[str, Popen] = field(init=False, factory=dict)
 
     def start(self) -> None:
         if self.start_yarn:

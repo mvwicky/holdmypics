@@ -3,37 +3,40 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any, Generic, NamedTuple, Optional, TypeVar, Union
 
-import attr
+from attrs import Factory, define, evolve, field
 
 _T = TypeVar("_T")
 _Inp = TypeVar("_Inp", bound="BaseInput")
 
 
-def _default_id(obj: BaseInput) -> str:
+def _default_id(obj: BaseInput[Any]) -> str:
     return obj.name
 
 
-@attr.s(slots=True, auto_attribs=True)
+_id_factory = Factory(_default_id, True)
+
+
+@define()
 class BaseInput(Generic[_T]):
     name: str
     label: str
     value: Optional[_T] = None
-    id: str = attr.ib(default=attr.Factory(_default_id, True))
+    id: str = _id_factory
     help_text: Optional[str] = None
     required: bool = False
-    extra: Mapping[str, Any] = attr.ib(factory=dict)
+    extra: Mapping[str, Any] = field(factory=dict)
 
     def add_cy(self: _Inp, value: Optional[str] = None) -> _Inp:
         extra = {**self.extra, "data-cy": value or self.name}
-        return attr.evolve(self, extra=extra)
+        return evolve(self, extra=extra)
 
 
-@attr.s(slots=True, auto_attribs=True)
+@define()
 class TextInput(BaseInput[str]):
     pattern: Optional[str] = None
 
 
-@attr.s(slots=True, auto_attribs=True)
+@define()
 class NumberInput(BaseInput[Union[int, float]]):
     min: Optional[Union[int, float]] = None
     max: Optional[Union[int, float]] = None
@@ -47,7 +50,7 @@ class SelectOption(NamedTuple):
     disabled: bool = False
 
 
-@attr.s(slots=True, auto_attribs=True)
+@define()
 class SelectInput(BaseInput[str]):
-    options: list[SelectOption] = attr.ib(factory=list)
+    options: list[SelectOption] = field(factory=list)
     help_text: Optional[str] = None

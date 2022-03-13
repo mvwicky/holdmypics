@@ -6,8 +6,8 @@ from collections.abc import Callable, Iterable
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
-import attr
 import pytest
+from attrs import define, field
 from environs import Env
 from hypothesis import HealthCheck, settings
 from loguru import logger
@@ -22,15 +22,15 @@ if TYPE_CHECKING:
 
 MAX_LOG_SIZE = 3 * (1024**2)
 PROFILES = {
-    "ci": {"max_examples": 50, "derandomize": True},
+    "ci": {"max_examples": 25, "derandomize": True},
     "dev": {"max_examples": 15},
 }
 
 
-@attr.s(slots=True, auto_attribs=True, frozen=True)
+@define(frozen=True)
 class AppFactory(object):
-    factory: Callable[[ModuleType], Holdmypics] = attr.ib(repr=False)
-    config: ModuleType = attr.ib(repr=False)
+    factory: Callable[[ModuleType], Holdmypics] = field(repr=False)
+    config: ModuleType = field(repr=False)
 
     def __call__(self) -> Holdmypics:
         return self.factory(self.config)

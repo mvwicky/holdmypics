@@ -5,7 +5,7 @@ from pathlib import Path
 from subprocess import CompletedProcess
 from typing import Any
 
-import attr
+from attrs import define, field
 from loguru import logger
 
 from .cli_utils import run
@@ -24,20 +24,12 @@ def find_path_named(name: str, start: Path = CWD, file_only: bool = False) -> Pa
     return find_path_named(name, p.parent, file_only=file_only)
 
 
-def _def_lock(obj: "Package") -> Path:
-    return obj.root_dir / "poetry.lock"
-
-
-@attr.s(slots=True, auto_attribs=True, repr=False)
+@define(repr=False)
 class Package(object):
-    root_dir: Path = attr.ib(default=CWD, converter=Path)
-
-    lock_file: Path = attr.ib(
-        default=attr.Factory(_def_lock, True), init=False, repr=False
-    )
+    root_dir: Path = field(default=CWD, converter=Path)
 
     @classmethod
-    def find_root(cls) -> "Package":
+    def find_root(cls) -> Package:
         return cls(root_dir=find_path_named("pyproject.toml", file_only=True).parent)
 
     def req_file(self, dev: bool) -> Path:
@@ -56,7 +48,7 @@ class Package(object):
         return cmd.stdout
 
     def freeze(self, dev: bool = False, hashes: bool = True) -> bool:
-        if not self.lock_file.is_file():
+        if not self.root_dir.joinpath("poetry.lock").is_file():
             self.sh("poetry", "lock")
 
         req_cts = self.export(dev, hashes)

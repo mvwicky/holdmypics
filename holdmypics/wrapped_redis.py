@@ -2,16 +2,16 @@ from __future__ import annotations
 
 from typing import Any, Optional, Union
 
-import attr
+from attrs import define, field
 from flask import Flask
 from flask_redis import FlaskRedis
 
 from .constants import COUNT_KEY, SIZE_KEY
 
 
-@attr.s(slots=True, auto_attribs=True)
+@define()
 class FakeRedis(object):
-    _store: dict[str, Any] = attr.ib(factory=dict, init=False)
+    _store: dict[str, Any] = field(factory=dict, init=False)
 
     def get(self, name: str) -> Optional[bytes]:
         value = self._store.get(name)
@@ -28,10 +28,10 @@ class FakeRedis(object):
         return self.incrby(name, 1)
 
 
-@attr.s(slots=True, auto_attribs=True)
+@define()
 class WrappedRedis(object):
     has_redis: bool = False
-    client: Union[FlaskRedis, FakeRedis] = attr.ib(factory=FakeRedis, repr=False)
+    client: Union[FlaskRedis, FakeRedis] = field(factory=FakeRedis, repr=False)
 
     def init_app(self, app: Flask) -> None:
         self.has_redis = bool(app.config.get("REDIS_URL"))

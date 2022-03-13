@@ -4,7 +4,7 @@ import math
 from itertools import cycle
 from typing import Any
 
-import attr
+from attrs import define
 from PIL import Image, ImageDraw
 
 from ..constants import DEFAULT_COLORS
@@ -12,7 +12,7 @@ from .args import TiledImageArgs
 from .base import BaseGeneratedImage
 
 
-@attr.s(slots=True, auto_attribs=True)
+@define()
 class GeneratedTiledImage(BaseGeneratedImage[TiledImageArgs]):
     cols: int
     rows: int

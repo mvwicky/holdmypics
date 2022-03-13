@@ -16,6 +16,7 @@ from tests.utils import (
     dpi_strategy,
     fmt_strategy,
     make_route,
+    size_id,
     size_strategy,
 )
 
@@ -111,12 +112,8 @@ def test_create_images_using_client(
     logger.debug("Elapsed: {0:.4f}", time.perf_counter() - start)
 
 
-def _sz_id(sz: tuple[int, int]) -> str:
-    return "{0}x{1}".format(*sz)
-
-
 @pytest.mark.parametrize(("cols", "rows"), [(19, 10), (5, 5)])
-@pytest.mark.parametrize("size", [(6408, 8154), (3840, 2160), (960, 540)], ids=_sz_id)
+@pytest.mark.parametrize("size", [(6408, 8154), (3840, 2160), (960, 540)], ids=size_id)
 def test_tiled_make_examples(
     app: Holdmypics, image_format: str, size: tuple[int, int], cols: int, rows: int
 ):

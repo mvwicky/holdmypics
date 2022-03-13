@@ -10,7 +10,7 @@ import loguru
 from flask import Flask, Response, request
 from loguru import logger
 
-from .utils import get_size, natsize
+from .utils import nat_file_size, natsize
 
 
 class InterceptHandler(logging.Handler):
@@ -106,7 +106,7 @@ def log_request(res: Response) -> None:
 
 def log_static_file(path: str, url: str) -> None:
     try:
-        size = natsize(get_size(path))
+        size = nat_file_size(path)
     except Exception:
         size = "<unknown>"
     logger.info("Static File {0} size={1}", url, size)

@@ -3,8 +3,8 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from typing import Any, Optional, cast
 
-import attr
 import marshmallow as ma
+from attrs import astuple, define, evolve, field
 from flask import request
 from marshmallow import fields
 from marshmallow.validate import Range, Regexp
@@ -54,21 +54,21 @@ text_schema = TextImageArgsSchema()
 tiled_schema = TiledImageArgsSchema()
 
 
-@attr.s(slots=True, auto_attribs=True, frozen=True)
+@define(frozen=True)
 class BaseImageArgs(object):
     dpi: int = DEFAULT_DPI
     seed: Optional[str] = None
     debug: bool = False
 
     def to_seq(self) -> tuple[Any, ...]:
-        return attr.astuple(self)
+        return astuple(self)
 
 
-@attr.s(slots=True, auto_attribs=True, frozen=True)
+@define(frozen=True)
 class TextImageArgs(BaseImageArgs):
     text: Optional[str] = None
     font_name: str = DEFAULT_FONT
-    alpha: float = attr.ib(default=1.0, converter=clamp_alpha)
+    alpha: float = field(default=1.0, converter=clamp_alpha)
     random_text: bool = False
 
     @classmethod
@@ -81,7 +81,7 @@ class TextImageArgs(BaseImageArgs):
             return self
         else:
             text = f'{words.random("predicates")} {words.random("objects")}'
-            return attr.evolve(self, text=text)
+            return evolve(self, text=text)
 
 
 def color_converter(inp: Any) -> Any:
@@ -90,10 +90,10 @@ def color_converter(inp: Any) -> Any:
     return inp
 
 
-@attr.s(slots=True, auto_attribs=True, frozen=True)
+@define(frozen=True)
 class TiledImageArgs(BaseImageArgs):
-    colors: list[str] = attr.ib(factory=list, converter=color_converter)
-    alpha: float = attr.ib(default=1.0, converter=clamp_alpha)
+    colors: list[str] = field(factory=list, converter=color_converter)
+    alpha: float = field(default=1.0, converter=clamp_alpha)
     col_major: bool = False
 
     @classmethod
@@ -102,10 +102,10 @@ class TiledImageArgs(BaseImageArgs):
         return cast(TiledImageArgs, args)
 
     def to_seq(self) -> tuple[Any, ...]:
-        return attr.astuple(attr.evolve(self, colors="-".join(self.colors)))
+        return astuple(evolve(self, colors="-".join(self.colors)))
 
 
-@attr.s(slots=True, auto_attribs=True, frozen=True)
+@define(frozen=True)
 class AnimArgs(object):
     frames: int = 10
 

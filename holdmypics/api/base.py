@@ -7,7 +7,7 @@ from functools import partial
 from types import MappingProxyType
 from typing import Any, ClassVar, Generic, Literal, Optional, TypeVar, Union
 
-import attr
+from attrs import define, field
 from loguru import logger
 from PIL import Image
 
@@ -51,9 +51,7 @@ def _gif_opt_kw(args: BaseImageArgs) -> dict[str, Any]:
     return {"optmize": config_value("GIF_OPTIMIZE", cast_as=bool)}
 
 
-SAVE_KW: MappingProxyType[
-    str, Callable[[BaseImageArgs], dict[str, Any]]
-] = MappingProxyType(
+SAVE_KW = MappingProxyType[str, Callable[[BaseImageArgs], dict[str, Any]]](
     {
         "jpeg": _jpeg_opt_kw,
         "png": _png_opt_kw,
@@ -67,14 +65,14 @@ def _default_kw(*args: object, **kwargs: object) -> dict[str, Any]:
     return {}
 
 
-@attr.s(slots=True, auto_attribs=True)
+@define()
 class BaseGeneratedImage(Generic[_Args], ABC):
     mode: ClassVar[Literal["RGBA"]] = "RGBA"
 
     size: tuple[int, int]
-    fmt: str = attr.ib(converter=normalize_fmt)
-    bg_color: str = attr.ib(converter=resolve_color)
-    fg_color: str = attr.ib(converter=resolve_color)
+    fmt: str = field(converter=normalize_fmt)
+    bg_color: str = field(converter=resolve_color)
+    fg_color: str = field(converter=resolve_color)
     args: _Args
 
     def new_image(

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Union
 
-import attr
+from attrs import define
 from loguru import logger
 from PIL import Image, ImageDraw
 from PIL.ImageFont import FreeTypeFont, ImageFont
@@ -16,7 +16,7 @@ MAX_TEXT_HEIGHT = 0.9
 MAX_TEXT_WIDTH = 0.9
 
 
-@attr.s(slots=True, auto_attribs=True)
+@define()
 class GeneratedTextImage(BaseGeneratedImage[TextImageArgs]):
     def make(self) -> Image.Image:
         im = self.new_image()

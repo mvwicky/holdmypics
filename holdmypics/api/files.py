@@ -8,7 +8,7 @@ from itertools import chain
 from operator import itemgetter
 from typing import Any, ClassVar, Optional
 
-import attr
+from attrs import define, evolve, field
 from loguru import logger
 
 from ..utils import get_size, natsize
@@ -18,17 +18,17 @@ from .args import BaseImageArgs
 FNAME_TBL = str.maketrans({"#": "", " ": "-", ".": "", "/": "-", "\\": "-"})
 
 
-@attr.s(slots=True, auto_attribs=True, repr=False)
+@define(repr=False)
 class GeneratedFiles(object):
     hash_function: ClassVar[Callable[..., hashlib._Hash]] = hashlib.md5
     extensions: ClassVar[tuple[str, ...]] = ("png", "webp", "jpg", "jpeg", "gif")
     fmt_re: ClassVar[re.Pattern[str]] = re.compile(f"\\.({'|'.join(extensions)})$")
 
-    files: set[str] = attr.ib(factory=set)
-    initted: bool = attr.ib(init=False, default=False)
-    _images_folder: Optional[str] = attr.ib(init=False, default=None)
-    _max_size: Optional[int] = attr.ib(init=False, default=None)
-    _hash_file_names: Optional[bool] = attr.ib(init=False, default=None)
+    files: set[str] = field(factory=set)
+    initted: bool = field(init=False, default=False)
+    _images_folder: Optional[str] = field(init=False, default=None)
+    _max_size: Optional[int] = field(init=False, default=None)
+    _hash_file_names: Optional[bool] = field(init=False, default=None)
 
     def setup(self, images_folder: str, max_size: int, hash_file_names: bool) -> None:
         self._images_folder = images_folder
@@ -95,7 +95,7 @@ class GeneratedFiles(object):
         *extra: Any,
     ) -> str:
         if getattr(args, "text", None):
-            args = attr.evolve(args, text=self.hash_strings(args.text))  # type: ignore
+            args = evolve(args, text=self.hash_strings(args.text))  # type: ignore
         params = chain(["x".join(map(str, size)), bg, fg, fmt], args.to_seq(), extra)
         base_name: str
         if not self.hash_file_names:

@@ -8,8 +8,8 @@ from functools import partial
 from pathlib import Path
 from typing import Any, ClassVar, Optional, Union
 
-import attr
 import click
+from attrs import define, field
 from jinja2 import Environment, FileSystemLoader, Template
 
 import config
@@ -23,17 +23,17 @@ def diff_contents(a: str, b: str) -> SequenceMatcher:
     return matcher
 
 
-@attr.s(slots=True, auto_attribs=True)
+@define()
 class Generator(object):
     common_context: ClassVar[dict[str, Any]] = {"python_version": sys.version_info[:3]}
 
-    template_file: Path = attr.ib(converter=Path)
-    dev_dir: Path = attr.ib(converter=Path)
-    prod_dir: Path = attr.ib(converter=Path)
+    template_file: Path = field(converter=Path)
+    dev_dir: Path = field(converter=Path)
+    prod_dir: Path = field(converter=Path)
 
-    _env: Optional[Environment] = attr.ib(default=None, init=False, repr=False)
-    _template: Optional[Template] = attr.ib(default=None, init=False, repr=False)
-    _node_version: Optional[str] = attr.ib(default=None, init=False, repr=False)
+    _env: Optional[Environment] = field(default=None, init=False, repr=False)
+    _template: Optional[Template] = field(default=None, init=False, repr=False)
+    _node_version: Optional[str] = field(default=None, init=False, repr=False)
 
     def confirm(self, file: Path, yes: bool) -> bool:
         if yes or not file.is_file():

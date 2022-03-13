@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Literal, Optional
 from urllib.request import urlopen
 
-import attr
+from attrs import define, field
 
 from ..utils import config_value
 
@@ -24,10 +24,10 @@ def download_words(output_file: Path) -> None:
         output_file.write_bytes(res.read())
 
 
-@attr.s(auto_attribs=True, slots=True)
+@define()
 class Words(object):
-    _word_file: Optional[Path] = attr.ib(default=None, init=False)
-    _word_data: Optional[dict[WordType, list[str]]] = attr.ib(
+    _word_file: Optional[Path] = field(default=None, init=False)
+    _word_data: Optional[dict[WordType, list[str]]] = field(
         default=None, init=False, repr=False
     )
 

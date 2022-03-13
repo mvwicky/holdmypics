@@ -1,30 +1,25 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from functools import partial
 from pathlib import Path
 from typing import Optional, Union
 
-import attr
+from attrs import define, field
 from flask import current_app
 from loguru import logger
 from PIL.ImageFont import FreeTypeFont, ImageFont, truetype
-
-none_attr = partial(attr.ib, default=None, init=False, repr=False)
 
 
 class UnknownFont(KeyError):
     pass
 
 
-@attr.s(auto_attribs=True, slots=True)
+@define()
 class Font(object):
-    file: Path = attr.ib(converter=Path)
-    font_sizes: set[int] = attr.ib(converter=set)
+    file: Path = field(converter=Path)
+    font_sizes: set[int] = field(converter=set)
 
-    _sizes: dict[int, Union[ImageFont, FreeTypeFont]] = attr.ib(
-        factory=dict, init=False
-    )
+    _sizes: dict[int, Union[ImageFont, FreeTypeFont]] = field(factory=dict, init=False)
 
     def load(self, sizes: Sequence[int]):
         for size in sizes:
@@ -39,19 +34,19 @@ class Font(object):
         return size in self.font_sizes
 
 
-@attr.s(auto_attribs=True, slots=True)
+@define()
 class Fonts(object):
-    font_sizes: list[int] = attr.ib(
+    font_sizes: list[int] = field(
         default=range(4, 289, 4), converter=list, init=False, repr=False
     )
 
-    _font_dir: Optional[Path] = none_attr()
-    _font_files: dict[str, Path] = none_attr()
-    _fonts: dict[str, Font] = attr.ib(factory=dict, init=False, repr=False)
-    _num_sizes: Optional[int] = none_attr()
-    _font_names: set[str] = none_attr()
-    _max_size: int = none_attr()
-    _min_size: int = none_attr()
+    _font_dir: Optional[Path] = field(default=None, init=False, repr=False)
+    _font_files: Optional[dict[str, Path]] = field(default=None, init=False, repr=False)
+    _fonts: dict[str, Font] = field(factory=dict, init=False, repr=False)
+    _num_sizes: Optional[int] = field(default=None, init=False, repr=False)
+    _font_names: Optional[set[str]] = field(default=None, init=False, repr=False)
+    _max_size: Optional[int] = field(default=None, init=False, repr=False)
+    _min_size: Optional[int] = field(default=None, init=False, repr=False)
 
     @property
     def num_sizes(self) -> int:
