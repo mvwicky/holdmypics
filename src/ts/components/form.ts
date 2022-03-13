@@ -12,12 +12,11 @@ function isCheckbox(inp: HTMLInputElement): boolean {
 }
 
 export class ImageForm {
-  private readonly form: HTMLFormElement;
-  private elements: FormInput[] = [];
+  private readonly elements: FormInput[];
 
-  constructor(form: HTMLFormElement) {
+  constructor(private readonly form: HTMLFormElement) {
     this.form = form;
-    this.elements = Array.from(form.elements).filter(isInput);
+    this.elements = [...form.elements].filter(isInput);
   }
 
   gatherPath(): Partial<EndpointPathArgs> {
@@ -46,5 +45,12 @@ export class ImageForm {
   createSearchParams(): URLSearchParams {
     const params = new URLSearchParams(this.gatherQuery());
     return params;
+  }
+
+  createURL(): URL {
+    const { action } = this.form;
+    const url = new URL(action, self.location.href);
+    url.search = this.createSearchParams().toString();
+    return url;
   }
 }

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import math
 import os
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable
 from functools import lru_cache
 from typing import Any, Optional, TypeVar, Union, cast
 
@@ -35,7 +35,6 @@ except ImportError:
 
 
 _T = TypeVar("_T")
-_AttVal = Union[str, bool, int, None]
 
 
 def config_value(
@@ -95,30 +94,5 @@ def get_size(path: str) -> int:
     return os.path.getsize(path)
 
 
-def flatatt(attrs: Union[Mapping[str, _AttVal], Sequence[tuple[str, _AttVal]]]) -> str:
-    kv_attrs: list[tuple[str, Any]] = []
-    bool_attrs: list[str] = []
-    attrs_iter = attrs if not isinstance(attrs, Mapping) else attrs.items()
-    for attr, value in attrs_iter:
-        if isinstance(value, bool):
-            if value:
-                bool_attrs.append(attr)
-        elif value is not None:
-            kv_attrs.append((attr, value))
-    return "".join(
-        (
-            "".join(f' {k}="{v}"' for k, v in sorted(kv_attrs)),
-            "".join(f" {k}" for k in sorted(bool_attrs)),
-        )
-    )
-
-
-def format_attrs(
-    attrs: Union[Mapping[str, _AttVal], Sequence[tuple[str, _AttVal]]]
-) -> str:
-    attrs_iter = attrs if not isinstance(attrs, Mapping) else attrs.items()
-    return flatatt([(k.replace("_", "-"), v) for k, v in attrs_iter])
-
-
-def format_attrs_kw(**attrs: _AttVal) -> str:
-    return flatatt([(k.replace("_", "-"), v) for (k, v) in attrs.items()])
+def nat_file_size(path: str, fmt: str = "{0:.2f}") -> str:
+    return natsize(get_size(path), fmt)

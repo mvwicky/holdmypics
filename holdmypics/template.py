@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any
 
 from loguru import logger
 
-from .utils import format_attrs, format_attrs_kw
+from .html import format_attrs, format_attrs_kw
 
 if TYPE_CHECKING:
     from flask import Flask
