@@ -16,15 +16,14 @@ IMG_FORMATS = ("jpg", "jpeg", "gif", "png", "webp")
 IMG_FORMATS_STR = ",".join(IMG_FORMATS)
 
 DEFAULT_FONT = "overpass"
-DEFAULT_DPI: Final = 144
+DEFAULT_DPI: Final[int] = 144
 NO_CACHE = "max-age=0, no-store, must-revalidate"
 COUNT_KEY = "image_count"
 SIZE_KEY = "image_size"
-PX_PER_PT: Final = 0.75
 
 DEFAULT_COLORS = (
     (0x55, 0x55, 0x55, 0xFF),
-    (0xDD, 0xDD, 0xDD, 128),
+    (0xDD, 0xDD, 0xDD, 0x80),
     (0xEE, 0x77, 0x33, 0xFF),
 )
 

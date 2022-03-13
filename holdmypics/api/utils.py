@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import functools
 import random
+from numbers import Real
 from string import hexdigits
-from typing import NamedTuple, Union
+from typing import Final, NamedTuple, Union
 
-from loguru import logger
 from PIL.ImageFont import FreeTypeFont, ImageFont
 
-from ..constants import PX_PER_PT
+from ..exceptions import InvalidColor
 
 
 class FontParams(NamedTuple):
@@ -22,6 +22,8 @@ class TextArgs(NamedTuple):
     font_name: str
     debug: bool
 
+
+PX_PER_PT: Final[float] = 0.75
 
 RAND_COLOR = "rand".casefold()
 
@@ -51,23 +53,27 @@ def get_color(color: str) -> str:
     start = int(color.startswith("#"))
     color = color[start:].casefold()
     if not all(e in hexdigits for e in color):
-        logger.warning("Unable to create hex color from {0!r}", color)
-        return color
+        raise InvalidColor(color)
     n = len(color)
     if n in (3, 4):
         color = "".join(c * 2 for c in color)
         n *= 2
     if n == 6:
         color = f"{color}ff"
-    if len(color) in (3, 4, 6, 8):  # Should only be 8
-        return f"#{color}"
-    logger.warning("Unable to create hex color from {0!r}", color)
-    return color
+    if len(color) not in (3, 4, 6, 8):  # Should only be 8
+        raise InvalidColor(color)
+    return f"#{color}"
 
 
 def convert_color(
-    color: Union[float, tuple[float, ...], str]
+    color: Union[
+        float, tuple[float, float, float, float], tuple[float, float, float], str
+    ]
 ) -> tuple[float, float, float, float]:
+    if isinstance(color, str):
+        get_color(color)[1:]
+    elif isinstance(color, Real):
+        pass
     raise NotImplementedError
 
 
