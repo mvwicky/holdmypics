@@ -14,6 +14,7 @@ set -x
 BUILD_DEPS=(build-essential libpcre3-dev)
 apt-get update
 apt-get install -y --no-install-recommends "${BUILD_DEPS[@]}"
+python -m pip install --upgrade pip
 XDG_CACHE_HOME="/pip-cache" pip install -r "$requirements"
 apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false "${BUILD_DEPS[@]}"
 rm "$requirements"

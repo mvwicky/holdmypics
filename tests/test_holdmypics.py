@@ -3,7 +3,6 @@ from __future__ import annotations
 import os
 import re
 from typing import TYPE_CHECKING
-from urllib.parse import urlencode
 
 import pytest
 from attrs import fields_dict
@@ -11,7 +10,7 @@ from flask import url_for
 from flask.testing import FlaskClient
 from hypothesis import given
 
-from tests.utils import color_strategy
+from tests.strategies import color_strategy
 
 if TYPE_CHECKING:
     from holdmypics.api.args import BaseImageArgs, BaseImageArgsSchema
@@ -54,11 +53,10 @@ def test_forwarding_headers(client: FlaskClient):
             bg_color="cef",
             fg_color="555",
             fmt="png",
+            text="Some Random Text",
         )
-    args = {"text": "Some Random Text"}
-    url = f"{path}?{urlencode(args)}"
     forwarded = "123.45.4.2,123.45.4.2"
-    res = client.get(url, headers=[("X-Forwarded-For", forwarded)])
+    res = client.get(path, headers=[("X-Forwarded-For", forwarded)])
     was_forwarded = res.headers.get("X-Was-Forwarded-For", None)
     assert was_forwarded == forwarded
 
@@ -74,7 +72,9 @@ def test_color_validator_accepts(string: str):
     assert match_color(string) is not None
 
 
-@pytest.mark.parametrize("string", ["ee7733f"])
+@pytest.mark.parametrize(
+    "string", ["ee7733f", "ee773", "e", "ee", "ee7733fff", "ee7733fg"]
+)
 def test_color_validator_rejects(string: str):
     assert match_color(string) is None
 

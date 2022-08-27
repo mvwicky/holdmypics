@@ -11,7 +11,7 @@ NODE_ENV_VALUE?=development
 CACHE_DIR=.cache
 SENTINEL_DIR=$(CACHE_DIR)/sentinels
 
-DOCKER=docker
+DOCKER?=docker
 DOCKER_COMPOSE=docker-compose
 CONTAINER_NAME?=hold
 
@@ -69,7 +69,7 @@ dbuilddev: docker-build
 dbuildprod: MODE=prod
 dbuildprod: docker-build
 
-docker-build: DOCKER_ARGS=build -f $(DOCKERFILE) -c $(BUILD_CPU_SHARES) --tag=$(DOCKER_TAG) -o out .
+docker-build: DOCKER_ARGS=build -f $(DOCKERFILE) -c $(BUILD_CPU_SHARES) --tag=$(DOCKER_TAG) .
 docker-build: compile docker
 
 rundev: MODE=dev
