@@ -2,21 +2,15 @@
 name: Tests
 "on":
   push:
-    paths-ignore:
-      - "src/**"
     branches:
       - main
 jobs:
   tests:
-    name: Test ${{ matrix.python-version }}
+    name: Run Tests
     env:
       POETRY_VIRTUALENVS_IN_PROJECT: "true"
     runs-on: ubuntu-latest
-    # container: python:3.9-slim
-    strategy:
-      fail-fast: true
-      matrix:
-        python-version: [3.9]
+    # container: python:3.10-slim
     # services:
     #   redis:
     #     image: redis
@@ -28,39 +22,27 @@ jobs:
     #     ports:
     #       - "6379:6379"
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.10"
+          cache: "poetry"
       - name: Set up Node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: "16"
-      - name: Get full python version
-        shell: bash
-        id: python-version
-        # yamllint disable-line rule:line-length
-        run: echo ::set-output name=version::$(python -c "import sys; print('-'.join(map(str, sys.version_info)))")
+          node-version: "18"
       - name: Install poetry
-        run: |
-          curl -sSL https://install.python-poetry.org | python - -y
-      - name: Set up python cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            .venv
-          # yamllint disable-line rule:line-length
-          key: venv-${{ runner.os }}-${{ steps.python-version.outputs.version }}-${{ hashFiles('**/poetry.lock') }}
+        shell: bash
+        run: curl -sSL https://install.python-poetry.org | python - -y
       - name: Install python dependencies
-        run: $HOME/.local/bin/poetry install --no-interaction --no-dev -E tests
+        run: $HOME/.local/bin/poetry install --no-interaction --with test --without dev
       - name: Install node dependencies
         uses: bahmutov/npm-install@v1
         if: ${{ !env.ACT }}
       - name: Run pytest
         env:
           TESTS_SKIP_INDEX: "1"
-          REDIS_URL: ""
+          # REDIS_URL: "redis://localhost:6379"
         run: |
           $HOME/.local/bin/poetry run pytest

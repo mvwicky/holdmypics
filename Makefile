@@ -97,7 +97,6 @@ webpack: export NODE_ENV=$(NODE_ENV_VALUE)
 webpack:
 	@$(WEBPACK) $(WEBPACK_ARGS)
 
-
 version-commit:
 ifdef DRY_RUN
 	@echo $(VERSION_TAG)
@@ -160,4 +159,4 @@ clean-webpack-cache:
 requirements: requirements.txt
 
 requirements.txt: poetry.lock
-	poetry export -f requirements.txt --without-hashes -o $@
+	poetry export -f requirements.txt -o $@
