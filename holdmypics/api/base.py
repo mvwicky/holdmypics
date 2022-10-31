@@ -78,7 +78,7 @@ class BaseGeneratedImage(Generic[_Args], ABC):
     def new_image(
         self,
         size: Optional[tuple[int, int]] = None,
-        color: Union[float, tuple[float, float, float, float], str, None] = None,
+        color: Union[float, tuple[int, int, int, int], str, None] = None,
     ) -> Image.Image:
         return Image.new(self.mode, size or self.size, color or self.bg_color)
 

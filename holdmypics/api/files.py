@@ -6,36 +6,31 @@ import re
 from collections.abc import Callable
 from itertools import chain
 from operator import itemgetter
+from pathlib import Path
 from typing import Any, ClassVar, Optional
 
 from attrs import define, evolve, field
 from loguru import logger
 
-from ..utils import get_size, natsize
-from . import bp
+from ..utils import config_value, get_size, natsize
 from .args import BaseImageArgs
 
 FNAME_TBL = str.maketrans({"#": "", " ": "-", ".": "", "/": "-", "\\": "-"})
+_extensions: tuple[str, ...] = ("png", "webp", "jpg", "jpeg", "gif")
 
 
 @define(repr=False)
 class GeneratedFiles(object):
     hash_function: ClassVar[Callable[..., hashlib._Hash]] = hashlib.md5
-    extensions: ClassVar[tuple[str, ...]] = ("png", "webp", "jpg", "jpeg", "gif")
-    fmt_re: ClassVar[re.Pattern[str]] = re.compile(f"\\.({'|'.join(extensions)})$")
+    fmt_re: ClassVar[re.Pattern[str]] = re.compile(f"\\.({'|'.join(_extensions)})$")
 
     files: set[str] = field(factory=set)
-    initted: bool = field(init=False, default=False)
-    _images_folder: Optional[str] = field(init=False, default=None)
+    _images_folder: Optional[Path] = field(init=False, default=None)
     _max_size: Optional[int] = field(init=False, default=None)
     _hash_file_names: Optional[bool] = field(init=False, default=None)
 
-    def setup(self, images_folder: str, max_size: int, hash_file_names: bool) -> None:
-        self._images_folder = images_folder
-        self._max_size = max_size
-        self._hash_file_names = hash_file_names
+    def setup(self) -> None:
         self.find_current()
-        self.initted = True
 
     def get_current_files(self) -> list[str]:
         folder = self.images_folder
@@ -54,22 +49,19 @@ class GeneratedFiles(object):
     @property
     def max_size(self) -> int:
         if self._max_size is None:
-            logger.warning("Getting max size property from blueprint")
-            self._max_size = bp.max_size  # type: ignore
+            self._max_size = config_value("SAVED_IMAGES_MAX_SIZE", assert_is=int)
         return self._max_size
 
     @property
-    def images_folder(self) -> str:
+    def images_folder(self) -> Path:
         if self._images_folder is None:
-            logger.warning("Getting images folder property from blueprint")
-            self._images_folder = bp.images_folder  # type: ignore
+            self._images_folder = config_value("SAVED_IMAGES_CACHE_DIR", assert_is=Path)
         return self._images_folder
 
     @property
     def hash_file_names(self) -> bool:
         if self._hash_file_names is None:
-            logger.warning("Getting hash file names property from blueprint")
-            self._hash_file_names = bp.hash_file_names  # type: ignore
+            self._hash_file_names = config_value("HASH_IMG_FILE_NAMES", assert_is=bool)
         return self._hash_file_names
 
     @property
@@ -107,11 +99,8 @@ class GeneratedFiles(object):
         return path
 
     def collect_for_cleaning(self) -> list[tuple[str, int, float]]:
-        images_folder = self.images_folder
-        files = (os.path.join(images_folder, f) for f in os.listdir(images_folder))
-        files = (
-            (f, get_size(f), os.path.getatime(f)) for f in filter(os.path.isfile, files)
-        )
+        stats = ((f, f.stat()) for f in self.images_folder.iterdir() if f.is_file())
+        files = ((str(f), st.st_size, st.st_atime) for f, st in stats)
         return sorted(files, key=itemgetter(2))
 
     def clean(self) -> int:

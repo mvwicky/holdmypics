@@ -14,22 +14,23 @@ from hypothesis import example, given, strategies as st
 from loguru import logger
 from PIL import Image
 
-from tests.utils import (
+from tests.strategies import (
     color_strategy,
-    compact_dict,
     dpi_strategy,
     fmt_strategy,
-    make_route,
     opt_color_strategy,
-    size_id,
     size_strategy,
 )
+from tests.utils import compact_dict, make_route, size_id
 
 if TYPE_CHECKING:
     from holdmypics import Holdmypics
 
-text_strategy = st.one_of(st.none(), st.text(max_size=255))
-args_strategy = st.fixed_dictionaries({"text": text_strategy, "dpi": dpi_strategy})
+char_stragegy = st.characters(blacklist_categories=("Cc", "Cf", "Cs", "Co", "Cn"))
+text_strategy = st.text(min_size=1, max_size=255, alphabet=char_stragegy)
+long_text_strategy = st.text(min_size=16, max_size=255, alphabet=char_stragegy)
+opt_text_strategt = st.one_of(st.none(), text_strategy)
+args_strategy = st.fixed_dictionaries({"text": opt_text_strategt, "dpi": dpi_strategy})
 
 
 def make_args(**kwargs: Union[str, int, None]):
@@ -96,10 +97,16 @@ def test_create_images_using_client(
     app = app_factory()
     with app.test_client() as client:
         url = make_route(
-            app, "api.image_route", size=size, bg_color=bg, fg_color=fg, fmt=img_fmt
+            app,
+            "api.image_route",
+            size=size,
+            bg_color=bg,
+            fg_color=fg,
+            fmt=img_fmt,
+            **compact_dict(args),
         )
-        if args:
-            url = "?".join((url, urlencode(compact_dict(args))))
+        # if args:
+        #     url = "?".join((url, urlencode(compact_dict(args))))
         res = client.get(url, follow_redirects=False)
         assert res.status_code == 200
         img_type = imghdr.what("filename", h=res.data)
@@ -117,11 +124,9 @@ def test_random_text_header(client: FlaskClient):
         bg_color="cef",
         fg_color="555",
         fmt="png",
+        random_text=True,
     )
-    args = {"dpi": None, "random_text": True}
-    query = urlencode({k: v for (k, v) in args.items() if v})
-    url = "?".join((path, query))
-    res = client.get(url, follow_redirects=False)
+    res = client.get(path, follow_redirects=False)
     assert res.status_code == 200
     assert "X-Random-Text" in res.headers
 

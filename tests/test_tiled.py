@@ -10,15 +10,8 @@ import pytest
 from hypothesis import example, given, strategies as st
 from loguru import logger
 
-from tests.utils import (
-    color_strategy,
-    compact_dict,
-    dpi_strategy,
-    fmt_strategy,
-    make_route,
-    size_id,
-    size_strategy,
-)
+from tests.strategies import color_strategy, dpi_strategy, fmt_strategy, size_strategy
+from tests.utils import compact_dict, make_route, size_id
 
 if TYPE_CHECKING:
     from holdmypics import Holdmypics

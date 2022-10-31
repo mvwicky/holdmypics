@@ -4,6 +4,7 @@ import math
 import os
 from collections.abc import Callable
 from functools import lru_cache
+from pathlib import Path
 from typing import Any, Optional, TypeVar, Union, cast
 
 from flask import Flask, current_app
@@ -90,9 +91,9 @@ def natsize(num: Union[float, int], fmt: str = "{0:.2f}") -> str:
 
 
 @lru_cache(maxsize=128)
-def get_size(path: str) -> int:
+def get_size(path: Union[Path, str, bytes]) -> int:
     return os.path.getsize(path)
 
 
-def nat_file_size(path: str, fmt: str = "{0:.2f}") -> str:
+def nat_file_size(path: Union[Path, str, bytes], fmt: str = "{0:.2f}") -> str:
     return natsize(get_size(path), fmt)
