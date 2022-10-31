@@ -23,6 +23,9 @@ jobs:
     #       - "6379:6379"
     steps:
       - uses: actions/checkout@v3
+      - name: Install poetry
+        run: pipx install poetry
+        # run: curl -sSL https://install.python-poetry.org | python3 - -y
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -32,9 +35,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "18"
-      - name: Install poetry
-        shell: bash
-        run: curl -sSL https://install.python-poetry.org | python - -y
       - name: Install python dependencies
         run: $HOME/.local/bin/poetry install --no-interaction --with test --without dev
       - name: Install node dependencies
