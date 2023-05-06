@@ -20,21 +20,6 @@ from .constants import (
 )
 from .exceptions import ImproperlyConfigured
 
-try:
-    from memory_profiler import profile
-except ImportError:
-
-    def profile(f=None):
-        if f is None:
-
-            def inner(f):
-                return f
-
-            return inner
-
-        return f
-
-
 _T = TypeVar("_T")
 
 

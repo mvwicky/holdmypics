@@ -71,7 +71,7 @@
     "webpack-cli": "^4.4.0"
   },
   "engines": {
-    "node": "^18",
+    "node": "^19",
     "npm": "^8.1",
     "yarn": "^1.21"
   }

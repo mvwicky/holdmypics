@@ -7,9 +7,9 @@ from collections.abc import Callable
 from itertools import chain
 from operator import itemgetter
 from pathlib import Path
-from typing import Any, ClassVar, Optional
+from typing import Any, ClassVar
 
-from attrs import define, evolve, field
+import attrs
 from loguru import logger
 
 from ..utils import config_value, get_size, natsize
@@ -19,18 +19,33 @@ FNAME_TBL = str.maketrans({"#": "", " ": "-", ".": "", "/": "-", "\\": "-"})
 _extensions: tuple[str, ...] = ("png", "webp", "jpg", "jpeg", "gif")
 
 
-@define(repr=False)
+@attrs.define(repr=False)
 class GeneratedFiles(object):
     hash_function: ClassVar[Callable[..., hashlib._Hash]] = hashlib.md5
     fmt_re: ClassVar[re.Pattern[str]] = re.compile(f"\\.({'|'.join(_extensions)})$")
 
-    files: set[str] = field(factory=set)
-    _images_folder: Optional[Path] = field(init=False, default=None)
-    _max_size: Optional[int] = field(init=False, default=None)
-    _hash_file_names: Optional[bool] = field(init=False, default=None)
+    files: set[str] = attrs.field(factory=set)
+    _done_setup: bool = attrs.field(init=False, default=False)
+    _images_folder: Path | None = attrs.field(init=False, default=None)
+    _max_size: int | None = attrs.field(init=False, default=None)
+    _hash_file_names: bool | None = attrs.field(init=False, default=None)
+
+    @classmethod
+    def hash_strings(cls, *strings: str) -> str:
+        hasher = cls.hash_function()
+        [hasher.update(s.encode("utf-8", errors="replace")) for s in strings]
+        return hasher.hexdigest()
+
+    @classmethod
+    def params_hash(cls, *params: Any) -> str:
+        return cls.hash_strings(*map(repr, params))
 
     def setup(self) -> None:
+        folder = self.images_folder
+        if not folder.is_dir():
+            folder.mkdir(parents=True, exist_ok=True)
         self.find_current()
+        self._done_setup = True
 
     def get_current_files(self) -> list[str]:
         folder = self.images_folder
@@ -68,15 +83,6 @@ class GeneratedFiles(object):
     def need_to_clean(self) -> bool:
         return self.get_current_size() > self.max_size
 
-    def hash_strings(self, *strings: str) -> str:
-        hasher = self.hash_function()
-        for s in strings:
-            hasher.update(s.encode("utf-8"))
-        return hasher.hexdigest()
-
-    def params_hash(self, *params) -> str:
-        return self.hash_strings(*map(repr, params))
-
     def get_file_name(
         self,
         size: tuple[int, int],
@@ -86,9 +92,11 @@ class GeneratedFiles(object):
         args: BaseImageArgs,
         *extra: Any,
     ) -> str:
-        if getattr(args, "text", None):
-            args = evolve(args, text=self.hash_strings(args.text))  # type: ignore
-        params = chain(["x".join(map(str, size)), bg, fg, fmt], args.to_seq(), extra)
+        if not self._done_setup:
+            self.setup()
+        if hasattr(args, "text"):
+            args = attrs.evolve(args, text=self.hash_strings(args.text))  # type: ignore
+        params = chain(("x".join(map(str, size)), bg, fg, fmt), args.to_seq(), extra)
         base_name: str
         if not self.hash_file_names:
             base_name = "-".join(map(str, params)).translate(FNAME_TBL)

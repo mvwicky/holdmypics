@@ -107,6 +107,7 @@ def after_request_callback(
     start_time = g.pop("start_time", None)
     if start_time is not None:
         elapsed = REQUEST_TIMER() - start_time
+        res.headers["Server-Timing"] = f"total;dur={elapsed*1000:.2f}"
         res.headers["X-Processing-Time"] = elapsed
     return res
 

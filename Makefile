@@ -54,8 +54,7 @@ ISORT_DEPS=$(filter-out %/__version__.py,$(LS_PYTHON))
 WEBPACK_ARGS=--config webpack.config.ts --progress
 
 .PHONY: compile compose dbuilddev dbuildprod docker docker-build run stop version-tag \
-	lint isort flake8 eslint stylelint clean-lint clean-webpack clean-webpack-cache \
-	requirements
+	lint isort flake8 eslint stylelint clean-lint clean-webpack clean-webpack-cache
 
 compile: $(COMPILE_OUT)
 
@@ -155,8 +154,6 @@ clean-webpack:
 
 clean-webpack-cache:
 	$(RM_CMD)  node_modules/.cache/webpack
-
-requirements: requirements.txt
 
 requirements.txt: poetry.lock
 	poetry export -f requirements.txt -o $@
