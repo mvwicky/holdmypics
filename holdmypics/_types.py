@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, TypeAlias
 
 from flask import Response as FlaskResponse
-from typing_extensions import TypeAlias
 from werkzeug import Response as WerkzeugResponse
 
 Dimension: TypeAlias = tuple[int, int]
