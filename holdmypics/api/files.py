@@ -13,7 +13,7 @@ import attrs
 from loguru import logger
 
 from ..utils import config_value, get_size, natsize
-from .args import BaseImageArgs
+from .args import BaseImageArgs, TextImageArgs
 
 FNAME_TBL = str.maketrans({"#": "", " ": "-", ".": "", "/": "-", "\\": "-"})
 _extensions: tuple[str, ...] = ("png", "webp", "jpg", "jpeg", "gif")
@@ -58,7 +58,7 @@ class GeneratedFiles:
     def get_current_size(self) -> int:
         files = self.get_current_files()
         size = sum(map(get_size, files))
-        logger.debug("Total: {0}, Max: {1}", *map(natsize, [size, self.max_size]))
+        logger.debug("Total: {0}, Max: {1}", *map(natsize, (size, self.max_size)))
         return size
 
     @property
@@ -94,8 +94,8 @@ class GeneratedFiles:
     ) -> str:
         if not self._done_setup:
             self.setup()
-        if hasattr(args, "text"):
-            args = attrs.evolve(args, text=self.hash_strings(args.text))  # type: ignore
+        if isinstance(args, TextImageArgs) and args.text:
+            args = attrs.evolve(args, text=self.hash_strings(args.text))
         params = chain(("x".join(map(str, size)), bg, fg, fmt), args.to_seq(), extra)
         base_name: str
         if not self.hash_file_names:

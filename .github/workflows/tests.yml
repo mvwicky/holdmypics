@@ -11,6 +11,9 @@ jobs:
       POETRY_VIRTUALENVS_IN_PROJECT: "true"
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
     # container: python:3.10-slim
     # services:
     #   redis:

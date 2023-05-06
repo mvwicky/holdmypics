@@ -97,7 +97,7 @@ def draw_text(im: Image.Image, args: TextArgs) -> Image.Image:
     w, h = im.size
     d = ImageDraw.Draw(im)
     font, (tw, th) = get_font(d, (int(w * 0.9), h), args)
-    logger.info('Writing text "{0}" (size={1})', args.text, (tw, th))
+    logger.info("Writing text {0!r} (size={1})", args.text, (tw, th))
     tc = int((w - tw) / 2), int((h - th) / 2)
     anchor = "lt" if "\n" not in args.text else "la"
     d.text(tc, args.text, font=font, fill=args.color, align="center", anchor=anchor)

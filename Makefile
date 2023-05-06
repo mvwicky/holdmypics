@@ -25,8 +25,7 @@ RM_CMD:=$(or $(shell command -v trash),trash,rm -rf)
 
 SENTINEL_FILE=$(SENTINEL_DIR)/$(1).last-run
 
-ISORT_SENTINEL=$(call SENTINEL_FILE,isort)
-FLAKE8_SENTINEL=$(call SENTINEL_FILE,flake8)
+RUFF_SENTINEL=$(call SENTINEL_FILE,isort)
 ESLINT_SENTINEL=$(call SENTINEL_FILE,eslint)
 STYLELINT_SENTINEL=$(call SENTINEL_FILE,stylelint)
 PYRIGHT_SENTINEL=$(call SENTINEL_FILE,pyright)
@@ -49,12 +48,11 @@ COMPILE_OUT=$(CONFIG_DIR)/dev/Dockerfile $(CONFIG_DIR)/prod/Dockerfile
 
 ESLINT_DEPS=$(filter %.ts,$(LS_FILES)) $(filter %.js,$(LS_FILES)) $(filter .eslintrc.%,$(LS_FILES))
 STYLELINT_DEPS=$(filter %.css,$(LS_FILES)) $(filter .stylelintrc.%,$(LS_FILES))
-ISORT_DEPS=$(filter-out %/__version__.py,$(LS_PYTHON))
 
 WEBPACK_ARGS=--config webpack.config.ts --progress
 
 .PHONY: compile compose dbuilddev dbuildprod docker docker-build run stop version-tag \
-	lint isort flake8 eslint stylelint clean-lint clean-webpack clean-webpack-cache
+	lint ruff eslint stylelint clean-lint clean-webpack clean-webpack-cache
 
 compile: $(COMPILE_OUT)
 
@@ -110,22 +108,17 @@ else
 	@git tag $(VERSION_TAG) -m $(VERSION_TAG)
 endif
 
-lint: isort flake8 eslint stylelint pyright
+lint: ruff eslint stylelint pyright
 
-isort: $(SENTINEL_DIR) $(ISORT_SENTINEL)
-flake8: $(SENTINEL_DIR) $(FLAKE8_SENTINEL)
+ruff: $(SENTINEL_DIR) $(RUFF_SENTINEL)
 eslint: $(SENTINEL_DIR) $(ESLINT_SENTINEL)
 stylelint: $(SENTINEL_DIR) $(STYLELINT_SENTINEL)
 pyright: $(SENTINEL_DIR) $(PYRIGHT_SENTINEL)
 
-$(ISORT_SENTINEL): $(ISORT_DEPS) pyproject.toml
-	@echo "Running isort. $(words $?) outdated."
-	@isort --check-only $(filter %.py,$?)
-	@date > $@
 
-$(FLAKE8_SENTINEL): $(LS_PYTHON) .flake8
-	@echo "Running flake8. $(words $?) outdated."
-	@flake8 $(filter %.py,$?)
+$(RUFF_SENTINEL): $(LS_PYTHON) ruff.toml
+	@echo "Running ruff. $(words $?) outdated."
+	@time ruff check $(filter %.py,$?)
 	@date > $@
 
 $(ESLINT_SENTINEL): $(ESLINT_DEPS)
