@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import random
 from pathlib import Path
-from typing import Literal, Optional
+from typing import Literal
 from urllib.request import urlopen
 
 from attrs import define, field
@@ -25,9 +25,9 @@ def download_words(output_file: Path) -> None:
 
 
 @define()
-class Words(object):
-    _word_file: Optional[Path] = field(default=None, init=False)
-    _word_data: Optional[dict[WordType, list[str]]] = field(
+class Words:
+    _word_file: Path | None = field(default=None, init=False)
+    _word_data: dict[WordType, list[str]] | None = field(
         default=None, init=False, repr=False
     )
 

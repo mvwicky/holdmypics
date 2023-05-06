@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any, Union
+from typing import TYPE_CHECKING, Any
 
 from flask import Flask, url_for
 
@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from flask.testing import FlaskClient
 
 
-def make_route(app: Union[Flask, FlaskClient], endpoint: str, **kwargs: Any) -> str:
+def make_route(app: Flask | FlaskClient, endpoint: str, **kwargs: Any) -> str:
     if not isinstance(app, Flask):
         app = app.application
     with app.test_request_context():

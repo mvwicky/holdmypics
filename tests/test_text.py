@@ -5,7 +5,7 @@ import io
 import os
 import time
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING
 from urllib.parse import urlencode
 
 import pytest
@@ -33,7 +33,7 @@ opt_text_strategt = st.one_of(st.none(), text_strategy)
 args_strategy = st.fixed_dictionaries({"text": opt_text_strategt, "dpi": dpi_strategy})
 
 
-def make_args(**kwargs: Union[str, int, None]):
+def make_args(**kwargs: str | int | None):
     from holdmypics.api.args import TextImageArgs
 
     return TextImageArgs(**compact_dict(kwargs))
@@ -59,7 +59,7 @@ def test_create_images_using_function(
     img_fmt: str,
     fg: str,
     bg: str,
-    args: dict[str, Union[str, int, None]],
+    args: dict[str, str | int | None],
 ):
     from holdmypics.api.text import GeneratedTextImage
 
@@ -87,9 +87,9 @@ def test_create_images_using_client(
     app_factory: Callable[[], Holdmypics],
     size: tuple[int, int],
     img_fmt: str,
-    fg: Optional[str],
-    bg: Optional[str],
-    args: dict[str, Union[str, int, None]],
+    fg: str | None,
+    bg: str | None,
+    args: dict[str, str | int | None],
 ):
     if bg is None and fg:
         bg, fg = fg, None

@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from collections.abc import Iterable, Mapping, Sequence
-from typing import Any, Union
+from typing import Any
 
-_AttVal = Union[str, bool, int, None]
-_Attrs = Union[Mapping[str, _AttVal], Sequence[tuple[str, _AttVal]]]
+_AttVal = str | bool | int | None
+_Attrs = Mapping[str, _AttVal] | Sequence[tuple[str, _AttVal]]
 
 # def to_html_attrib()
 #

@@ -6,7 +6,7 @@ import time
 from collections.abc import Sequence
 from pathlib import Path
 from subprocess import Popen, TimeoutExpired
-from typing import Any, Optional
+from typing import Any
 
 from attrs import define, field
 from flask import Flask
@@ -19,7 +19,7 @@ WEB_PROC_RE = re.compile(r"^web: (?P<cmd>.+)$")
 
 
 @define()
-class Server(object):
+class Server:
     app: Flask
     wait: float
     start_server: bool = True
@@ -44,7 +44,7 @@ class Server(object):
         if not procfile.is_file():
             raise RuntimeError("Unable to find Procfile")
         lines = procfile.read_text().splitlines()
-        cmd: Optional[list[str]] = None
+        cmd: list[str] | None = None
         for line in lines:
             match = WEB_PROC_RE.match(line.strip())
             if match:

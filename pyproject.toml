@@ -21,9 +21,14 @@ whitenoise = { version = "^6.0.0", extras = ["brotli"] }
 pytesseract = { version = "^0.3.4", optional = true }
 
 [tool.poetry.group.dev.dependencies]
-isort = "^5.0"
 pre-commit = { version = "^3.0.0" }
 memory_profiler = { version = "^0.61.0" }
+
+[tool.poetry.group.lint]
+optional = true
+
+[tool.poetry.group.lint.dependencies]
+ruff = "^0.0.265"
 
 [tool.poetry.group.test]
 optional = true
@@ -40,14 +45,6 @@ ocr = ["pytesseract"]
 [tool.poetry.plugins."pytest11"]
 holdmyplugin = "tests.holdmyplugin"
 
-[tool.isort]
-profile = "black"
-known_first_party = ["config", "holdmypics"]
-no_lines_before = "LOCALFOLDER"
-combine_as_imports = true
-add_imports = ["from __future__ import annotations"]
-extend_skip_glob = ["**/__version__.py"]
-
 [tool.black]
 line-length = 88
 skip-numeric-underscore-normalization = true
@@ -61,11 +58,11 @@ data_file = ".cache/.cov/.coverage"
 precision = 2
 skip_empty = true
 exclude_lines = [
-    "pragma: no cover",
-    "def __repr__",
-    "if TYPE_CHECKING",
-    "raise NotImplementedError",
-    "if __name__ == .__main__.:",
+  "pragma: no cover",
+  "def __repr__",
+  "if TYPE_CHECKING",
+  "raise NotImplementedError",
+  "if __name__ == .__main__.:",
 ]
 
 [tool.coverage.html]

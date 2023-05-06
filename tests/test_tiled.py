@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 import time
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 from urllib.parse import urlencode
 
 import pytest
@@ -22,7 +22,7 @@ colors_strategy = st.lists(color_strategy, min_size=1, max_size=15)
 args_strategy = st.fixed_dictionaries({"colors": colors_strategy, "dpi": dpi_strategy})
 
 
-def make_args(**kwargs: Union[str, int, list[str], None]):
+def make_args(**kwargs: str | int | list[str] | None):
     from holdmypics.api.args import TiledImageArgs
 
     return TiledImageArgs(**compact_dict(kwargs))
@@ -55,7 +55,7 @@ def test_create_images_using_function(
     img_fmt: str,
     cols: int,
     rows: int,
-    args: dict[str, Union[int, list[str]]],
+    args: dict[str, int | list[str]],
 ):
     from holdmypics.api.tiled import GeneratedTiledImage
 
@@ -90,9 +90,8 @@ def test_create_images_using_client(
     img_fmt: str,
     cols: int,
     rows: int,
-    args: dict[str, Union[int, list[str]]],
+    args: dict[str, int | list[str]],
 ):
-
     start = time.perf_counter()
     app = app_factory()
     with app.test_client() as client:

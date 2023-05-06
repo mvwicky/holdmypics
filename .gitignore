@@ -1,3 +1,4 @@
+pyrightconfig.json
 out/
 cypress.env.json
 pytest-report/

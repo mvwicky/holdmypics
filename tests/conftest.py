@@ -28,7 +28,7 @@ PROFILES = {
 
 
 @define(frozen=True)
-class AppFactory(object):
+class AppFactory:
     factory: Callable[[ModuleType], Holdmypics] = field(repr=False)
     config: ModuleType = field(repr=False)
 

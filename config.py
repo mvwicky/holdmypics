@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import Optional
 
 from environs import Env
 from marshmallow.validate import OneOf, Range, Regexp
@@ -18,9 +17,9 @@ _img_cache = str(HERE / ".cache" / "images")
 
 BASE_PATH = HERE
 DEBUG: bool = env.bool("DEBUG", default=False)
-REDIS_URL: Optional[str] = env("REDIS_URL", default=None)
-LOG_DIR: Optional[str] = env("LOG_DIR", default=None)
-LOG_FILE_NAME: Optional[str] = env("LOG_FILE_NAME", default=None)
+REDIS_URL: str | None = env("REDIS_URL", default=None)
+LOG_DIR: str | None = env("LOG_DIR", default=None)
+LOG_FILE_NAME: str | None = env("LOG_FILE_NAME", default=None)
 LOG_LEVEL: int = env.log_level("LOG_LEVEL", default="INFO")
 MAX_LOG_SIZE: int = env.int("MAX_LOG_SIZE", default=524288)
 MAX_AGE: int = env.int("MAX_AGE", default=86400)
@@ -39,9 +38,7 @@ SAVED_IMAGES_MAX_SIZE: int = env.int(
 SAVED_IMAGES_CACHE_DIR: Path = env.path("SAVED_IMAGES_CACHE_DIR", default=_img_cache)
 
 SESSION_COOKIE_SECURE: bool = env.bool("SESSION_COOKIE_SECURE", default=False)
-SESSION_COOKIE_SAMESITE: Optional[bool] = env.bool(
-    "SESSION_COOKIE_SAMESITE", default=None
-)
+SESSION_COOKIE_SAMESITE: bool | None = env.bool("SESSION_COOKIE_SAMESITE", default=None)
 
 INDEX_DEFAULT_WIDTH: int = env.int(
     "INDEX_DEFAULT_WIDTH", default=638, validate=[Range(1)]

@@ -1,0 +1,47 @@
+extend-select = [
+  "B",
+  "C4",
+  "C9",
+  "D",
+  "DJ003",
+  "DJ006",
+  "DJ007",
+  # "DJ012",
+  "DJ013",
+  "I",
+  "PGH002",
+  "PGH004",
+  "PLE",
+  "PT",
+  "RUF100",
+  "SIM1",
+  # "TID252",
+  "UP00",
+  "UP01",
+  "UP02",
+  "UP037",
+  "W",
+  "YTT"
+]
+ignore = [
+  "D1",
+  "D401",
+  "D405",
+  "D416",
+  "E501",
+  "B904",
+  "SIM105",
+  "UP030",
+  "B018"
+]
+
+[isort]
+combine-as-imports = true
+no-lines-before = ["local-folder"]
+
+[mccabe]
+max-complexity = 11
+
+[pydocstyle]
+convention = "google"
+

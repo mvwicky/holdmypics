@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, Generic, NamedTuple, Optional, TypeVar, Union
+from typing import Any, Generic, NamedTuple, TypeVar
 
 from attrs import Factory, define, evolve, field
 
@@ -20,37 +20,37 @@ _id_factory = Factory(_default_id, True)
 class BaseInput(Generic[_T]):
     name: str
     label: str
-    value: Optional[_T] = None
+    value: _T | None = None
     id: str = _id_factory
-    help_text: Optional[str] = None
+    help_text: str | None = None
     required: bool = False
     extra: Mapping[str, Any] = field(factory=dict)
 
-    def add_cy(self: _Inp, value: Optional[str] = None) -> _Inp:
+    def add_cy(self: _Inp, value: str | None = None) -> _Inp:
         extra = {**self.extra, "data-cy": value or self.name}
         return evolve(self, extra=extra)
 
 
 @define()
 class TextInput(BaseInput[str]):
-    pattern: Optional[str] = None
+    pattern: str | None = None
 
 
 @define()
-class NumberInput(BaseInput[Union[int, float]]):
-    min: Optional[Union[int, float]] = None
-    max: Optional[Union[int, float]] = None
-    step: Optional[Union[int, float]] = None
+class NumberInput(BaseInput[int | float]):
+    min: int | float | None = None
+    max: int | float | None = None
+    step: int | float | None = None
 
 
 class SelectOption(NamedTuple):
     value: str
     name: str
-    selected: Optional[bool] = None
+    selected: bool | None = None
     disabled: bool = False
 
 
 @define()
 class SelectInput(BaseInput[str]):
     options: list[SelectOption] = field(factory=list)
-    help_text: Optional[str] = None
+    help_text: str | None = None

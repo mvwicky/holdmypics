@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Optional, Union
+from typing import Any
 
 from attrs import define, field
 from flask import Flask
@@ -10,10 +10,10 @@ from .constants import COUNT_KEY, SIZE_KEY
 
 
 @define()
-class FakeRedis(object):
+class FakeRedis:
     _store: dict[str, Any] = field(factory=dict, init=False)
 
-    def get(self, name: str) -> Optional[bytes]:
+    def get(self, name: str) -> bytes | None:
         value = self._store.get(name)
         if value is not None:
             return str(value).encode("utf-8")
@@ -29,9 +29,9 @@ class FakeRedis(object):
 
 
 @define()
-class WrappedRedis(object):
+class WrappedRedis:
     has_redis: bool = False
-    client: Union[FlaskRedis, FakeRedis] = field(factory=FakeRedis, repr=False)
+    client: FlaskRedis | FakeRedis = field(factory=FakeRedis, repr=False)
 
     def init_app(self, app: Flask) -> None:
         self.has_redis = bool(app.config.get("REDIS_URL"))

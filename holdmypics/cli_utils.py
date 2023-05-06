@@ -3,7 +3,7 @@ from __future__ import annotations
 import shlex
 import shutil
 from subprocess import CompletedProcess, run as _run
-from typing import Any, Literal, Union, overload
+from typing import Any, Literal, overload
 
 from loguru import logger
 
@@ -23,9 +23,7 @@ def run(
 
 
 @overload
-def run(
-    *args: str, text: Union[bool, None] = ..., **kwargs: Any
-) -> CompletedProcess[Any]:
+def run(*args: str, text: bool | None = ..., **kwargs: Any) -> CompletedProcess[Any]:
     ...
 
 

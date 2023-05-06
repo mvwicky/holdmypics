@@ -20,7 +20,7 @@ _extensions: tuple[str, ...] = ("png", "webp", "jpg", "jpeg", "gif")
 
 
 @attrs.define(repr=False)
-class GeneratedFiles(object):
+class GeneratedFiles:
     hash_function: ClassVar[Callable[..., hashlib._Hash]] = hashlib.md5
     fmt_re: ClassVar[re.Pattern[str]] = re.compile(f"\\.({'|'.join(_extensions)})$")
 

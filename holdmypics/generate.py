@@ -6,7 +6,7 @@ from collections.abc import Mapping
 from difflib import SequenceMatcher
 from functools import partial
 from pathlib import Path
-from typing import Any, ClassVar, Optional, Union
+from typing import Any, ClassVar
 
 import click
 from attrs import define, field
@@ -24,25 +24,23 @@ def diff_contents(a: str, b: str) -> SequenceMatcher:
 
 
 @define()
-class Generator(object):
+class Generator:
     common_context: ClassVar[dict[str, Any]] = {"python_version": sys.version_info[:3]}
 
     template_file: Path = field(converter=Path)
     dev_dir: Path = field(converter=Path)
     prod_dir: Path = field(converter=Path)
 
-    _env: Optional[Environment] = field(default=None, init=False, repr=False)
-    _template: Optional[Template] = field(default=None, init=False, repr=False)
-    _node_version: Optional[str] = field(default=None, init=False, repr=False)
+    _env: Environment | None = field(default=None, init=False, repr=False)
+    _template: Template | None = field(default=None, init=False, repr=False)
+    _node_version: str | None = field(default=None, init=False, repr=False)
 
     def confirm(self, file: Path, yes: bool) -> bool:
         if yes or not file.is_file():
             return True
         return click.confirm(f"Overwrite {config.rel_to_root(file)}?", default=True)
 
-    def get_context(
-        self, dev: bool, port: Optional[int]
-    ) -> dict[str, Union[str, bool, int]]:
+    def get_context(self, dev: bool, port: int | None) -> dict[str, str | bool | int]:
         extra = {
             "yarn_build": f"build{':dev' if dev else ''}",
             "requirements": f"requirements{'-dev' if dev else ''}.txt",
@@ -55,7 +53,7 @@ class Generator(object):
         ctx.update(extra)
         return ctx
 
-    def generate(self, dry_run: bool, verbosity: int, yes: bool, port: Optional[int]):
+    def generate(self, dry_run: bool, verbosity: int, yes: bool, port: int | None):
         for dev in (True, False):
             mode = "dev" if dev else "prod"
             click.secho(f"Rendering {mode} template.", fg="green", bold=True)

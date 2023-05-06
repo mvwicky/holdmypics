@@ -4,7 +4,7 @@ import logging
 import logging.config
 import sys
 from pathlib import Path
-from typing import Optional, Union, cast
+from typing import cast
 
 import loguru
 from flask import Flask, Response, request
@@ -42,7 +42,7 @@ def file_filter(record: loguru.Record) -> bool:
 
 
 def make_file_handler(
-    log_dir: Path, file_name: str, fmt: str, max_size: int, level: Union[str, int]
+    log_dir: Path, file_name: str, fmt: str, max_size: int, level: str | int
 ) -> dict:
     log_file = log_dir.joinpath(file_name).with_suffix(".log")
     return {
@@ -58,7 +58,7 @@ def make_file_handler(
 
 def config_logging(app: Flask) -> None:
     file_name: str = app.config.get("LOG_FILE_NAME") or app.name
-    log_dir: Optional[Path] = app.config.get("LOG_DIR")
+    log_dir: Path | None = app.config.get("LOG_DIR")
     log_level = cast(str, app.config.get("LOG_LEVEL"))
     max_log_size = cast(int, app.config.get("MAX_LOG_SIZE"))
     logging.config.dictConfig(

@@ -5,7 +5,7 @@ import os
 from collections.abc import Callable
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Optional, TypeVar, Union, cast
+from typing import Any, TypeVar, cast
 
 from flask import Flask, current_app
 from loguru import logger
@@ -25,10 +25,10 @@ _T = TypeVar("_T")
 
 def config_value(
     name: str,
-    default: Union[_T, Unset] = UNSET,
-    app: Optional[Flask] = None,
-    cast_as: Optional[Callable[[Any], _T]] = None,
-    assert_is: Optional[type[_T]] = None,
+    default: _T | Unset = UNSET,
+    app: Flask | None = None,
+    cast_as: Callable[[Any], _T] | None = None,
+    assert_is: type[_T] | None = None,
 ) -> _T:
     app = app if app is not None else current_app
     value = app.config.get(name, default)
@@ -36,11 +36,10 @@ def config_value(
         raise ImproperlyConfigured(f"Unknown setting {name}")
     if cast_as is not None:
         value = cast_as(value)
-    if assert_is:
-        if not isinstance(value, assert_is):
-            raise ImproperlyConfigured(
-                f"Expected {name} to be {assert_is} got {type(value)}"
-            )
+    if assert_is and not isinstance(value, assert_is):
+        raise ImproperlyConfigured(
+            f"Expected {name} to be {assert_is} got {type(value)}"
+        )
     logger.trace("Got config value. [key={0} value={1}]", name, value)
     return cast(Any, value)
 
@@ -66,7 +65,7 @@ def make_rules() -> list[tuple[str, dict[str, str]]]:
 UNITS = ("B", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
 
 
-def natsize(num: Union[float, int], fmt: str = "{0:.2f}") -> str:
+def natsize(num: float | int, fmt: str = "{0:.2f}") -> str:
     num = num * (-1 if num < 0 else 1)
     if num < 1:
         return f"{fmt.format(num)} {UNITS[0]}"
@@ -76,9 +75,9 @@ def natsize(num: Union[float, int], fmt: str = "{0:.2f}") -> str:
 
 
 @lru_cache(maxsize=128)
-def get_size(path: Union[Path, str, bytes]) -> int:
+def get_size(path: Path | str | bytes) -> int:
     return os.path.getsize(path)
 
 
-def nat_file_size(path: Union[Path, str, bytes], fmt: str = "{0:.2f}") -> str:
+def nat_file_size(path: Path | str | bytes, fmt: str = "{0:.2f}") -> str:
     return natsize(get_size(path), fmt)

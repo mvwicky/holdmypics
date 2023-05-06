@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Union
-
 from attrs import define
 from loguru import logger
 from PIL import Image, ImageDraw
@@ -33,12 +31,12 @@ def _log_font(font_name: str, pt: int, idx: int):
 
 def guess_font_size(
     size: tuple[int, int], font_name: str
-) -> tuple[Union[ImageFont, FreeTypeFont], int]:
+) -> tuple[ImageFont | FreeTypeFont, int]:
     """Try and figure out the correct font size for a given height and font.
 
     Args:
-        ``size``: The dimensions of the image in pixels.
-        ``font_name``: The name of the font we're using.
+        size: The dimensions of the image in pixels.
+        font_name: The name of the font we're using.
 
     Returns:
         A size and an index.

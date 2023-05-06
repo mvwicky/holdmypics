@@ -16,16 +16,15 @@ CWD = Path.cwd()
 
 def find_path_named(name: str, start: Path = CWD, file_only: bool = False) -> Path:
     p = start / name
-    if p.exists():
-        if not file_only or p.is_file():
-            return p
+    if p.exists() and (not file_only or p.is_file()):
+        return p
     if p.parent == p:
         raise RuntimeError(f"Traversed to root, unable to find {name}")
     return find_path_named(name, p.parent, file_only=file_only)
 
 
 @define(repr=False)
-class Package(object):
+class Package:
     root_dir: Path = field(default=CWD, converter=Path)
 
     @classmethod

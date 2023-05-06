@@ -4,7 +4,7 @@ import functools
 import random
 from numbers import Real
 from string import hexdigits
-from typing import Final, NamedTuple, Union
+from typing import Final, NamedTuple
 
 from PIL.ImageFont import FreeTypeFont, ImageFont
 
@@ -12,7 +12,7 @@ from ..exceptions import InvalidColor
 
 
 class FontParams(NamedTuple):
-    font: Union[ImageFont, FreeTypeFont]
+    font: ImageFont | FreeTypeFont
     size: tuple[int, int]
 
 
@@ -66,9 +66,7 @@ def get_color(color: str) -> str:
 
 
 def convert_color(
-    color: Union[
-        float, tuple[float, float, float, float], tuple[float, float, float], str
-    ]
+    color: float | tuple[float, float, float, float] | tuple[float, float, float] | str
 ) -> tuple[float, float, float, float]:
     if isinstance(color, str):
         get_color(color)[1:]

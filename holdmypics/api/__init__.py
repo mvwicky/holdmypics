@@ -15,4 +15,4 @@ CORS(
 )
 
 
-from . import routes  # noqa: F401,E402,I202
+from . import routes  # noqa: F401, E402

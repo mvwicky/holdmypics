@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Callable
 from functools import partial
 from types import MappingProxyType
-from typing import Any, ClassVar, Generic, Literal, Optional, TypeVar, Union
+from typing import Any, ClassVar, Generic, Literal, TypeVar
 
 from attrs import define, field
 from loguru import logger
@@ -77,8 +77,8 @@ class BaseGeneratedImage(Generic[_Args], ABC):
 
     def new_image(
         self,
-        size: Optional[tuple[int, int]] = None,
-        color: Union[float, tuple[int, int, int, int], str, None] = None,
+        size: tuple[int, int] | None = None,
+        color: float | tuple[int, int, int, int] | str | None = None,
     ) -> Image.Image:
         return Image.new(self.mode, size or self.size, color or self.bg_color)
 

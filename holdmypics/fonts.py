@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from pathlib import Path
-from typing import Optional, Union
 
 from attrs import define, field
 from flask import current_app
@@ -15,17 +14,17 @@ class UnknownFont(KeyError):
 
 
 @define()
-class Font(object):
+class Font:
     file: Path = field(converter=Path)
     font_sizes: set[int] = field(converter=set)
 
-    _sizes: dict[int, Union[ImageFont, FreeTypeFont]] = field(factory=dict, init=False)
+    _sizes: dict[int, ImageFont | FreeTypeFont] = field(factory=dict, init=False)
 
     def load(self, sizes: Sequence[int]):
         for size in sizes:
             self[size]
 
-    def __getitem__(self, size: int) -> Union[ImageFont, FreeTypeFont]:
+    def __getitem__(self, size: int) -> ImageFont | FreeTypeFont:
         if size not in self._sizes:
             self._sizes[size] = truetype(str(self.file), size=size)
         return self._sizes[size]
@@ -35,18 +34,18 @@ class Font(object):
 
 
 @define()
-class Fonts(object):
+class Fonts:
     font_sizes: list[int] = field(
         default=range(4, 289, 4), converter=list, init=False, repr=False
     )
 
-    _font_dir: Optional[Path] = field(default=None, init=False, repr=False)
-    _font_files: Optional[dict[str, Path]] = field(default=None, init=False, repr=False)
+    _font_dir: Path | None = field(default=None, init=False, repr=False)
+    _font_files: dict[str, Path] | None = field(default=None, init=False, repr=False)
     _fonts: dict[str, Font] = field(factory=dict, init=False, repr=False)
-    _num_sizes: Optional[int] = field(default=None, init=False, repr=False)
-    _font_names: Optional[set[str]] = field(default=None, init=False, repr=False)
-    _max_size: Optional[int] = field(default=None, init=False, repr=False)
-    _min_size: Optional[int] = field(default=None, init=False, repr=False)
+    _num_sizes: int | None = field(default=None, init=False, repr=False)
+    _font_names: set[str] | None = field(default=None, init=False, repr=False)
+    _max_size: int | None = field(default=None, init=False, repr=False)
+    _min_size: int | None = field(default=None, init=False, repr=False)
 
     @property
     def num_sizes(self) -> int:

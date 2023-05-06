@@ -6,7 +6,7 @@ import time
 from functools import lru_cache, partial
 from importlib.metadata import version
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional, Union, cast
+from typing import TYPE_CHECKING, cast
 
 from flask import Flask, Response, g, request, send_from_directory
 from loguru import logger
@@ -65,7 +65,7 @@ def immutable_file_test(debug: bool, path: str, url: str) -> bool:
     return is_immutable
 
 
-def configure_hsts(app: Flask) -> Optional[str]:
+def configure_hsts(app: Flask) -> str | None:
     hsts_seconds = app.config.get("HSTS_SECONDS", 0)
     hsts_preload = app.config.get("HSTS_PRELOAD", False)
     include_sub = app.config.get("HSTS_INCLUDE_SUBDOMAINS", False)
@@ -85,7 +85,7 @@ def before_request_callback():
 
 
 def after_request_callback(
-    hsts_header: Optional[str], version: str, res: Response
+    hsts_header: str | None, version: str, res: Response
 ) -> Response:
     log_request(res)
     endpoint = request.endpoint
@@ -116,7 +116,7 @@ class Holdmypics(Flask):
     pass
 
 
-def create_app(cfg: Union[str, ModuleType] = "config") -> Holdmypics:
+def create_app(cfg: str | ModuleType = "config") -> Holdmypics:
     app = Holdmypics(__name__)
     app.config.from_object(cfg)
     config_logging(app)

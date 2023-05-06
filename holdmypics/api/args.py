@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from typing import Any, Optional, cast
+from typing import Any, cast
 
 import marshmallow as ma
 from attrs import astuple, define, evolve, field
@@ -55,9 +55,9 @@ tiled_schema = TiledImageArgsSchema()
 
 
 @define(frozen=True)
-class BaseImageArgs(object):
+class BaseImageArgs:
     dpi: int = DEFAULT_DPI
-    seed: Optional[str] = None
+    seed: str | None = None
     debug: bool = False
 
     def to_seq(self) -> tuple[Any, ...]:
@@ -66,7 +66,7 @@ class BaseImageArgs(object):
 
 @define(frozen=True)
 class TextImageArgs(BaseImageArgs):
-    text: Optional[str] = None
+    text: str | None = None
     font_name: str = DEFAULT_FONT
     alpha: float = field(default=1.0, converter=clamp_alpha)
     random_text: bool = False
@@ -106,7 +106,7 @@ class TiledImageArgs(BaseImageArgs):
 
 
 @define(frozen=True)
-class AnimArgs(object):
+class AnimArgs:
     frames: int = 10
 
     @classmethod

@@ -3,14 +3,13 @@ from __future__ import annotations
 import hashlib
 import os
 from pathlib import Path
-from typing import Optional
 
 from .utils import get_debug
 
 HERE = Path(__file__).parent.parent
 
 
-class HashedFile(object):
+class HashedFile:
     __slots__ = (
         "strip_newlines",
         "_orig_file",
@@ -25,7 +24,7 @@ class HashedFile(object):
         self._orig_file: Path = self.static_dir / file_name
         self.strip_newlines: bool = strip_newlines
         self._last_mtime: float = 0
-        self._output_file: Optional[Path] = None
+        self._output_file: Path | None = None
         self._out_dir: Path = self._orig_file.parent / "dist"
         self._out_dir.mkdir(exist_ok=True)
 
