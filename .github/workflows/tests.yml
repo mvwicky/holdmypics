@@ -38,7 +38,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v3
         with:
-          node-version: "19"
+          node-version: "20"
       - name: Install python dependencies
         run: poetry install --no-interaction --with test --without dev
       - name: Install node dependencies

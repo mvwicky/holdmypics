@@ -2,6 +2,10 @@
 
 ## Backend
 
+- [ ] Generate icons for apps, i.e., with rounded edges
+  - Look up guidelines for iOS and android
+- [ ] Allow positioning of text, maybe just in the vertical axis
+  - or maybe specific justifications or named positions (top-left, bottom-right, etc.)
 - [ ] Nothing saves as `RGBA`
 - [ ] Better path parameter validation
   - e.g., right now, we'd accept a size of `0x0` (which we shouldn't)
