@@ -66,7 +66,7 @@ def get_color(color: str) -> str:
 
 
 def convert_color(
-    color: float | tuple[float, float, float, float] | tuple[float, float, float] | str
+    color: float | tuple[float, float, float, float] | tuple[float, float, float] | str,
 ) -> tuple[float, float, float, float]:
     if isinstance(color, str):
         get_color(color)[1:]

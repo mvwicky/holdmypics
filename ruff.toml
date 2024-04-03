@@ -1,3 +1,4 @@
+[lint]
 extend-select = [
   "B",
   "C4",
@@ -9,7 +10,7 @@ extend-select = [
   # "DJ012",
   "DJ013",
   "I",
-  "PGH002",
+  "G010",
   "PGH004",
   "PLE",
   "PT",
@@ -34,14 +35,13 @@ ignore = [
   "UP030",
   "B018"
 ]
-
-[isort]
+[lint.isort]
 combine-as-imports = true
 no-lines-before = ["local-folder"]
 
-[mccabe]
+[lint.mccabe]
 max-complexity = 11
 
-[pydocstyle]
+[lint.pydocstyle]
 convention = "google"
 

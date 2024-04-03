@@ -12,7 +12,6 @@ if TYPE_CHECKING:
 
 
 def format_attrs_ctx() -> dict[str, Any]:
-
     return {"format_attrs": format_attrs, "format_attrs_kw": format_attrs_kw}
 
 

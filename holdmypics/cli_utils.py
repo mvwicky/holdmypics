@@ -11,20 +11,19 @@ CTX_SETTINGS = {"max_content_width": min(shutil.get_terminal_size().columns, 130
 
 
 @overload
-def run(*args: str, text: Literal[True], **kwargs: Any) -> CompletedProcess[str]:
-    ...
+def run(*args: str, text: Literal[True], **kwargs: Any) -> CompletedProcess[str]: ...
 
 
 @overload
 def run(
     *args: str, text: Literal[None, False], **kwargs: Any
-) -> CompletedProcess[bytes]:
-    ...
+) -> CompletedProcess[bytes]: ...
 
 
 @overload
-def run(*args: str, text: bool | None = ..., **kwargs: Any) -> CompletedProcess[Any]:
-    ...
+def run(
+    *args: str, text: bool | None = ..., **kwargs: Any
+) -> CompletedProcess[Any]: ...
 
 
 def run(*args: str, no_log: bool = False, **kwargs: Any) -> CompletedProcess[Any]:

@@ -86,8 +86,7 @@ class BaseGeneratedImage(Generic[_Args], ABC):
         return SAVE_KW.get(self.fmt, _default_kw)(self.args)
 
     @abstractmethod
-    def make(self) -> Image.Image:
-        ...
+    def make(self) -> Image.Image: ...
 
     def get_file_name_extra(self) -> tuple[Any, ...]:
         return ()

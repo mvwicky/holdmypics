@@ -62,7 +62,7 @@ def font_redirect(font_name: str) -> ResponseType:
     if font_name.lower() in fonts.font_names:
         parts = urlsplit(request.url)
         query = {**parse_qs(parts.query), "font": [font_name.lower()]}
-        query_list = [(k, v) for k, v in query.items()]
+        query_list = list(query.items())
         url = urlunsplit(parts._replace(query=urlencode(query_list, doseq=True)))
         return redirect(url)
     else:
